@@ -1,0 +1,18 @@
+Copyright (c) 2026 Ledger & Co. All rights reserved.
+
+This repository contains the source code, design, and original written
+content for the Ledger & Co. website. Unless you specify otherwise, this
+is proprietary content, not open-source software — it is shared here for
+your own development and deployment purposes only.
+
+Third-party trademarks, logos, and brand names referenced in this project
+(including but not limited to Fidelity, Charles Schwab, E*TRADE, and any
+financial institutions or platforms mentioned in guide content) are the
+property of their respective owners and are referenced solely for
+identification purposes, as disclosed in index.html and terms-of-sale.html.
+
+If you intend to open-source any part of this codebase (e.g. the front-end
+demo, decoupled from your specific business copy/branding), replace this
+file with an appropriate open-source license (MIT, Apache 2.0, etc.) and
+confirm that no proprietary copy, pricing, or trademark references remain
+in the portions you release.

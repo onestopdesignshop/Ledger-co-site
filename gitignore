@@ -1,0 +1,21 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# Environment / secrets — never commit real keys
+.env
+.env.local
+.env.*.local
+
+# Node (in case you later add a build step, e.g. for bundling)
+node_modules/
+npm-debug.log*
+
+# Supabase local dev (if you use the CLI later)
+supabase/.branches
+supabase/.temp
