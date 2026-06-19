@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terms of Sale — Ledger & Co.</title>
+<meta name="description" content="Terms of Sale for Ledger & Co. membership plans, billing, and refunds.">
+<link rel="canonical" href="https://onestopdesignshop.github.io/Ledger-co-site/terms-of-sale.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -12,8 +14,8 @@
   --parchment:#E8E3D5; --slate:#7C8AA8; --rule:rgba(201,162,39,0.22); --rule-bright:rgba(201,162,39,0.5);
 }
 *{box-sizing:border-box;}
-body{background:var(--bg); color:var(--parchment); font-family:'Inter',sans-serif; line-height:1.7; margin:0;}
-.wrap{max-width:760px; margin:0 auto; padding:80px 28px 120px;}
+body{background:var(--bg); color:var(--parchment); font-family:'Inter',sans-serif; line-height:1.7; margin:0; overflow-x:hidden;}
+.wrap{max-width:760px; margin:0 auto; padding:80px 28px 0;}
 h1{font-family:'Fraunces',serif; font-weight:600; font-size:36px; margin-bottom:8px;}
 .updated{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--slate); margin-bottom:48px;}
 h2{font-family:'Fraunces',serif; font-weight:600; font-size:21px; margin-top:48px; margin-bottom:16px; border-top:1px solid var(--rule); padding-top:32px;}
@@ -31,7 +33,38 @@ li{margin-bottom:8px;}
 .pricing-table th{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em; color:var(--gold); text-transform:uppercase;}
 .pricing-table td{font-family:'JetBrains Mono',monospace; color:var(--parchment);}
 a{color:var(--gold); text-decoration:none;}
+a:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
 .back{display:inline-block; margin-bottom:32px; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--slate);}
+img{max-width:100%; height:auto;}
+@media (max-width:600px){
+  .wrap{padding:48px 20px 0;}
+  h1{font-size:28px;}
+  .pricing-table{font-size:12px;}
+  .pricing-table th, .pricing-table td{padding:8px 8px;}
+}
+
+/* ============ FOOTER (matches index.html) ============ */
+footer{border-top:1px solid var(--rule); padding:64px 0 40px; margin-top:80px;}
+.footer-wrap{max-width:760px; margin:0 auto; padding:0 28px;}
+.disclosure-full{
+  padding:20px; border:1px solid var(--rule);
+  font-size:11.5px; color:#4D5876; line-height:1.7;
+}
+.footer-bottom{
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:16px;
+  margin-top:24px; padding-top:24px; border-top:1px solid var(--rule);
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:#4D5876;
+}
+.footer-links{
+  display:flex; gap:24px; flex-wrap:wrap; margin-bottom:24px;
+  font-family:'JetBrains Mono',monospace; font-size:12.5px;
+}
+.footer-links a{color:var(--slate);}
+.footer-links a:hover{color:var(--gold-bright);}
+@media (max-width:600px){
+  .footer-bottom{flex-direction:column; align-items:flex-start;}
+}
 </style>
 </head>
 <body>
@@ -102,7 +135,7 @@ a{color:var(--gold); text-decoration:none;}
   <p>Monthly, Quarterly, and Annual Plans may be cancelled at any time through your account dashboard or the Lemon Squeezy customer portal. Cancellation stops future billing; you retain access through the end of your current paid period. There are no cancellation fees.</p>
 
   <h2>7. Refund Policy</h2>
-  <p>We offer a full, no-questions-asked refund if requested within <strong>7 days</strong> of your first charge on any Plan — Monthly, Quarterly, Annual, or Lifetime. To request one, email <a href="mailto:dee8shops@gmail.com">dee8shops@gmail.com</a> with your purchase email; refunds are typically processed within 5 business days back to your original payment method via Lemon Squeezy.</p>
+  <p>We offer a full, no-questions-asked refund if requested within <strong>7 days</strong> of your first charge on any Plan — Monthly, Quarterly, Annual, or Lifetime. To request one, email <a href="mailto:support@ledgerco.com">support@ledgerco.com</a> with your purchase email; refunds are typically processed within 5 business days back to your original payment method via Lemon Squeezy.</p>
   <p>This 7-day guarantee applies once per person per Plan. It does not apply to renewal charges on Monthly, Quarterly, or Annual Plans after the first billing cycle — for those, simply cancel before the next renewal date to avoid being charged again; no refund is issued for time already used in a billing period you choose to cancel mid-cycle. <strong>This policy must be mirrored exactly in your Lemon Squeezy refund/dunning settings before launch.</strong></p>
 
   <h2>8. No Investment Advice; Risk Acknowledgment</h2>
@@ -137,8 +170,26 @@ a{color:var(--gold); text-decoration:none;}
   <p>We may update these Terms from time to time. Material changes affecting existing subscribers will be communicated by email or in-product notice at least 14 days before taking effect.</p>
 
   <h2>11. Contact</h2>
-  <p>Questions about these Terms or a specific order can be sent to <a href="mailto:dee8shops@gmail.com">dee8shops@gmail.com</a>.</p>
-
+  <p>Questions about these Terms or a specific order can be sent to <a href="mailto:support@ledgerco.com">support@ledgerco.com</a>.</p>
 </div>
+
+<footer>
+  <div class="footer-wrap">
+    <div class="footer-links">
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="terms-of-sale.html">Terms of Sale</a>
+    </div>
+    <div class="disclosure-full">
+      Ledger & Co. provides educational content only and does not provide financial, investment, legal, or tax advice. All investments involve risk, including possible loss of principal. Past performance does not guarantee future results.
+    </div>
+    <div class="footer-bottom">
+      <span>Copyright © 2026 Ledger & Co. All rights reserved.</span>
+      <span>Educational Content Only — Not Financial Advice</span>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>

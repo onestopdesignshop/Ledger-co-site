@@ -3,8 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ledger & Co. — Finally, Money Advice Worth Paying For</title>
-<meta name="description" content="Finally, money advice worth paying for. Plain, accurate financial education: where the real yield is, how to evaluate web3 opportunities, and what the risks actually are.">
+
+<title>Ledger & Co. | Investment Research & Financial Education</title>
+<meta name="description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+<link rel="canonical" href="https://onestopdesignshop.github.io/Ledger-co-site/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ledger & Co.">
+<meta property="og:title" content="Ledger & Co. | Investment Research & Financial Education">
+<meta property="og:description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+<meta property="og:url" content="https://onestopdesignshop.github.io/Ledger-co-site/">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ledger & Co. | Investment Research & Financial Education">
+<meta name="twitter:description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+
+<!-- Structured data: Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Ledger & Co.",
+  "url": "https://onestopdesignshop.github.io/Ledger-co-site/",
+  "description": "Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.",
+  "email": "support@ledgerco.com",
+  "sameAs": []
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -14,17 +43,20 @@
 <header>
   <nav>
     <a href="#top" class="logo"><span class="mark"><span>L</span></span> Ledger & Co.</a>
-    <div class="navlinks">
+    <div class="navlinks" id="navLinks">
       <a href="#guides">Guides</a>
       <a href="#rates">Today's Rates</a>
       <a href="#brokers">Top Brokers</a>
       <a href="#web3">Web3</a>
       <a href="#method">Our Method</a>
+      <a href="#about">About</a>
       <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
     </div>
     <div style="display:flex; align-items:center; gap:20px;">
       <a href="#" class="sign-in-link" onclick="openAuthModal('signin'); return false;">Sign in</a>
       <a href="#guides" class="nav-cta">GET ACCESS</a>
+      <button class="navlinks-mobile-toggle" id="navMobileToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">☰</button>
     </div>
   </nav>
 </header>
@@ -493,6 +525,35 @@
     </div>
   </section>
 
+  <!-- ABOUT -->
+  <section id="about" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal" style="max-width:720px;">
+        <div class="eyebrow"><span class="tick"></span>WHY WE EXIST</div>
+        <h2>Why Ledger & Co Exists</h2>
+        <p>Ledger & Co was created to provide investors with transparent, research-driven educational content focused on long-term wealth building.</p>
+        <p>Our mission is to simplify complex financial concepts, encourage independent thinking, and help investors make informed decisions through disciplined research and analysis.</p>
+        <p>We believe successful investing comes from patience, education, and a long-term perspective rather than speculation or hype.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="border-top">
+    <div class="wrap">
+      <div class="contact-card reveal">
+        <div class="eyebrow"><span class="tick"></span>GET IN TOUCH</div>
+        <h2>Contact Ledger & Co</h2>
+        <p>Questions about membership, research, or support?</p>
+        <a href="mailto:support@ledgerco.com" class="contact-email">support@ledgerco.com</a>
+        <div class="contact-meta">
+          <div class="label">Response Time</div>
+          <div class="val">1–2 Business Days</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ -->
   <section id="faq" class="border-top">
     <div class="wrap">
@@ -565,16 +626,16 @@
       <p class="sub">Access the guides and rate sheets included in your plan.</p>
       <form onsubmit="return handleSignIn(event)">
         <div class="form-field">
-          <label>Email</label>
-          <input type="email" id="signinEmail" required placeholder="you@email.com">
+          <label for="signinEmail">Email</label>
+          <input type="email" id="signinEmail" required placeholder="you@email.com" autocomplete="email">
         </div>
         <div class="form-field">
-          <label>Password</label>
-          <input type="password" id="signinPassword" required placeholder="••••••••">
+          <label for="signinPassword">Password</label>
+          <input type="password" id="signinPassword" required placeholder="••••••••" autocomplete="current-password">
         </div>
         <button type="submit" class="modal-submit">SIGN IN</button>
       </form>
-      <div class="modal-switch">No account yet? <a onclick="switchAuthView('signup')">Subscribe & create one</a></div>
+      <div class="modal-switch">No account yet? <a onclick="switchAuthView('signup')" tabindex="0" role="button">Subscribe & create one</a></div>
     </div>
 
     <div id="signupView" style="display:none;">
@@ -582,12 +643,12 @@
       <p class="sub">This is the account you'll use to sign in after checkout.</p>
       <form onsubmit="return handleSignUp(event)">
         <div class="form-field">
-          <label>Email</label>
-          <input type="email" id="signupEmail" required placeholder="you@email.com">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" required placeholder="you@email.com" autocomplete="email">
         </div>
         <div class="form-field">
-          <label>Password</label>
-          <input type="password" id="signupPassword" required placeholder="At least 8 characters">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" required placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
         </div>
         <div class="form-field">
           <label>How do you want to buy?</label>
@@ -604,7 +665,7 @@
         </div>
         <button type="submit" class="modal-submit">CONTINUE TO CHECKOUT</button>
       </form>
-      <div class="modal-switch">Already a member? <a onclick="switchAuthView('signin')">Sign in</a></div>
+      <div class="modal-switch">Already a member? <a onclick="switchAuthView('signin')" tabindex="0" role="button">Sign in</a></div>
     </div>
 
     <div class="modal-note">DEMO MODE: this form is a working front-end preview. To actually create accounts and check real subscription status, it needs to be connected to an auth provider (e.g. Supabase) and a Lemon Squeezy webhook — see build notes.</div>
@@ -620,12 +681,13 @@
     <p class="sub">Get our free <strong style="color:var(--parchment); font-style:normal;">Stock Evaluation Framework</strong> — the same questions we ask before any company earns a mention in a paid guide — plus this week's rate sheet, a broker comparison, and a peek at what members get every month (live data refreshes, web3 red-flag checklists, and the entry/exit discipline used in The Annotated Portfolio). No spam, unsubscribe whenever.</p>
     <div id="emailPopupForm">
       <form class="email-popup-form" onsubmit="return handleEmailCapture(event)">
+        <label for="popupEmail" style="position:absolute; left:-9999px;">Email address</label>
         <input type="email" id="popupEmail" required placeholder="you@email.com">
         <button type="submit">SEND IT TO ME</button>
       </form>
     </div>
     <div id="emailPopupSuccess" class="email-popup-success" style="display:none;">You're in. Check your inbox shortly.</div>
-    <span class="email-popup-skip" onclick="closeEmailPopup()">No thanks, just let me browse</span>
+    <span class="email-popup-skip" onclick="closeEmailPopup()" tabindex="0" role="button">No thanks, just let me browse</span>
   </div>
 </div>
 
@@ -690,6 +752,8 @@
     <div class="viewer-footer-note">For your eyes only — licensed to <span id="viewerLicenseEmail">you</span>. Sharing this content outside your account violates our <a href="terms-of-sale.html" style="color:var(--gold);" target="_blank">Terms of Sale</a>.</div>
   </div>
 </div>
+
+<footer>
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-col">
@@ -711,25 +775,27 @@
         <a href="#brokers">Top 3 Brokers</a>
         <a href="#web3">Web3 Basics</a>
         <a href="#method">Our Method</a>
+        <a href="#about">About</a>
         <a href="#faq">FAQ</a>
       </div>
       <div class="footer-col">
         <h5>Contact</h5>
-        <a href="mailto:dee8shops@gmail.com">dee8shops@gmail.com</a>
+        <a href="#contact">Contact Us</a>
+        <a href="mailto:support@ledgerco.com">support@ledgerco.com</a>
         <a href="terms-of-sale.html">Terms of Sale</a>
         <a href="privacy-policy.html">Privacy Policy</a>
       </div>
     </div>
 
     <div class="disclosure-full">
-      <strong style="color:var(--slate);">DISCLOSURE:</strong> Ledger & Co. provides general financial education and research summaries for informational purposes only. We are not a registered investment advisor, broker-dealer, or tax professional, and nothing on this site constitutes personalized financial, legal, or tax advice. Interest rates, APYs, and promotional terms are subject to change without notice and should be verified directly with the relevant institution before you act. Digital asset and web3-related content involves substantial risk, including potential loss of principal. Past performance and currently advertised rates are not indicative of future results. Consult a licensed professional regarding your specific situation before making financial decisions.
+      <strong style="color:var(--slate);">DISCLOSURE:</strong> Ledger & Co. provides educational content only and does not provide financial, investment, legal, or tax advice. All investments involve risk, including possible loss of principal. Past performance does not guarantee future results. We are not a registered investment advisor, broker-dealer, or tax professional, and nothing on this site constitutes personalized financial, legal, or tax advice. Interest rates, APYs, and promotional terms are subject to change without notice and should be verified directly with the relevant institution before you act. Digital asset and web3-related content involves substantial risk, including potential loss of principal. Consult a licensed professional regarding your specific situation before making financial decisions.
       <br><br>
       <strong style="color:var(--slate);">THIRD-PARTY TRADEMARKS:</strong> Fidelity®, Charles Schwab®, E*TRADE®, and all other company names, logos, and trademarks referenced on this site are the property of their respective owners. They are used here solely to identify and link to those companies' own products and are not affiliated with, sponsored by, or endorsed by Ledger & Co. unless explicitly stated. Any affiliate or referral relationship that exists now or in the future will be clearly disclosed at the point it appears.
     </div>
 
     <div class="footer-bottom">
-      <span>© 2026 LEDGER & CO. ALL RIGHTS RESERVED.</span>
-      <span>EDUCATIONAL CONTENT ONLY — NOT LICENSED FINANCIAL ADVICE</span>
+      <span>Copyright © 2026 Ledger & Co. All rights reserved.</span>
+      <span>Educational Content Only — Not Financial Advice</span>
     </div>
   </div>
 </footer>

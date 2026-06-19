@@ -93,6 +93,11 @@ function handleSignUp(e){
 }
 
 function signOut(){
+  // Fully clear demo session state (in addition to hiding the dashboard) so a
+  // fresh sign-in doesn't inherit the previous session's plan/email. A real
+  // implementation should also invalidate the server-side session token here.
+  demoState = null;
+  localStorage.removeItem('ledgerDemoState');
   document.getElementById('dashboard').classList.remove('show');
   document.body.style.overflow = '';
 }
@@ -194,7 +199,12 @@ function openViewer(idx){
 }
 function closeViewer(){
   document.getElementById('contentViewer').classList.remove('show');
-  document.body.style.overflow = 'hidden'; // dashboard is still open underneath
+  // The dashboard sits underneath the viewer and is itself a full-screen
+  // overlay, so scroll should stay locked only if the dashboard is still
+  // open. Previously this unconditionally re-locked scroll, which left the
+  // page stuck even after both overlays were closed.
+  const dashboardOpen = document.getElementById('dashboard').classList.contains('show');
+  document.body.style.overflow = dashboardOpen ? 'hidden' : '';
 }
 
 // Copy/right-click/print deterrence scoped to the content viewer only —
@@ -211,34 +221,6 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 
-// Lemon Squeezy checkout URLs — 16 variants across 4 products
-const CHECKOUT_URLS = {
-  'yield-map': {
-    monthly:   'https://aldgateco.lemonsqueezy.com/checkout/buy/8abad108-253b-4bb2-aaa6-599fff90a506',
-    quarterly: 'https://aldgateco.lemonsqueezy.com/checkout/buy/09cd0462-4e20-45e9-b9b7-81654c0ff96f',
-    annual:    'https://aldgateco.lemonsqueezy.com/checkout/buy/dc669ab5-7bf9-4c3f-b073-cf1c56468db4',
-    lifetime:  'https://aldgateco.lemonsqueezy.com/checkout/buy/5ca64af6-84e7-4e08-b91a-62458e1cf2f9',
-  },
-  'full-ledger': {
-    monthly:   'https://aldgateco.lemonsqueezy.com/checkout/buy/37257542-7ae5-4689-af24-9a2205e08e86',
-    quarterly: 'https://aldgateco.lemonsqueezy.com/checkout/buy/2ec900bc-82f4-4221-bfe3-7fed6f7482ba',
-    annual:    'https://aldgateco.lemonsqueezy.com/checkout/buy/41a2680f-d149-4ecd-a34e-82e1bbb2626c',
-    lifetime:  'https://aldgateco.lemonsqueezy.com/checkout/buy/0f77f02d-01a5-4eeb-aa0b-582dab2b7b4a',
-  },
-  'annotated-portfolio': {
-    monthly:   'https://aldgateco.lemonsqueezy.com/checkout/buy/bf5d135b-4f21-47ac-a9a6-f607740bfd28',
-    quarterly: 'https://aldgateco.lemonsqueezy.com/checkout/buy/e70fafbc-f6cb-49cf-ad8d-8bb6c96eadbf',
-    annual:    'https://aldgateco.lemonsqueezy.com/checkout/buy/e803979a-9f49-4baa-a245-6cf447b8ec86',
-    lifetime:  'https://aldgateco.lemonsqueezy.com/checkout/buy/9501ad72-faf2-4c71-b3e4-fa9e1eb4bcfe',
-  },
-  'all-access': {
-    monthly:   'https://aldgateco.lemonsqueezy.com/checkout/buy/f3a9e598-c22b-40f5-8a80-adad5a75ec6a',
-    quarterly: 'https://aldgateco.lemonsqueezy.com/checkout/buy/b3761847-ca87-48a3-9454-830051cb37e7',
-    annual:    'https://aldgateco.lemonsqueezy.com/checkout/buy/80cc0375-122b-44dc-9160-35a8e7ebb92a',
-    lifetime:  'https://aldgateco.lemonsqueezy.com/checkout/buy/b87d7ab5-8c10-4d58-9bee-842b38426fbc',
-  },
-};
-
 function setBilling(period){
   document.querySelectorAll('.billing-seg').forEach(b=>{
     b.classList.toggle('active', b.dataset.billing === period);
@@ -250,18 +232,6 @@ function setBilling(period){
   document.querySelectorAll('.annual-note').forEach(el=> el.style.display = (period==='annual') ? 'block' : 'none');
   document.querySelectorAll('.quarterly-note').forEach(el=> el.style.display = (period==='quarterly') ? 'block' : 'none');
   document.querySelectorAll('.lifetime-note').forEach(el=> el.style.display = (period==='lifetime') ? 'block' : 'none');
-
-  // Update checkout button URLs to match selected billing period
-  document.querySelectorAll('.product-btn[data-product]').forEach(btn=>{
-    const product = btn.dataset.product;
-    if(CHECKOUT_URLS[product] && CHECKOUT_URLS[product][period]){
-      btn.href = CHECKOUT_URLS[product][period];
-    }
-  });
-
-  // Update "Go to checkout" banner link to All-Access for selected period
-  const bannerBtn = document.querySelector('.annual-banner .btn-ghost');
-  if(bannerBtn) bannerBtn.href = CHECKOUT_URLS['all-access'][period];
 }
 
 function toggleFaq(el){
@@ -277,6 +247,39 @@ function toggleFaq(el){
     answer.style.maxHeight = answer.scrollHeight + 'px';
   }
 }
+
+// ============ MOBILE NAV MENU ============
+// Toggles the same .navlinks list used by desktop nav; CSS shows it as a
+// dropdown panel under 860px width. Previously the toggle button existed in
+// markup/CSS with no JS behind it, so tapping it did nothing.
+function initMobileNav(){
+  const toggle = document.getElementById('navMobileToggle');
+  const links = document.getElementById('navLinks');
+  if(!toggle || !links) return;
+
+  toggle.addEventListener('click', ()=>{
+    const isOpen = links.classList.toggle('mobile-open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggle.textContent = isOpen ? '×' : '☰';
+  });
+
+  // Close the menu after tapping a nav link, and when clicking outside it.
+  links.addEventListener('click', (e)=>{
+    if(e.target.tagName === 'A'){
+      links.classList.remove('mobile-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '☰';
+    }
+  });
+  document.addEventListener('click', (e)=>{
+    if(!links.classList.contains('mobile-open')) return;
+    if(links.contains(e.target) || toggle.contains(e.target)) return;
+    links.classList.remove('mobile-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = '☰';
+  });
+}
+initMobileNav();
 
 // scroll reveal
 const revealEls = document.querySelectorAll('.reveal');
