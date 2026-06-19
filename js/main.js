@@ -93,6 +93,11 @@ function handleSignUp(e){
 }
 
 function signOut(){
+  // Fully clear demo session state (in addition to hiding the dashboard) so a
+  // fresh sign-in doesn't inherit the previous session's plan/email. A real
+  // implementation should also invalidate the server-side session token here.
+  demoState = null;
+  localStorage.removeItem('ledgerDemoState');
   document.getElementById('dashboard').classList.remove('show');
   document.body.style.overflow = '';
 }
@@ -194,7 +199,12 @@ function openViewer(idx){
 }
 function closeViewer(){
   document.getElementById('contentViewer').classList.remove('show');
-  document.body.style.overflow = 'hidden'; // dashboard is still open underneath
+  // The dashboard sits underneath the viewer and is itself a full-screen
+  // overlay, so scroll should stay locked only if the dashboard is still
+  // open. Previously this unconditionally re-locked scroll, which left the
+  // page stuck even after both overlays were closed.
+  const dashboardOpen = document.getElementById('dashboard').classList.contains('show');
+  document.body.style.overflow = dashboardOpen ? 'hidden' : '';
 }
 
 // Copy/right-click/print deterrence scoped to the content viewer only —
@@ -237,6 +247,39 @@ function toggleFaq(el){
     answer.style.maxHeight = answer.scrollHeight + 'px';
   }
 }
+
+// ============ MOBILE NAV MENU ============
+// Toggles the same .navlinks list used by desktop nav; CSS shows it as a
+// dropdown panel under 860px width. Previously the toggle button existed in
+// markup/CSS with no JS behind it, so tapping it did nothing.
+function initMobileNav(){
+  const toggle = document.getElementById('navMobileToggle');
+  const links = document.getElementById('navLinks');
+  if(!toggle || !links) return;
+
+  toggle.addEventListener('click', ()=>{
+    const isOpen = links.classList.toggle('mobile-open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggle.textContent = isOpen ? '×' : '☰';
+  });
+
+  // Close the menu after tapping a nav link, and when clicking outside it.
+  links.addEventListener('click', (e)=>{
+    if(e.target.tagName === 'A'){
+      links.classList.remove('mobile-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '☰';
+    }
+  });
+  document.addEventListener('click', (e)=>{
+    if(!links.classList.contains('mobile-open')) return;
+    if(links.contains(e.target) || toggle.contains(e.target)) return;
+    links.classList.remove('mobile-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = '☰';
+  });
+}
+initMobileNav();
 
 // scroll reveal
 const revealEls = document.querySelectorAll('.reveal');
