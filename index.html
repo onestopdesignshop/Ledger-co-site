@@ -668,7 +668,6 @@
       <div class="modal-switch">Already a member? <a onclick="switchAuthView('signin')" tabindex="0" role="button">Sign in</a></div>
     </div>
 
-    <div class="modal-note">DEMO MODE: this form is a working front-end preview. To actually create accounts and check real subscription status, it needs to be connected to an auth provider (e.g. Supabase) and a Lemon Squeezy webhook — see build notes.</div>
   </div>
 </div>
 
@@ -702,10 +701,10 @@
 
   <div class="wrap">
     <div class="dash-hero">
-      <div class="dash-demo-flag">DEMO MODE — this dashboard is showing sample data for <strong id="demoEmailDisplay">your account</strong>. Connect Lemon Squeezy + Supabase to replace this with each member's real plan and renewal date.</div>
+      <div class="dash-demo-flag" id="dashStatusNote" style="display:none;">Checkout isn't connected to this sign-up form yet — if you just created an account, use one of the START buttons on the pricing section with the same email, then sign in again.</div>
 
       <div class="dash-plan-badge"><span class="tick" style="background:var(--gold); width:14px; height:1px; display:inline-block;"></span> <span id="dashPlanName">THE FULL LEDGER</span> — ACTIVE</div>
-      <h2>Welcome back.</h2>
+      <h2>Welcome back, <span id="demoEmailDisplay">there</span>.</h2>
       <div class="dash-meta">
         <div class="dash-meta-item"><div class="label">Current plan</div><div class="val" id="dashPlanVal">The Full Ledger</div></div>
         <div class="dash-meta-item"><div class="label">Billing</div><div class="val" id="dashBillingVal">Monthly</div></div>
@@ -800,6 +799,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/main.js"></script>
 
 </body>
