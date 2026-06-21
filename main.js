@@ -10,6 +10,39 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // pattern Supabase's own docs use) so the rest of this file can just call `supabase.auth...`.
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ============ CHECKOUT URL MAP ============
+// Mirrors the same Lemon Squeezy URLs used on the product buttons in index.html.
+// Keyed by tier (1-4) -> billing interval -> URL. Lemon Squeezy checkout
+// overlay/buy links support a [data-lemonsqueezy]-style query param for
+// prefilling email; we append ?checkout[email]=... below so the person
+// doesn't have to retype the email they just signed up with.
+//
+// NOTE: these are the exact same 4 URLs already on the START buttons —
+// each Lemon Squeezy "buy" link covers all billing intervals for that
+// product via its own checkout page variant selector, EXCEPT this site's
+// checkout pages are one-URL-per-product (variant chosen at signup time
+// here, not on the Lemon Squeezy page itself). If your Lemon Squeezy buy
+// links are actually variant-specific (one per billing interval), replace
+// the single URL per tier below with the four billing-specific URLs.
+const CHECKOUT_URLS = {
+  1: "https://aldgateco.lemonsqueezy.com/checkout/buy/8abad108-253b-4bb2-aaa6-599fff90a506",
+  2: "https://aldgateco.lemonsqueezy.com/checkout/buy/37257542-7ae5-4689-af24-9a2205e08e86",
+  3: "https://aldgateco.lemonsqueezy.com/checkout/buy/bf5d135b-4f21-47ac-a9a6-f607740bfd28",
+  4: "https://aldgateco.lemonsqueezy.com/checkout/buy/f3a9e598-c22b-40f5-8a80-adad5a75ec6a",
+};
+
+// Builds the checkout URL for a given tier, pre-filling the email and
+// passing the chosen billing interval through as custom checkout data so
+// it's available on the webhook payload if needed downstream.
+function buildCheckoutUrl(tier, email, billingInterval){
+  const base = CHECKOUT_URLS[tier];
+  if(!base) return null;
+  const url = new URL(base);
+  if(email) url.searchParams.set('checkout[email]', email);
+  if(billingInterval) url.searchParams.set('checkout[custom][billing_interval]', billingInterval);
+  return url.toString();
+}
+
 // ============ CONTENT LIBRARY (still static — not yet backend-driven) ============
 const LIBRARY = [
   { title:"The Yield Map — Current Edition", desc:"This month's ranked savings, CD, and money-market comparison.", minTier:1,
@@ -105,16 +138,24 @@ async function handleSignIn(e){
 }
 
 // ============ REAL SIGN UP ============
-// NOTE (scoped for this pass): this creates the Supabase account only.
-// It does NOT yet redirect to Lemon Squeezy checkout — that's the next
-// piece of wiring. After this, the person has an account but no active
-// subscription until they check out and the ls-webhook writes their row.
+// Creates the Supabase account, then redirects straight to the correct
+// Lemon Squeezy checkout page for the tier + billing interval the person
+// picked on the signup form — no more manual "go click a START button"
+// step. Email is pre-filled on the checkout page so they don't retype it.
+//
+// "Stack tiers" mode: this still sends them to checkout for the single
+// tier they selected first (their first tier). Adding additional stacked
+// tiers afterward is the next piece of wiring — see TODO below.
 async function handleSignUp(e){
   e.preventDefault();
   clearAuthError();
   const email = document.getElementById('signupEmail').value;
   const password = document.getElementById('signupPassword').value;
   const mode = document.querySelector('input[name="purchaseMode"]:checked').value; // 'single' or 'stack'
+  const tierSelect = document.getElementById('signupTier');
+  const billingSelect = document.getElementById('signupBillingInterval');
+  const tier = tierSelect ? parseInt(tierSelect.value, 10) : 2;
+  const billingInterval = billingSelect ? billingSelect.value : 'monthly';
 
   const submitBtn = e.target.querySelector('.modal-submit');
   submitBtn.disabled = true;
@@ -130,19 +171,23 @@ async function handleSignUp(e){
     return false;
   }
 
-  // TODO (next pass): redirect to the correct Lemon Squeezy checkout URL
-  // based on the selected tier + billing interval + purchase mode (single
-  // vs. stack). For now, confirm account creation and let them know
-  // checkout is the next manual step.
-  alert(
-    "Account created! Checkout isn't wired up to this form yet — " +
-    "for now, scroll up and use one of the START buttons above to check out " +
-    "with the email you just used (" + email + "). Once payment goes through, " +
-    "sign in here and your plan will show automatically."
-  );
+  const checkoutUrl = buildCheckoutUrl(tier, email, billingInterval);
 
-  switchAuthView('signin');
-  document.getElementById('signinEmail').value = email;
+  if(!checkoutUrl){
+    // Shouldn't happen with the current 4 tiers, but fail safely instead of
+    // silently stranding the person with an account and no path to pay.
+    showAuthError("Account created, but we couldn't find a checkout link for that plan. Please use a START button on the pricing section above.");
+    switchAuthView('signin');
+    document.getElementById('signinEmail').value = email;
+    return false;
+  }
+
+  // TODO (next pass): if mode === 'stack', after this first checkout
+  // completes, surface a way for them to add additional tiers at the
+  // 15%-off stacking rate rather than re-running full signup.
+
+  closeAuthModal();
+  window.location.href = checkoutUrl;
   return false;
 }
 
@@ -193,7 +238,10 @@ function showDashboard(){
   if(!currentSubscription || currentSubscription.length === 0){
     // Real "no active plan" state — not demo data.
     const statusNote = document.getElementById('dashStatusNote');
-    if(statusNote) statusNote.style.display = 'block';
+    if(statusNote){
+      statusNote.textContent = "No active subscription found yet. If you just checked out, this can take a minute to sync — try refreshing. Otherwise, pick a plan above to get started.";
+      statusNote.style.display = 'block';
+    }
     document.getElementById('dashPlanName').textContent = 'NO ACTIVE PLAN';
     document.getElementById('dashPlanVal').textContent = '—';
     document.getElementById('dashBillingVal').textContent = '—';
@@ -343,6 +391,32 @@ function setBilling(period){
   document.querySelectorAll('.annual-note').forEach(el=> el.style.display = (period==='annual') ? 'block' : 'none');
   document.querySelectorAll('.quarterly-note').forEach(el=> el.style.display = (period==='quarterly') ? 'block' : 'none');
   document.querySelectorAll('.lifetime-note').forEach(el=> el.style.display = (period==='lifetime') ? 'block' : 'none');
+
+  // Keep the signup modal's billing dropdown in sync with whichever toggle
+  // the person last clicked on the pricing section, so if they then click a
+  // START button (which opens signup pre-set to that product) the billing
+  // interval they were already looking at carries through.
+  const signupBillingSelect = document.getElementById('signupBillingInterval');
+  if(signupBillingSelect) signupBillingSelect.value = period;
+}
+
+// When a pricing-section START button is clicked, open the signup modal
+// pre-set to that exact tier (and whatever billing interval is currently
+// toggled) instead of sending the person straight to checkout with no
+// account. This keeps "create account" and "checkout" as one flow.
+function initProductButtons(){
+  document.querySelectorAll('.product-btn[data-tier]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const tier = btn.getAttribute('data-tier');
+      const tierSelect = document.getElementById('signupTier');
+      if(tierSelect) tierSelect.value = tier;
+      const activeBilling = document.querySelector('.billing-seg.active');
+      const billingSelect = document.getElementById('signupBillingInterval');
+      if(billingSelect && activeBilling) billingSelect.value = activeBilling.dataset.billing;
+      openAuthModal('signup');
+    });
+  });
 }
 
 function toggleFaq(el){
@@ -387,6 +461,7 @@ function initMobileNav(){
   });
 }
 initMobileNav();
+initProductButtons();
 
 // scroll reveal
 const revealEls = document.querySelectorAll('.reveal');
