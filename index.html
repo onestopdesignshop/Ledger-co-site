@@ -53,6 +53,30 @@
   .stack-tier-billing{ flex:0 0 auto; max-width:170px; }
   .stack-tier-row:has(input:checked){ border-color:var(--gold); background:rgba(212,175,55,0.06); }
   .stack-tier-billing:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  /* Signup quiz */
+  .quiz-question{ margin-bottom:16px; }
+  .quiz-question label{ display:block; margin-bottom:6px; font-size:13px; color:var(--slate); }
+  .quiz-result{
+    margin-top:18px; padding:16px; border:1px solid var(--gold); border-radius:8px;
+    background:rgba(212,175,55,0.06);
+  }
+  .quiz-result-label{ font-size:11px; letter-spacing:0.06em; color:var(--slate); font-family:'JetBrains Mono',monospace; }
+  .quiz-result-name{ font-size:19px; font-family:'Fraunces',serif; color:var(--gold-bright); margin-top:4px; }
+  .quiz-result-note{ font-size:13px; color:var(--slate); margin-top:6px; }
+
+  /* Free-tier preview dashboard */
+  .preview-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; font-family:'JetBrains Mono',monospace;
+    color:var(--slate); border:1px solid rgba(255,255,255,0.15); border-radius:4px;
+    padding:3px 8px; margin-bottom:10px;
+  }
+  .preview-blur{ position:relative; }
+  .preview-blur .lib-action{ filter:blur(0.4px); opacity:0.85; }
+  .preview-overlay-note{
+    font-size:12.5px; color:var(--slate); margin-top:14px; padding:12px 14px;
+    border:1px dashed rgba(255,255,255,0.15); border-radius:8px;
+  }
 </style>
 </head>
 <body>
@@ -161,6 +185,7 @@
           <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
           <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
           <p class="desc">A living, ranked breakdown of where to actually park cash right now — high-yield savings, money markets, CDs, T-bills — with the catches each one doesn't put in the headline.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: a ranked account comparison, a fee/minimum-balance breakdown, and a short topic guide added monthly. No specific account names or rates shown here — those are inside.</p>
           <div class="recurring-box">
             <div class="recurring-label">EVERY MONTH YOU GET</div>
             <ul class="feat-list">
@@ -191,6 +216,7 @@
           <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
           <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
           <p class="desc">Everything in The Yield Map, plus an ongoing, plain-English framework for evaluating web3 yield products, staking, and on-chain savings tools — including the specific ways people lose money in this space.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: a due-diligence checklist, a custody/audit primer, and a new web3 topic broken down monthly. Categories only — no platform names or specific deals are listed here.</p>
           <div class="recurring-box">
             <div class="recurring-label">EVERY MONTH YOU GET</div>
             <ul class="feat-list">
@@ -221,6 +247,7 @@
           <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
           <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
           <p class="desc">Everything above, plus a structured, continually-updated walkthrough of building a diversified, auditable income approach — savings ladders, bond/T-bill layering, and a sober look at automated/algorithmic strategies.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: an income-layering worksheet, a recorded monthly call, and a quarterly deep-dive. The worksheet's actual structure and call topics are member-only.</p>
           <div class="recurring-box">
             <div class="recurring-label">EVERY MONTH YOU GET</div>
             <ul class="feat-list">
@@ -668,7 +695,7 @@
           <input type="password" id="signupPassword" required placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
         </div>
 
-        <!-- STEP 1: opt in or skip plan selection entirely -->
+        <!-- STEP 1: opt in, skip, or take a short quiz to get a recommendation -->
         <div class="form-field">
           <label>Want to choose a plan now?</label>
           <div class="purchase-mode-options">
@@ -677,10 +704,53 @@
               <div><strong>Not yet</strong><span>Just create my account — I'll pick a plan later from the pricing section.</span></div>
             </label>
             <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="quiz" onchange="updateSignupPlanUI()">
+              <div><strong>Not sure — help me decide</strong><span>Answer a few quick questions and we'll point you to the right guide(s).</span></div>
+            </label>
+            <label class="pm-option">
               <input type="radio" name="wantsPlan" value="yes" onchange="updateSignupPlanUI()">
-              <div><strong>Yes, set me up now</strong><span>I know which guide(s) I want.</span></div>
+              <div><strong>Yes, set me up now</strong><span>I already know which guide(s) I want.</span></div>
             </label>
           </div>
+        </div>
+
+        <!-- QUIZ (hidden until "Not sure" above) — a few quick questions that map to
+             a recommended tier or combination of tiers. Nothing here is graded or
+             "correct" — it's a steer, not a gate, and the result feeds straight into
+             the same single/stack fields below so the person can still see and change
+             exactly what they're signing up for before submitting. -->
+        <div class="form-field" id="quizFields" style="display:none;">
+          <div class="quiz-question">
+            <label>What's mainly on your mind right now?</label>
+            <select id="quizGoal" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="park-cash">Finding a better place to park cash I already have</option>
+              <option value="web3-curious" selected>Web3 / crypto yield stuff keeps coming up and I want to understand it before I touch it</option>
+              <option value="build-income">Building toward a real income strategy, not just one account switch</option>
+              <option value="all-of-it">Honestly, all of the above</option>
+            </select>
+          </div>
+          <div class="quiz-question">
+            <label>How hands-on do you want to be?</label>
+            <select id="quizDepth" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="light" selected>Light — just tell me what's good and what to avoid</option>
+              <option value="moderate">Moderate — I'll read a worksheet and ask occasional questions</option>
+              <option value="deep">Deep — I want calls, ongoing Q&A, and the full picture</option>
+            </select>
+          </div>
+          <div class="quiz-question">
+            <label>Budget comfort for a monthly guide like this?</label>
+            <select id="quizBudget" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="low" selected>Closer to $20/mo</option>
+              <option value="mid">Closer to $40/mo</option>
+              <option value="high">$75+/mo is fine if the depth is there</option>
+            </select>
+          </div>
+          <div class="quiz-result" id="quizResult">
+            <div class="quiz-result-label">BASED ON THAT, WE'D START WITH</div>
+            <div class="quiz-result-name" id="quizResultName">The Full Ledger</div>
+            <p class="quiz-result-note" id="quizResultNote">A good middle ground if web3 questions are part of what brought you here.</p>
+          </div>
+          <button type="button" class="btn-ghost" style="margin-top:4px;" onclick="applyQuizRecommendation()">USE THIS RECOMMENDATION →</button>
         </div>
 
         <!-- STEP 2 (hidden until "Yes" above): single vs. stack -->

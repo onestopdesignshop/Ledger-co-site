@@ -113,9 +113,13 @@ function clearAuthError(){
 }
 
 // ============ SIGNUP FORM: PROGRESSIVE PLAN PICKER ============
-// Three-step reveal so a plan is never required to sign up:
-//   1. "Want to choose a plan now?" — Not yet (default) / Yes
-//   2. If Yes: "How do you want to buy?" — Single / Stack
+// Three-way fork so a plan is never required to sign up:
+//   1. "Want to choose a plan now?" — Not yet (default) / Not sure, quiz me / Yes
+//   2a. "Not sure": a 3-question quiz that recommends a tier (or combo via
+//       the "use this recommendation" button, which routes into the same
+//       single/stack fields below — the quiz only ever pre-fills, it never
+//       submits anything on its own).
+//   2b. "Yes": "How do you want to buy?" — Single / Stack
 //   3. If Single: one tier + one billing dropdown
 //      If Stack: checkboxes for any combo of the 3 individual tiers
 //      (All-Access is intentionally excluded from stacking — it already
@@ -125,6 +129,7 @@ function updateSignupPlanUI(){
   const wantsPlanEl = document.querySelector('input[name="wantsPlan"]:checked');
   const wantsPlan = wantsPlanEl ? wantsPlanEl.value : 'no';
 
+  const quizFields = document.getElementById('quizFields');
   const purchaseModeField = document.getElementById('purchaseModeField');
   const singleFields = document.getElementById('singlePlanFields');
   const stackFields = document.getElementById('stackPlanFields');
@@ -132,6 +137,7 @@ function updateSignupPlanUI(){
   const stackWarning = document.getElementById('stackEmptyWarning');
 
   if(wantsPlan === 'no'){
+    quizFields.style.display = 'none';
     purchaseModeField.style.display = 'none';
     singleFields.style.display = 'none';
     stackFields.style.display = 'none';
@@ -140,6 +146,19 @@ function updateSignupPlanUI(){
     return;
   }
 
+  if(wantsPlan === 'quiz'){
+    quizFields.style.display = 'block';
+    purchaseModeField.style.display = 'none';
+    singleFields.style.display = 'none';
+    stackFields.style.display = 'none';
+    if(stackWarning) stackWarning.style.display = 'none';
+    if(submitBtn) submitBtn.textContent = 'CREATE ACCOUNT';
+    updateQuizRecommendation();
+    return;
+  }
+
+  // wantsPlan === 'yes'
+  quizFields.style.display = 'none';
   purchaseModeField.style.display = 'block';
   const modeEl = document.querySelector('input[name="purchaseMode"]:checked');
   const mode = modeEl ? modeEl.value : 'single';
@@ -165,6 +184,87 @@ function updateSignupPlanUI(){
     if(stackWarning) stackWarning.style.display = 'none'; // only shown on submit attempt, not while editing
     if(submitBtn) submitBtn.textContent = anyChecked ? 'CREATE ACCOUNT & CONTINUE TO CHECKOUT' : 'CREATE ACCOUNT';
   }
+}
+
+// ============ SIGNUP QUIZ: RECOMMENDATION ENGINE ============
+// Simple weighted scoring across the 3 questions. Nothing here is a "test"
+// with a right answer — it's a steer toward a starting point, and the
+// person can always override it via the single/stack fields it feeds into.
+// goal: which problem brought them here. depth: how hands-on they want to
+// be. budget: rough monthly comfort level. Each maps to point weights per
+// tier (1=Yield Map, 2=Full Ledger, 3=Annotated Portfolio); highest score
+// wins, with budget acting as a soft ceiling rather than a hard cutoff.
+function getQuizRecommendation(){
+  const goal = (document.getElementById('quizGoal') || {}).value || 'web3-curious';
+  const depth = (document.getElementById('quizDepth') || {}).value || 'light';
+  const budget = (document.getElementById('quizBudget') || {}).value || 'low';
+
+  const scores = { 1:0, 2:0, 3:0 };
+
+  // Goal weighting
+  if(goal === 'park-cash') scores[1] += 3;
+  if(goal === 'web3-curious') scores[2] += 3;
+  if(goal === 'build-income') scores[3] += 3;
+  if(goal === 'all-of-it'){ scores[1] += 1; scores[2] += 1; scores[3] += 1; }
+
+  // Depth weighting
+  if(depth === 'light') scores[1] += 2;
+  if(depth === 'moderate') scores[2] += 2;
+  if(depth === 'deep') scores[3] += 2;
+
+  // Budget acts as a soft nudge, not a hard gate — someone can still want
+  // more depth than their stated budget and the quiz will say so honestly
+  // rather than just downgrading the recommendation to fit.
+  if(budget === 'low') scores[1] += 1;
+  if(budget === 'mid') scores[2] += 1;
+  if(budget === 'high') scores[3] += 1;
+
+  let bestTier = 1, bestScore = -1;
+  [1,2,3].forEach(t=>{ if(scores[t] >= bestScore){ bestScore = scores[t]; bestTier = t; } });
+
+  const stretchBudget = (bestTier === 3 && budget === 'low') || (bestTier === 2 && budget === 'low' && goal !== 'park-cash');
+
+  const notes = {
+    1: "A good starting point if the main goal is making sure cash isn't sitting somewhere underperforming.",
+    2: "A good middle ground if web3 questions are part of what brought you here, without committing to the deepest tier yet.",
+    3: "Fits if you're thinking in terms of an ongoing strategy, not just a single account switch.",
+  };
+  let note = notes[bestTier];
+  if(stretchBudget) note += " Worth noting: this sits a bit above the budget you flagged — The Yield Map or Full Ledger are lighter starting points if that matters more than depth right now.";
+
+  return { tier: bestTier, note };
+}
+
+function updateQuizRecommendation(){
+  const rec = getQuizRecommendation();
+  const nameEl = document.getElementById('quizResultName');
+  const noteEl = document.getElementById('quizResultNote');
+  if(nameEl) nameEl.textContent = TIER_NAMES[rec.tier] || ('Tier ' + rec.tier);
+  if(noteEl) noteEl.textContent = rec.note;
+}
+
+// Routes the quiz's recommended tier into the normal single-plan fields,
+// switches the form into "Yes / Single" mode, and lets the person see and
+// adjust the exact tier/billing before they ever submit — the quiz never
+// submits anything on its own.
+function applyQuizRecommendation(){
+  const rec = getQuizRecommendation();
+
+  const wantsPlanYes = document.querySelector('input[name="wantsPlan"][value="yes"]');
+  if(wantsPlanYes) wantsPlanYes.checked = true;
+  const modeSingle = document.querySelector('input[name="purchaseMode"][value="single"]');
+  if(modeSingle) modeSingle.checked = true;
+
+  const tierSelect = document.getElementById('signupTier');
+  if(tierSelect) tierSelect.value = String(rec.tier);
+
+  updateSignupPlanUI();
+
+  // Scroll the now-visible tier dropdown into view within the modal so the
+  // person immediately sees what got pre-filled rather than wondering if
+  // anything happened.
+  const singleFields = document.getElementById('singlePlanFields');
+  if(singleFields) singleFields.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // ============ REAL SIGN IN ============
@@ -247,7 +347,9 @@ async function handleSignUp(e){
       stackQueue = plans.slice(1);
     }
   }
-  // wantsPlan === 'no' → checkoutPlan stays null, account is created with no purchase.
+  // wantsPlan === 'no', or 'quiz' without ever clicking "use this
+  // recommendation" (which switches wantsPlan to 'yes' itself) → checkoutPlan
+  // stays null and the account is created with no purchase either way.
 
   const submitBtn = e.target.querySelector('.modal-submit');
   submitBtn.disabled = true;
@@ -374,25 +476,33 @@ function showDashboard(){
   const dashHero = document.querySelector('.dash-hero');
 
   if(!currentSubscription || currentSubscription.length === 0){
-    // Real "no active plan" state — not demo data.
+    // FREE / NO-PLAN PREVIEW STATE.
+    // This is not real member data — every number here is randomly generated
+    // per page load so it never claims to be an actual finding. The goal is
+    // to let someone see the *shape* of what membership looks like (a real
+    // dashboard, a real-looking library, a savings tracker) without ever
+    // exposing real rates, account names, or guide content. Nothing here
+    // says "upgrade now" outright — it shows, rather than tells.
     const statusNote = document.getElementById('dashStatusNote');
     if(statusNote){
-      statusNote.textContent = "No active subscription found yet. If you just checked out, this can take a minute to sync — try refreshing. Otherwise, pick a plan above to get started.";
+      statusNote.innerHTML = 'You\'re looking at a <strong style="color:var(--parchment);">preview</strong> — the numbers below are randomly generated examples, not real data. <a href="#guides" onclick="closeDashboardToPricing(event)" style="color:var(--gold);">See what each guide actually includes →</a>';
       statusNote.style.display = 'block';
     }
-    document.getElementById('dashPlanName').textContent = 'NO ACTIVE PLAN';
-    document.getElementById('dashPlanVal').textContent = '—';
+    document.getElementById('dashPlanName').textContent = 'FREE PREVIEW';
+    document.getElementById('dashPlanVal').textContent = 'Free preview';
     document.getElementById('dashBillingVal').textContent = '—';
     const planBadge = document.querySelector('.dash-plan-badge');
-    if(planBadge) planBadge.innerHTML = '<span class="tick" style="background:var(--gold); width:14px; height:1px; display:inline-block;"></span> NO ACTIVE PLAN';
-    document.getElementById('libraryGrid').innerHTML =
-      '<p style="color:var(--slate); font-size:14px;">No active subscription found for this account yet. ' +
-      'If you just checked out, this can take a minute to sync — try refreshing. ' +
-      'Otherwise, pick a plan above to get started.</p>';
+    if(planBadge) planBadge.innerHTML = '<span class="tick" style="background:var(--gold); width:14px; height:1px; display:inline-block;"></span> FREE PREVIEW';
+
+    renderPreviewSavings();
+    renderPreviewLibrary();
+
     document.getElementById('dashboard').classList.add('show');
     document.body.style.overflow = 'hidden';
     return;
   }
+
+  hidePreviewSavingsIfPresent();
 
   // Effective tier = the highest tier among all active rows (handles both
   // single-plan members with one row and stacked members with several).
@@ -459,6 +569,89 @@ function logWin(){
   const total = parseFloat(localStorage.getItem('ledgerTotalSavings') || '0') + num;
   localStorage.setItem('ledgerTotalSavings', total.toString());
   renderSavings();
+}
+
+// ============ FREE PREVIEW: RANDOMLY-GENERATED DEMO DATA ============
+// Everyone without an active subscription sees this. Every number below is
+// freshly randomized on each dashboard open — never the same twice, never
+// claimed to be real, and never tied to actual guide content. The point is
+// to make the dashboard feel inhabited and concrete rather than empty, while
+// being explicit (via the "preview" labels) that none of it is real data.
+function randomBetween(min, max){
+  return Math.random() * (max - min) + min;
+}
+function renderPreviewSavings(){
+  const amount = Math.round(randomBetween(80, 640));
+  const members = Math.round(randomBetween(1100, 4200));
+  document.getElementById('totalSavings').textContent = '$' + amount.toLocaleString();
+  document.getElementById('savingsSub').textContent =
+    "Example only — members like you have logged wins from $20 to over $1,000 this year. " +
+    "(" + members.toLocaleString() + " wins logged sitewide so far.)";
+
+  // Mark the tracker as a preview rather than letting it look like a real total.
+  const stRight = document.querySelector('.savings-tracker .st-right');
+  if(stRight && !document.getElementById('previewSavingsTag')){
+    const tag = document.createElement('div');
+    tag.id = 'previewSavingsTag';
+    tag.className = 'preview-badge';
+    tag.textContent = 'EXAMPLE — NOT YOUR DATA';
+    stRight.insertBefore(tag, stRight.firstChild);
+  }
+}
+function hidePreviewSavingsIfPresent(){
+  const tag = document.getElementById('previewSavingsTag');
+  if(tag) tag.remove();
+}
+
+// Free-preview library: same card layout as the real library, but every
+// card is locked, the category name is real (matches what's actually in
+// that tier), and a short randomized "preview stat" is shown per card to
+// make it feel alive — again, clearly marked as an example, never wired to
+// actual guide content.
+const PREVIEW_LIBRARY_CARDS = [
+  { tier:1, title:"The Yield Map — Current Edition", category:"Rate comparison" },
+  { tier:1, title:"Fee & Minimum-Balance Trap Guide", category:"Fee breakdown" },
+  { tier:2, title:"Web3 Due-Diligence Checklist", category:"Risk checklist" },
+  { tier:2, title:"This Month's Web3 Mini-Guide", category:"Monthly topic" },
+  { tier:3, title:"Income-Layering Worksheet", category:"Strategy worksheet" },
+  { tier:3, title:"Live Q&A Call Recording — Latest", category:"Recorded call" },
+];
+function renderPreviewLibrary(){
+  const grid = document.getElementById('libraryGrid');
+  grid.innerHTML = '';
+
+  const intro = document.createElement('p');
+  intro.className = 'desc-small';
+  intro.style.cssText = 'color:var(--slate); margin-bottom:18px; grid-column:1/-1;';
+  intro.textContent = "This is what your library will look like once you're on a plan — same layout, real categories, locked content. Pick a tier above whenever you're ready.";
+  grid.appendChild(intro);
+
+  PREVIEW_LIBRARY_CARDS.forEach(item=>{
+    const previewStat = Math.round(randomBetween(2, 5)) + ' min read';
+    const card = document.createElement('div');
+    card.className = 'library-item locked preview-blur';
+    card.innerHTML = `
+      <div class="lib-tag">REQUIRES ${(TIER_NAMES[item.tier] || '').toUpperCase()}</div>
+      <h4>${item.title}</h4>
+      <p>${item.category} · <span style="opacity:0.7;">${previewStat} (example)</span></p>
+      <div class="lib-action locked-action">🔒 LOCKED — PREVIEW ONLY</div>`;
+    grid.appendChild(card);
+  });
+
+  const note = document.createElement('div');
+  note.className = 'preview-overlay-note';
+  note.style.gridColumn = '1/-1';
+  note.textContent = "Titles and categories above are real. Actual content, numbers, and recommendations are only visible to members.";
+  grid.appendChild(note);
+}
+
+// Lets the "See what each guide actually includes" link in the preview
+// banner close the dashboard and jump to the pricing section in one click.
+function closeDashboardToPricing(e){
+  if(e) e.preventDefault();
+  document.getElementById('dashboard').classList.remove('show');
+  document.body.style.overflow = '';
+  document.getElementById('guides').scrollIntoView({ behavior:'smooth' });
 }
 
 // ============ CONTENT VIEWER: PER-USER WATERMARK + COPY DETERRENCE ============
