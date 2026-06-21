@@ -85,6 +85,7 @@ let currentSubscription = null; // row from the `subscriptions` table, or null
 function openAuthModal(view){
   document.getElementById('authModal').classList.add('show');
   switchAuthView(view || 'signin');
+  if(view === 'signup' || !view) updateSignupPlanUI();
 }
 function closeAuthModal(){
   document.getElementById('authModal').classList.remove('show');
@@ -93,6 +94,7 @@ function switchAuthView(view){
   document.getElementById('signinView').style.display = view === 'signin' ? 'block' : 'none';
   document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
   clearAuthError();
+  if(view === 'signup') updateSignupPlanUI();
 }
 
 function showAuthError(message){
@@ -108,6 +110,61 @@ function showAuthError(message){
 function clearAuthError(){
   const el = document.getElementById('authError');
   if(el) el.textContent = '';
+}
+
+// ============ SIGNUP FORM: PROGRESSIVE PLAN PICKER ============
+// Three-step reveal so a plan is never required to sign up:
+//   1. "Want to choose a plan now?" — Not yet (default) / Yes
+//   2. If Yes: "How do you want to buy?" — Single / Stack
+//   3. If Single: one tier + one billing dropdown
+//      If Stack: checkboxes for any combo of the 3 individual tiers
+//      (All-Access is intentionally excluded from stacking — it already
+//      includes everything, so stacking it with anything else is redundant),
+//      each with its own billing dropdown that only enables once checked.
+function updateSignupPlanUI(){
+  const wantsPlanEl = document.querySelector('input[name="wantsPlan"]:checked');
+  const wantsPlan = wantsPlanEl ? wantsPlanEl.value : 'no';
+
+  const purchaseModeField = document.getElementById('purchaseModeField');
+  const singleFields = document.getElementById('singlePlanFields');
+  const stackFields = document.getElementById('stackPlanFields');
+  const submitBtn = document.getElementById('signupSubmitBtn');
+  const stackWarning = document.getElementById('stackEmptyWarning');
+
+  if(wantsPlan === 'no'){
+    purchaseModeField.style.display = 'none';
+    singleFields.style.display = 'none';
+    stackFields.style.display = 'none';
+    if(stackWarning) stackWarning.style.display = 'none';
+    if(submitBtn) submitBtn.textContent = 'CREATE ACCOUNT';
+    return;
+  }
+
+  purchaseModeField.style.display = 'block';
+  const modeEl = document.querySelector('input[name="purchaseMode"]:checked');
+  const mode = modeEl ? modeEl.value : 'single';
+
+  if(mode === 'single'){
+    singleFields.style.display = 'block';
+    stackFields.style.display = 'none';
+    if(stackWarning) stackWarning.style.display = 'none';
+    if(submitBtn) submitBtn.textContent = 'CREATE ACCOUNT & CONTINUE TO CHECKOUT';
+  } else {
+    singleFields.style.display = 'none';
+    stackFields.style.display = 'block';
+
+    // Enable/disable each tier's billing dropdown based on whether its
+    // checkbox is checked — keeps the form honest about what's actually
+    // going to be purchased.
+    let anyChecked = false;
+    document.querySelectorAll('input[name="stackTier"]').forEach(cb=>{
+      const billingSelect = document.querySelector('.stack-tier-billing[data-tier="'+cb.value+'"]');
+      if(billingSelect) billingSelect.disabled = !cb.checked;
+      if(cb.checked) anyChecked = true;
+    });
+    if(stackWarning) stackWarning.style.display = 'none'; // only shown on submit attempt, not while editing
+    if(submitBtn) submitBtn.textContent = anyChecked ? 'CREATE ACCOUNT & CONTINUE TO CHECKOUT' : 'CREATE ACCOUNT';
+  }
 }
 
 // ============ REAL SIGN IN ============
@@ -133,29 +190,64 @@ async function handleSignIn(e){
 
   currentUser = { email: data.user.email, id: data.user.id };
   await loadSubscriptionAndShowDashboard();
+  checkStackQueue(currentUser.email);
   closeAuthModal();
   return false;
 }
 
 // ============ REAL SIGN UP ============
-// Creates the Supabase account, then redirects straight to the correct
-// Lemon Squeezy checkout page for the tier + billing interval the person
-// picked on the signup form — no more manual "go click a START button"
-// step. Email is pre-filled on the checkout page so they don't retype it.
-//
-// "Stack tiers" mode: this still sends them to checkout for the single
-// tier they selected first (their first tier). Adding additional stacked
-// tiers afterward is the next piece of wiring — see TODO below.
+// Creates the Supabase account first, always — no plan selection is ever
+// required to get an account. What happens next depends on what (if
+// anything) was chosen on the form:
+//   - "Not yet": account created, dashboard shown with no active plan.
+//   - "Single": redirect straight to that one tier's Lemon Squeezy checkout.
+//   - "Stack": redirect to the FIRST checked tier's checkout (Lemon Squeezy
+//     buy links are one-product-at-a-time, so multiple tiers can't be paid
+//     in a single checkout). The remaining checked tiers are saved to
+//     localStorage as a queue; after returning from checkout and signing
+//     back in, the dashboard offers a "continue stacking" prompt that walks
+//     through the rest one at a time. This keeps every tier individually
+//     billed and cancellable, as advertised, without losing track of what
+//     they originally asked to stack.
 async function handleSignUp(e){
   e.preventDefault();
   clearAuthError();
   const email = document.getElementById('signupEmail').value;
   const password = document.getElementById('signupPassword').value;
-  const mode = document.querySelector('input[name="purchaseMode"]:checked').value; // 'single' or 'stack'
-  const tierSelect = document.getElementById('signupTier');
-  const billingSelect = document.getElementById('signupBillingInterval');
-  const tier = tierSelect ? parseInt(tierSelect.value, 10) : 2;
-  const billingInterval = billingSelect ? billingSelect.value : 'monthly';
+
+  const wantsPlanEl = document.querySelector('input[name="wantsPlan"]:checked');
+  const wantsPlan = wantsPlanEl ? wantsPlanEl.value : 'no';
+
+  let checkoutPlan = null; // { tier, billingInterval } for the first checkout to send them to
+  let stackQueue = [];     // remaining { tier, billingInterval } pairs, if stacking
+
+  if(wantsPlan === 'yes'){
+    const modeEl = document.querySelector('input[name="purchaseMode"]:checked');
+    const mode = modeEl ? modeEl.value : 'single';
+
+    if(mode === 'single'){
+      const tierSelect = document.getElementById('signupTier');
+      const billingSelect = document.getElementById('signupBillingInterval');
+      checkoutPlan = {
+        tier: tierSelect ? parseInt(tierSelect.value, 10) : 2,
+        billingInterval: billingSelect ? billingSelect.value : 'monthly',
+      };
+    } else {
+      const checked = Array.from(document.querySelectorAll('input[name="stackTier"]:checked'));
+      if(checked.length === 0){
+        const stackWarning = document.getElementById('stackEmptyWarning');
+        if(stackWarning) stackWarning.style.display = 'block';
+        return false; // don't submit — nothing was actually picked to stack
+      }
+      const plans = checked.map(cb=>{
+        const billingSelect = document.querySelector('.stack-tier-billing[data-tier="'+cb.value+'"]');
+        return { tier: parseInt(cb.value, 10), billingInterval: billingSelect ? billingSelect.value : 'monthly' };
+      });
+      checkoutPlan = plans[0];
+      stackQueue = plans.slice(1);
+    }
+  }
+  // wantsPlan === 'no' → checkoutPlan stays null, account is created with no purchase.
 
   const submitBtn = e.target.querySelector('.modal-submit');
   submitBtn.disabled = true;
@@ -164,31 +256,77 @@ async function handleSignUp(e){
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   submitBtn.disabled = false;
-  submitBtn.textContent = 'CREATE ACCOUNT & CONTINUE';
 
   if(error){
     showAuthError(error.message);
+    submitBtn.textContent = checkoutPlan ? 'CREATE ACCOUNT & CONTINUE TO CHECKOUT' : 'CREATE ACCOUNT';
     return false;
   }
 
-  const checkoutUrl = buildCheckoutUrl(tier, email, billingInterval);
+  // No plan chosen — just land them in the (empty) dashboard. No purchase
+  // was ever required to get here.
+  if(!checkoutPlan){
+    currentUser = { email: data.user.email, id: data.user.id };
+    closeAuthModal();
+    await loadSubscriptionAndShowDashboard();
+    return false;
+  }
+
+  const checkoutUrl = buildCheckoutUrl(checkoutPlan.tier, email, checkoutPlan.billingInterval);
 
   if(!checkoutUrl){
-    // Shouldn't happen with the current 4 tiers, but fail safely instead of
-    // silently stranding the person with an account and no path to pay.
+    // Account still exists even if we can't build the URL — don't strand them.
     showAuthError("Account created, but we couldn't find a checkout link for that plan. Please use a START button on the pricing section above.");
     switchAuthView('signin');
     document.getElementById('signinEmail').value = email;
     return false;
   }
 
-  // TODO (next pass): if mode === 'stack', after this first checkout
-  // completes, surface a way for them to add additional tiers at the
-  // 15%-off stacking rate rather than re-running full signup.
+  if(stackQueue.length > 0){
+    try {
+      localStorage.setItem('ledgerStackQueue_' + email, JSON.stringify(stackQueue));
+    } catch(err){
+      console.error('Could not save stack queue:', err);
+    }
+  }
 
   closeAuthModal();
   window.location.href = checkoutUrl;
   return false;
+}
+
+// ============ CONTINUE STACKING (after returning from a checkout) ============
+// If this user has a saved stack queue (more tiers they wanted to add when
+// they originally signed up), offer to send them to the next one. Called
+// after sign-in, alongside the normal dashboard load.
+function checkStackQueue(email){
+  let queue = [];
+  try {
+    queue = JSON.parse(localStorage.getItem('ledgerStackQueue_' + email) || '[]');
+  } catch(err){
+    queue = [];
+  }
+  if(!queue.length) return;
+
+  const next = queue[0];
+  const proceed = confirm(
+    "You still have " + queue.length + " more guide" + (queue.length > 1 ? "s" : "") +
+    " to finish adding to your stack. Continue to checkout for " +
+    (TIER_NAMES[next.tier] || ('Tier ' + next.tier)) + " now?"
+  );
+  if(!proceed) return;
+
+  const remaining = queue.slice(1);
+  if(remaining.length > 0){
+    try { localStorage.setItem('ledgerStackQueue_' + email, JSON.stringify(remaining)); }
+    catch(err){ console.error('Could not update stack queue:', err); }
+  } else {
+    try { localStorage.removeItem('ledgerStackQueue_' + email); }
+    catch(err){ /* non-fatal */ }
+  }
+
+  const checkoutUrl = buildCheckoutUrl(next.tier, email, next.billingInterval);
+  if(checkoutUrl) window.location.href = checkoutUrl;
 }
 
 // ============ REAL SIGN OUT ============
@@ -409,12 +547,24 @@ function initProductButtons(){
     btn.addEventListener('click', (e)=>{
       e.preventDefault();
       const tier = btn.getAttribute('data-tier');
+
+      // Pre-set the form to "yes, single plan, this tier" so clicking a
+      // specific product button takes someone straight to the right
+      // dropdowns already filled in, rather than landing on the generic
+      // "want a plan now?" question they'd have to answer again.
+      const wantsPlanYes = document.querySelector('input[name="wantsPlan"][value="yes"]');
+      if(wantsPlanYes) wantsPlanYes.checked = true;
+      const modeSingle = document.querySelector('input[name="purchaseMode"][value="single"]');
+      if(modeSingle) modeSingle.checked = true;
+
       const tierSelect = document.getElementById('signupTier');
       if(tierSelect) tierSelect.value = tier;
       const activeBilling = document.querySelector('.billing-seg.active');
       const billingSelect = document.getElementById('signupBillingInterval');
       if(billingSelect && activeBilling) billingSelect.value = activeBilling.dataset.billing;
+
       openAuthModal('signup');
+      updateSignupPlanUI();
     });
   });
 }
@@ -514,5 +664,6 @@ document.addEventListener('keydown', (e)=>{
   if(data && data.session && data.session.user){
     currentUser = { email: data.session.user.email, id: data.session.user.id };
     await loadSubscriptionAndShowDashboard();
+    checkStackQueue(currentUser.email);
   }
 })();

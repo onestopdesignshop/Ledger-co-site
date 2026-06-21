@@ -37,6 +37,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<style>
+  /* Scoped styles for the multi-step signup plan picker (single vs. stack).
+     Added inline since these are new classes not yet in css/styles.css —
+     safe to migrate into that file later, but kept self-contained here so
+     this works without needing to touch the main stylesheet. */
+  .stack-tier-options{ display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+  .stack-tier-row{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; border:1px solid rgba(255,255,255,0.12); border-radius:8px;
+    cursor:pointer; background:rgba(255,255,255,0.02);
+  }
+  .stack-tier-row input[type="checkbox"]{ flex:0 0 auto; width:18px; height:18px; cursor:pointer; }
+  .stack-tier-name{ flex:1 1 auto; font-size:14px; }
+  .stack-tier-billing{ flex:0 0 auto; max-width:170px; }
+  .stack-tier-row:has(input:checked){ border-color:var(--gold); background:rgba(212,175,55,0.06); }
+  .stack-tier-billing:disabled{ opacity:0.4; cursor:not-allowed; }
+</style>
 </head>
 <body>
 
@@ -640,7 +657,7 @@
 
     <div id="signupView" style="display:none;">
       <h3>Create your account</h3>
-      <p class="sub">This is the account you'll use to sign in after checkout.</p>
+      <p class="sub">No purchase needed to sign up — pick a plan now if you know which one you want, or skip and decide later from the pricing section.</p>
       <form onsubmit="return handleSignUp(event)">
         <div class="form-field">
           <label for="signupEmail">Email</label>
@@ -650,7 +667,39 @@
           <label for="signupPassword">Password</label>
           <input type="password" id="signupPassword" required placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
         </div>
+
+        <!-- STEP 1: opt in or skip plan selection entirely -->
         <div class="form-field">
+          <label>Want to choose a plan now?</label>
+          <div class="purchase-mode-options">
+            <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="no" checked onchange="updateSignupPlanUI()">
+              <div><strong>Not yet</strong><span>Just create my account — I'll pick a plan later from the pricing section.</span></div>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="yes" onchange="updateSignupPlanUI()">
+              <div><strong>Yes, set me up now</strong><span>I know which guide(s) I want.</span></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 2 (hidden until "Yes" above): single vs. stack -->
+        <div class="form-field" id="purchaseModeField" style="display:none;">
+          <label>How do you want to buy?</label>
+          <div class="purchase-mode-options">
+            <label class="pm-option">
+              <input type="radio" name="purchaseMode" value="single" checked onchange="updateSignupPlanUI()">
+              <div><strong>Single plan</strong><span>One active tier at a time. Upgrade, downgrade, or switch to All-Access whenever — only one bill.</span></div>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="purchaseMode" value="stack" onchange="updateSignupPlanUI()">
+              <div><strong>Stack multiple tiers</strong><span>Own more than one tier at once as separate add-ons, each billed and cancellable on its own. A 15% stacking discount applies to each tier after your first.</span></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 3a (hidden until "single" chosen): one tier + one billing interval -->
+        <div class="form-field" id="singlePlanFields" style="display:none;">
           <label for="signupTier">Which guide do you want?</label>
           <select id="signupTier" class="tier-select">
             <option value="1">The Yield Map</option>
@@ -658,9 +707,7 @@
             <option value="3">The Annotated Portfolio</option>
             <option value="4">All-Access</option>
           </select>
-        </div>
-        <div class="form-field">
-          <label for="signupBillingInterval">Billing</label>
+          <label for="signupBillingInterval" style="margin-top:14px;">Billing</label>
           <select id="signupBillingInterval" class="tier-select">
             <option value="monthly" selected>Monthly</option>
             <option value="quarterly">Quarterly</option>
@@ -668,20 +715,49 @@
             <option value="lifetime">Lifetime — one payment</option>
           </select>
         </div>
-        <div class="form-field">
-          <label>How do you want to buy?</label>
-          <div class="purchase-mode-options">
-            <label class="pm-option">
-              <input type="radio" name="purchaseMode" value="single" checked>
-              <div><strong>Single plan</strong><span>One active tier at a time. Upgrade, downgrade, or switch to All-Access whenever — only one bill.</span></div>
+
+        <!-- STEP 3b (hidden until "stack" chosen): check any combo of the 3 individual
+             tiers (All-Access is excluded from stacking by design — it already includes
+             everything, so stacking it with anything else is redundant), each with its
+             own billing interval. -->
+        <div class="form-field" id="stackPlanFields" style="display:none;">
+          <label>Choose any combination of guides to stack</label>
+          <div class="stack-tier-options">
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="1" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Yield Map</span>
+              <select class="tier-select stack-tier-billing" data-tier="1">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
             </label>
-            <label class="pm-option">
-              <input type="radio" name="purchaseMode" value="stack">
-              <div><strong>Stack multiple tiers</strong><span>Own more than one tier at once as separate add-ons, each billed and cancellable on its own. A 15% stacking discount applies to each tier after your first.</span></div>
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="2" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Full Ledger</span>
+              <select class="tier-select stack-tier-billing" data-tier="2">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
+            </label>
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="3" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Annotated Portfolio</span>
+              <select class="tier-select stack-tier-billing" data-tier="3">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
             </label>
           </div>
+          <p class="desc-small" id="stackEmptyWarning" style="display:none; color:#e0b85e;">Pick at least one guide to stack, or switch back to "Not yet" above to skip plan selection.</p>
         </div>
-        <button type="submit" class="modal-submit">CREATE ACCOUNT &amp; CONTINUE</button>
+
+        <button type="submit" class="modal-submit" id="signupSubmitBtn">CREATE ACCOUNT</button>
       </form>
       <div class="modal-switch">Already a member? <a onclick="switchAuthView('signin')" tabindex="0" role="button">Sign in</a></div>
     </div>
