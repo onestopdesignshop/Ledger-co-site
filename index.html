@@ -196,7 +196,7 @@
               <li><span class="check">✓</span> Email access for quick factual questions</li>
             </ul>
           </div>
-          <a href="https://aldgateco.lemonsqueezy.com/checkout/buy/8abad108-253b-4bb2-aaa6-599fff90a506" class="product-btn" data-product="yield-map" data-tier="1">START THE YIELD MAP</a>
+          <button class="product-btn" data-product-key="yieldMap" data-price-id="yieldMap.monthly">START THE YIELD MAP</button>
         </div>
 
         <div class="product-card featured">
@@ -227,7 +227,7 @@
               <li><span class="check">✓</span> 1 written Q&A submission per month (48-hr response)</li>
             </ul>
           </div>
-          <a href="https://aldgateco.lemonsqueezy.com/checkout/buy/37257542-7ae5-4689-af24-9a2205e08e86" class="product-btn" data-product="full-ledger" data-tier="2">START THE FULL LEDGER</a>
+          <button class="product-btn" data-product-key="fullLedger" data-price-id="fullLedger.monthly">START THE FULL LEDGER</button>
         </div>
 
         <div class="product-card">
@@ -259,7 +259,7 @@
               <li><span class="check">✓</span> Priority access to every future guide</li>
             </ul>
           </div>
-          <a href="https://aldgateco.lemonsqueezy.com/checkout/buy/bf5d135b-4f21-47ac-a9a6-f607740bfd28" class="product-btn" data-product="annotated-portfolio" data-tier="3">START THE ANNOTATED PORTFOLIO</a>
+          <button class="product-btn" data-product-key="annotatedPortfolio" data-price-id="annotatedPortfolio.monthly">START THE ANNOTATED PORTFOLIO</button>
         </div>
       </div>
 
@@ -284,7 +284,7 @@
           <p class="desc-small annual-note" style="display:none;">≈ $74.25/mo billed yearly</p>
           <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
           <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access + all future updates</p>
-          <a href="https://aldgateco.lemonsqueezy.com/checkout/buy/f3a9e598-c22b-40f5-8a80-adad5a75ec6a" class="product-btn" data-product="all-access" data-tier="4" style="display:block;">START ALL-ACCESS</a>
+          <button class="product-btn" data-product-key="allAccess" data-price-id="allAccess.monthly" style="display:block;">START ALL-ACCESS</button>
         </div>
       </div>
 
@@ -293,7 +293,7 @@
           <span class="badge">SAVE 25%</span>
           <p>Flip the toggle above to see annual pricing on every tier — billed once a year instead of monthly, locked in for 12 months, 25% cheaper than paying month to month. Cancel or switch tiers anytime before renewal.</p>
         </div>
-        <a href="https://aldgateco.lemonsqueezy.com/checkout/buy/f3a9e598-c22b-40f5-8a80-adad5a75ec6a" class="btn-ghost">Go to checkout →</a>
+        <button class="btn-ghost" data-product-key="allAccess" data-price-id="allAccess.annual">Go to checkout →</button>
       </div>
 
       <!-- ONBOARDING PREVIEW -->
@@ -874,7 +874,7 @@
         <div class="dash-meta-item"><div class="label">Current plan</div><div class="val" id="dashPlanVal">The Full Ledger</div></div>
         <div class="dash-meta-item"><div class="label">Billing</div><div class="val" id="dashBillingVal">Monthly</div></div>
         <div class="dash-meta-item"><div class="label">Renews</div><div class="val">Jul 17, 2026</div></div>
-        <div class="dash-meta-item"><div class="label">Manage billing</div><div class="val"><a href="https://aldgateco.lemonsqueezy.com/billing" target="_blank" rel="noopener" style="color:var(--gold);">Lemon Squeezy portal →</a></div></div>
+        <div class="dash-meta-item"><div class="label">Manage billing</div><div class="val"><span style="color:var(--slate); font-style:italic;">Customer portal link pending Paddle integration</span></div></div>
       </div>
     </div>
 
@@ -966,6 +966,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/main.js"></script>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script src="js/paddle-checkout.js"></script>
 
 </body>
 </html>
