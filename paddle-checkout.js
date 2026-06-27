@@ -1,0 +1,175 @@
+/**
+ * Ledger & Co. — Paddle Checkout Integration
+ * Shared by index.html and capital-systems-suite.html
+ *
+ * ============================================================
+ * SETUP — STATUS: COMPLETE
+ * ============================================================
+ * 1. PADDLE_TOKENS  — DONE. Both sandbox and production tokens filled in.
+ * 2. PADDLE_ENVIRONMENT — currently "sandbox". Test thoroughly, then
+ *                          change to "production" to go live.
+ * 3. PRICE_IDS — DONE. All 28 real Price IDs filled in across all 7
+ *                products (4 main-site tiers + 3 Capital Systems Suite
+ *                tiers).
+ *
+ * Nothing left to configure here — this file is ready to upload.
+ * Remaining work is in the HTML files: replace placeholder/Lemon Squeezy
+ * buttons with <button data-price-id="..."> elements per the
+ * PADDLE_INTEGRATION_GUIDE.md.
+ * ============================================================
+ */
+
+// ---- 1. Client-side tokens (safe to expose publicly) ----
+// Paddle issues a SEPARATE token per environment — sandbox and live
+// each need their own. The PADDLE_ENVIRONMENT flag below controls
+// which one actually gets used; you don't need to swap these manually.
+const PADDLE_TOKENS = {
+  sandbox: "live_1169b590d533bfcc1e8de0587f0",
+  production: "live_333d303a9a968277c51360d7111",
+};
+
+// ---- 2. Environment ----
+// Use "sandbox" until you've tested a real transaction successfully.
+// Switch to "production" only once sandbox testing works end-to-end.
+const PADDLE_ENVIRONMENT = "production"; // live mode — using the confirmed-good token
+
+// ---- 3. Price ID map ----
+// Replace every "pri_REPLACE_ME..." below with the real Price ID from Paddle
+// (Catalog > Products > [product] > Prices > copy the ID starting with "pri_")
+const PRICE_IDS = {
+  // ---------- Ledger & Co. main site membership tiers ----------
+  yieldMap: {
+    monthly:   "pri_01kw30xwd5e5vqb1ys1jwdcmv4",
+    quarterly: "pri_01kw30wq20hwz77sf8cw9dqgv9",
+    annual:    "pri_01kw30sxdvgprwh6fwevjsht81",
+    lifetime:  "pri_01kw30pbncgebkjdeyjqws9azy",
+  },
+  fullLedger: {
+    monthly:   "pri_01kw328ryam9fpbj0h7rmt8dbv",
+    quarterly: "pri_01kw327tgfzh7x09z8q71e2sqh",
+    annual:    "pri_01kw326be37xc43gaw0eyyfwrh",
+    lifetime:  "pri_01kw322y5agp54ckp2h8dmsyn5",
+  },
+  annotatedPortfolio: {
+    monthly:   "pri_01kw31jb94zax5b099xxtzn6xs",
+    quarterly: "pri_01kw31hbkqmjnn3papbxvyq8p5",
+    annual:    "pri_01kw31fa7vffn8cr1dp2zrdkcb",
+    lifetime:  "pri_01kw31df78xnprnt4jb4k28swn",
+  },
+  allAccess: {
+    monthly:   "pri_01kw32pc2gk7825qxzfb3c9ztz",
+    quarterly: "pri_01kw32n8381d692yfwygppwsrw",
+    annual:    "pri_01kw32hgyx1j9g2hvx0na6gde2",
+    lifetime:  "pri_01kw32g13r3vmtnxmmcqx20f6p",
+  },
+
+  // ---------- Capital Systems Suite ----------
+  foundation: {
+    payInFull: "pri_01kw35kg3nebnzrqkcx8kzgc0b",
+    weekly:    "pri_01kw392b9fxb2ra8j1n2mwkjnb",
+    biweekly:  "pri_01kw37y2y4dhmarcy2r0f6gjqx",
+    monthly:   "pri_01kw37ky4pyg57qhsb67wxz6bw",
+  },
+  operator: {
+    payInFull: "pri_01kw396zvqmtvfxr7pdmmvzf6g",
+    weekly:    "pri_01kw39k79yngbjkx6qdnpcrkjs",
+    biweekly:  "pri_01kw39g5a8q81npd75bh23173x",
+    monthly:   "pri_01kw39b3qa3wqdtstr7qjp9xjz",
+  },
+  institutional: {
+    payInFull: "pri_01kw39p6z17zmahqgdybvr2rs4",
+    weekly:    "pri_01kw39wyc5zhvqvmjm3jaztbny",
+    biweekly:  "pri_01kw39tsp5n46sghczaxmkn3mx",
+    monthly:   "pri_01kw39sa68fpfv709ec0kv9mcf",
+  },
+};
+
+// ============================================================
+// Below this line: integration logic. Should not need editing
+// unless Paddle changes their API.
+// ============================================================
+
+(function initPaddle() {
+  if (typeof Paddle === "undefined") {
+    console.error(
+      "Paddle.js did not load. Make sure the script tag " +
+      "<script src='https://cdn.paddle.com/paddle/v2/paddle.js'></script> " +
+      "is included BEFORE this file in your HTML."
+    );
+    return;
+  }
+
+  Paddle.Environment.set(PADDLE_ENVIRONMENT);
+  Paddle.Initialize({
+    token: PADDLE_TOKENS[PADDLE_ENVIRONMENT],
+    eventCallback: function (data) {
+      // Fires on checkout events (loaded, completed, closed, etc.)
+      // Useful later for analytics or redirecting after purchase.
+      if (data.name === "checkout.completed") {
+        console.log("Checkout completed:", data);
+        // Optional: redirect to a thank-you page here, e.g.:
+        // window.location.href = "/thank-you.html";
+      }
+    },
+  });
+
+  console.log("Paddle initialized in " + PADDLE_ENVIRONMENT + " mode.");
+})();
+
+/**
+ * Opens a Paddle checkout overlay for the given Price ID.
+ * Call this from any button's onclick, or attach automatically
+ * via data-price-id attributes (see wireUpButtons() below).
+ */
+function openPaddleCheckout(priceId) {
+  if (!priceId || priceId.startsWith("pri_REPLACE_ME")) {
+    alert(
+      "This product isn't fully configured yet — its Paddle Price ID " +
+      "hasn't been set. (Dev note: check PRICE_IDS in paddle-checkout.js)"
+    );
+    console.warn("Attempted checkout with unconfigured price ID:", priceId);
+    return;
+  }
+
+  Paddle.Checkout.open({
+    items: [{ priceId: priceId, quantity: 1 }],
+  });
+}
+
+/**
+ * Automatically wires up any element with a [data-price-id] attribute
+ * so you don't need an inline onclick on every button.
+ *
+ * Usage in HTML:
+ *   <button data-price-id="foundation.payInFull">Get Foundation</button>
+ *
+ * The value should be a dot-path into PRICE_IDS above, e.g.
+ * "foundation.payInFull" resolves to PRICE_IDS.foundation.payInFull.
+ */
+function wireUpButtons() {
+  const buttons = document.querySelectorAll("[data-price-id]");
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const path = btn.getAttribute("data-price-id"); // e.g. "foundation.payInFull"
+      const priceId = resolvePricePath(path);
+      openPaddleCheckout(priceId);
+    });
+  });
+}
+
+function resolvePricePath(path) {
+  const parts = path.split(".");
+  let current = PRICE_IDS;
+  for (const part of parts) {
+    if (current && typeof current === "object" && part in current) {
+      current = current[part];
+    } else {
+      console.error("Could not resolve price path:", path);
+      return null;
+    }
+  }
+  return current;
+}
+
+document.addEventListener("DOMContentLoaded", wireUpButtons);
