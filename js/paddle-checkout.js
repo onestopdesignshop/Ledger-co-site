@@ -6,36 +6,26 @@
  * SETUP — STATUS: COMPLETE
  * ============================================================
  * 1. PADDLE_TOKENS  — DONE. Both sandbox and production tokens filled in.
- * 2. PADDLE_ENVIRONMENT — currently "sandbox". Test thoroughly, then
- *                          change to "production" to go live.
- * 3. PRICE_IDS — DONE. All 28 real Price IDs filled in across all 7
- *                products (4 main-site tiers + 3 Capital Systems Suite
- *                tiers).
+ * 2. PADDLE_ENVIRONMENT — "production" (live mode).
+ * 3. PRICE_IDS — DONE. All 28 real Price IDs filled in.
  *
- * Nothing left to configure here — this file is ready to upload.
- * Remaining work is in the HTML files: replace placeholder/Lemon Squeezy
- * buttons with <button data-price-id="..."> elements per the
- * PADDLE_INTEGRATION_GUIDE.md.
+ * UPDATED: openPaddleCheckout now passes the signed-in user's email to
+ * Paddle (as customer.email + customData.email) so the webhook can match
+ * the purchase to the right account. The email comes from
+ * window.__ledgerUserEmail, which main.js sets after sign-in.
  * ============================================================
  */
 
 // ---- 1. Client-side tokens (safe to expose publicly) ----
-// Paddle issues a SEPARATE token per environment — sandbox and live
-// each need their own. The PADDLE_ENVIRONMENT flag below controls
-// which one actually gets used; you don't need to swap these manually.
 const PADDLE_TOKENS = {
   sandbox: "live_1169b590d533bfcc1e8de0587f0",
   production: "live_333d303a9a968277c51360d7111",
 };
 
 // ---- 2. Environment ----
-// Use "sandbox" until you've tested a real transaction successfully.
-// Switch to "production" only once sandbox testing works end-to-end.
-const PADDLE_ENVIRONMENT = "production"; // live mode — using the confirmed-good token
+const PADDLE_ENVIRONMENT = "production"; // live mode
 
 // ---- 3. Price ID map ----
-// Replace every "pri_REPLACE_ME..." below with the real Price ID from Paddle
-// (Catalog > Products > [product] > Prices > copy the ID starting with "pri_")
 const PRICE_IDS = {
   // ---------- Ledger & Co. main site membership tiers ----------
   yieldMap: {
@@ -85,8 +75,7 @@ const PRICE_IDS = {
 };
 
 // ============================================================
-// Below this line: integration logic. Should not need editing
-// unless Paddle changes their API.
+// Below this line: integration logic.
 // ============================================================
 
 (function initPaddle() {
@@ -103,12 +92,9 @@ const PRICE_IDS = {
   Paddle.Initialize({
     token: PADDLE_TOKENS[PADDLE_ENVIRONMENT],
     eventCallback: function (data) {
-      // Fires on checkout events (loaded, completed, closed, etc.)
-      // Useful later for analytics or redirecting after purchase.
       if (data.name === "checkout.completed") {
         console.log("Checkout completed:", data);
-        // Optional: redirect to a thank-you page here, e.g.:
-        // window.location.href = "/thank-you.html";
+        // Optional: redirect to a thank-you page here.
       }
     },
   });
@@ -118,8 +104,8 @@ const PRICE_IDS = {
 
 /**
  * Opens a Paddle checkout overlay for the given Price ID.
- * Call this from any button's onclick, or attach automatically
- * via data-price-id attributes (see wireUpButtons() below).
+ * Passes the signed-in user's email through so the webhook can match the
+ * purchase to the correct account.
  */
 function openPaddleCheckout(priceId) {
   if (!priceId || priceId.startsWith("pri_REPLACE_ME")) {
@@ -131,27 +117,33 @@ function openPaddleCheckout(priceId) {
     return;
   }
 
-  Paddle.Checkout.open({
+  // Pull the signed-in user's email (set by main.js after sign-in).
+  const userEmail =
+    (typeof window !== "undefined" && window.__ledgerUserEmail) || null;
+
+  const checkoutOptions = {
     items: [{ priceId: priceId, quantity: 1 }],
-  });
+  };
+
+  if (userEmail) {
+    checkoutOptions.customer = { email: userEmail };
+    checkoutOptions.customData = { email: userEmail };
+  }
+
+  Paddle.Checkout.open(checkoutOptions);
 }
 
 /**
- * Automatically wires up any element with a [data-price-id] attribute
- * so you don't need an inline onclick on every button.
- *
+ * Automatically wires up any element with a [data-price-id] attribute.
  * Usage in HTML:
  *   <button data-price-id="foundation.payInFull">Get Foundation</button>
- *
- * The value should be a dot-path into PRICE_IDS above, e.g.
- * "foundation.payInFull" resolves to PRICE_IDS.foundation.payInFull.
  */
 function wireUpButtons() {
   const buttons = document.querySelectorAll("[data-price-id]");
   buttons.forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
-      const path = btn.getAttribute("data-price-id"); // e.g. "foundation.payInFull"
+      const path = btn.getAttribute("data-price-id");
       const priceId = resolvePricePath(path);
       openPaddleCheckout(priceId);
     });
