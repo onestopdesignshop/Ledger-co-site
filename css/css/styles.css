@@ -1,0 +1,69 @@
+# Fix: White "product-btn" buttons on index.html
+
+## The bug
+
+`.product-btn` was originally styled for `<a>` tags, which are transparent by
+default. Converting those to real `<button>` elements (so Paddle.js can attach
+click handlers) exposed the browser's default button background — typically
+white or light gray — because the CSS never explicitly set `background`.
+
+## The fix
+
+In `css/styles.css`, find this exact block:
+
+```css
+.product-btn{
+  display:block; text-align:center;
+  font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:0.04em;
+  padding:14px; border:1px solid var(--gold); color:var(--gold);
+  transition:all .2s ease;
+}
+```
+
+Replace it with this (adds `background: transparent`, `cursor: pointer`,
+`width: 100%`, and a few browser-default resets specific to `<button>`):
+
+```css
+.product-btn{
+  display:block; text-align:center;
+  font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:0.04em;
+  padding:14px; border:1px solid var(--gold); color:var(--gold);
+  background:transparent;
+  width:100%;
+  cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+  transition:all .2s ease;
+}
+```
+
+The featured-card override below it already handles the gold background for
+the highlighted tier, so no change needed there:
+
+```css
+.product-card.featured .product-btn{background:var(--gold); color:var(--bg);}
+.product-card.featured .product-btn:hover{background:var(--gold-bright);}
+```
+
+## Where to make this edit
+
+1. Go to your repo on GitHub
+2. Open `css/styles.css`
+3. Click the pencil/edit icon
+4. Find the `.product-btn{...}` rule (search for "product-btn" if needed)
+5. Replace it with the version above
+6. Commit directly to `main`
+
+## After committing
+
+Check the live site in an incognito tab — the "START THE YIELD MAP" / "START
+THE FULL LEDGER" / etc. buttons should now show the correct dark background
+with gold border/text, matching how they looked before the Paddle conversion.
+
+## Why this didn't show up in testing earlier
+
+The earlier render test used `wkhtmltoimage` in a sandboxed environment that
+couldn't load Google Fonts, but it still correctly used the *actual* CSS file
+bundled with `capital-systems-suite.html` (which has its own separate `.btn`
+class, styled differently and already safe for `<button>` elements). The
+`index.html` bug only exists in the separate `css/styles.css` file, which
+wasn't available to inspect until just now.
