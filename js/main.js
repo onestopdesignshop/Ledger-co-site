@@ -34,6 +34,9 @@ const LIBRARY = [
 const SUPABASE_URL = "https://wtlftsaigiehropidurn.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0bGZ0c2FpZ2llaHJvcGlkdXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjgxMDgsImV4cCI6MjA5NzQwNDEwOH0.tXL7p_ULHp-HePXceMNbOKJAsHHlAlfR6v4UDWaZ1Z0";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Expose the client so paddle-checkout.js can read the live session at
+// checkout time (so the buyer's email is always attached without sign-out).
+window.__ledgerSupabaseClient = sb;
 
 // Tier names now include the Capital Systems Suite (5/6/7).
 const TIER_NAMES = {
