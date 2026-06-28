@@ -1,0 +1,68 @@
+
+  /* ===== LEDGER & CO. BRAND VALUES SECTION ===== */
+  .brand-values{
+    background:linear-gradient(160deg,#0a1124 0%, #0f1a33 55%, #162542 100%);
+    color:#fff;
+  }
+  .brand-values .bv-inner{
+    display:grid; grid-template-columns:minmax(280px,430px) 1fr;
+    max-width:1180px; margin:0 auto; min-height:600px;
+  }
+  .brand-values .bv-left{
+    background:#0a1124; padding:78px 50px;
+    display:flex; flex-direction:column; justify-content:center;
+    border-right:1px solid rgba(212,175,55,.22);
+  }
+  .brand-values .bv-left h2{
+    font-family:'Fraunces',serif; font-size:clamp(28px,3.2vw,40px);
+    font-weight:500; line-height:1.15; margin:14px 0 20px; color:#fff;
+  }
+  .brand-values .bv-left h2 em{ color:var(--gold-bright); font-style:italic; display:block; }
+  .brand-values .bv-left p{ color:var(--slate); font-size:15.5px; margin:0; line-height:1.6; }
+  .brand-values .bv-quote{
+    margin-top:30px !important; font-family:'Fraunces',serif; font-style:italic;
+    color:var(--gold-bright); font-size:16px; line-height:1.5;
+    border-top:1px solid rgba(212,175,55,.25); padding-top:22px;
+  }
+  .brand-values .bv-right{
+    padding:54px 50px; display:grid; grid-template-columns:1fr 1fr; align-content:center;
+  }
+  .brand-values .bv-row{
+    padding:22px 20px; border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .brand-values .bv-row:nth-child(odd){ border-right:1px solid rgba(255,255,255,.06); }
+  .brand-values .bv-word{
+    font-family:'Fraunces',serif; font-size:clamp(26px,2.6vw,34px); font-weight:700;
+    color:#0b0f1a; line-height:1.1; margin-bottom:9px; letter-spacing:.005em;
+    -webkit-text-stroke:1px rgba(255,255,255,.92); paint-order:stroke fill;
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  .brand-values .bv-word .bv-ini{
+    color:var(--gold); font-size:1.35em;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.5); paint-order:stroke fill;
+    text-shadow:0 2px 20px rgba(212,175,55,.3);
+  }
+  .brand-values .bv-desc{
+    font-family:'Inter',sans-serif; font-size:12.5px; color:var(--slate);
+    line-height:1.5; margin:0; display:flex; gap:9px; align-items:flex-start;
+  }
+  .brand-values .bv-desc::before{
+    content:"\25C6"; color:var(--gold); font-size:9px; line-height:1.7;
+    flex-shrink:0; opacity:.9;
+  }
+  .brand-values .bv-co{
+    grid-column:1 / -1; margin-top:16px; padding:28px 20px 4px;
+    border-top:1px solid rgba(212,175,55,.2);
+    display:flex; gap:38px; flex-wrap:wrap; align-items:flex-start;
+  }
+  .brand-values .bv-co-amp{
+    font-family:'Fraunces',serif; font-size:44px; color:#9a7b3f; line-height:1; font-weight:700;
+  }
+  .brand-values .bv-co-item{ flex:1; min-width:200px; }
+  @media(max-width:860px){
+    .brand-values .bv-inner{ grid-template-columns:1fr; }
+    .brand-values .bv-left{ border-right:none; border-bottom:1px solid rgba(212,175,55,.22); }
+    .brand-values .bv-right{ grid-template-columns:1fr; }
+    .brand-values .bv-row:nth-child(odd){ border-right:none; }
+    .brand-values .bv-co{ flex-direction:column; gap:18px; }
+  }
