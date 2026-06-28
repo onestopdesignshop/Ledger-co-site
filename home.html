@@ -1081,3 +1081,104 @@
   }
 })();
 </script>
+<!-- ============ SHOP BUTTON (self-injecting — paste before </body>) ============ -->
+<style>
+  #shopNavLink{ display:none; }
+  body.is-authed #shopNavLink{ display:inline-block; }
+  body.is-authed .sign-in-link{ opacity:0.75; }
+  .dash-shop-btn{
+    display:inline-block; margin-top:10px;
+    font-family:'JetBrains Mono',monospace; text-transform:uppercase;
+    letter-spacing:0.12em; font-size:12px; font-weight:500;
+    color:#0a1124; background:var(--gold, #c9a13b);
+    border:none; border-radius:3px; cursor:pointer;
+    padding:13px 26px; text-decoration:none;
+    transition:background .2s ease;
+  }
+  .dash-shop-btn:hover{ background:var(--gold-bright, #e7c86a); }
+</style>
+<script>
+(function(){
+  function injectShopNav(){
+    var navLinks = document.getElementById('navLinks');
+    if(navLinks && !document.getElementById('shopNavLink')){
+      var a = document.createElement('a');
+      a.id = 'shopNavLink';
+      a.href = '#guides';
+      a.textContent = 'Shop';
+      navLinks.appendChild(a);
+    }
+  }
+  function injectDashShopBtn(){
+    var dashHero = document.querySelector('#dashboard .dash-hero');
+    if(dashHero && !document.getElementById('dashShopBtn')){
+      var btn = document.createElement('button');
+      btn.id = 'dashShopBtn';
+      btn.className = 'dash-shop-btn';
+      btn.textContent = 'Browse plans →';
+      btn.addEventListener('click', goShop);
+      dashHero.appendChild(btn);
+    }
+  }
+  function goShop(){
+    var dash = document.getElementById('dashboard');
+    if(dash){ dash.classList.remove('show'); }
+    document.body.style.overflow = '';
+    var guides = document.getElementById('guides');
+    if(guides){ guides.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  }
+  function wireShopNav(){
+    var link = document.getElementById('shopNavLink');
+    if(link){
+      link.addEventListener('click', function(e){ e.preventDefault(); goShop(); });
+    }
+  }
+  function setAuthed(on){
+    document.body.classList.toggle('is-authed', !!on);
+  }
+  function wrapAuthFns(){
+    if(typeof window.loadUserAndShow === 'function' && !window.__shopWrappedLogin){
+      var origLoad = window.loadUserAndShow;
+      window.loadUserAndShow = async function(){
+        var r = await origLoad.apply(this, arguments);
+        setAuthed(true);
+        return r;
+      };
+      window.__shopWrappedLogin = true;
+    }
+    if(typeof window.signOut === 'function' && !window.__shopWrappedLogout){
+      var origOut = window.signOut;
+      window.signOut = async function(){
+        var r = await origOut.apply(this, arguments);
+        setAuthed(false);
+        return r;
+      };
+      window.__shopWrappedLogout = true;
+    }
+  }
+  function checkExistingSession(){
+    try{
+      var sb = window.__ledgerSupabaseClient;
+      if(sb && sb.auth && typeof sb.auth.getSession === 'function'){
+        sb.auth.getSession().then(function(res){
+          if(res && res.data && res.data.session && res.data.session.user){
+            setAuthed(true);
+          }
+        }).catch(function(){});
+      }
+    }catch(e){}
+  }
+  function init(){
+    injectShopNav();
+    injectDashShopBtn();
+    wireShopNav();
+    wrapAuthFns();
+    checkExistingSession();
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
