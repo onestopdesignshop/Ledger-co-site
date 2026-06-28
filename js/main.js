@@ -265,6 +265,20 @@ function setBilling(period){
   document.querySelectorAll('.annual-note').forEach(el=> el.style.display = (period==='annual') ? 'block' : 'none');
   document.querySelectorAll('.quarterly-note').forEach(el=> el.style.display = (period==='quarterly') ? 'block' : 'none');
   document.querySelectorAll('.lifetime-note').forEach(el=> el.style.display = (period==='lifetime') ? 'block' : 'none');
+
+  // CRITICAL: keep each checkout button's price ID in sync with the toggle.
+  // Buttons carry data-product-key (e.g. "yieldMap"); we rebuild the full
+  // price path (e.g. "yieldMap.lifetime") so the RIGHT Paddle price opens.
+  // Without this, every button stays stuck on ".monthly" no matter what
+  // price the card is showing.
+  // We sync only the main tier buttons inside .product-card and
+  // .all-access-card. The "Go to checkout" annual banner button lives in
+  // .annual-banner and is intentionally NOT synced — it must always stay
+  // on allAccess.annual.
+  document.querySelectorAll('.product-card [data-product-key], .all-access-card [data-product-key]').forEach(btn=>{
+    var key = btn.getAttribute('data-product-key');
+    if(key) btn.setAttribute('data-price-id', key + '.' + period);
+  });
 }
 
 function toggleFaq(el){
@@ -430,4 +444,7 @@ function applyQuizRecommendation(){
 document.addEventListener('DOMContentLoaded', function(){
   if(document.querySelector('input[name="wantsPlan"]')) updateSignupPlanUI();
   if(document.getElementById('quizGoal')) updateQuizRecommendation();
+  // Initialize billing toggle to monthly so every checkout button's
+  // data-price-id is correctly set from the start (not just after a tap).
+  if(document.querySelector('.billing-seg')) setBilling('monthly');
 });
