@@ -1,0 +1,133 @@
+<!-- ===============================
+LEDGER & CO. — BRAND VALUES SECTION (FINAL)
+Style: Option 5 — gold initial + black word with white outline, on navy
+Drop this <section> into your page. Styles are scoped under .brand-values
+so they won't collide with the rest of your site.
+================================ -->
+
+<style>
+  .brand-values{
+    --bv-navy-900:#0a1124;
+    --bv-navy-800:#0f1a33;
+    --bv-navy-700:#162542;
+    --bv-gold:#c9a45c;
+    --bv-gold-bright:#e3c074;
+    --bv-gold-deep:#9a7b3f;
+    --bv-muted:#aeb6c6;
+    background:linear-gradient(160deg,var(--bv-navy-900) 0%, var(--bv-navy-800) 55%, var(--bv-navy-700) 100%);
+    color:#fff;
+    font-family:Georgia,'Times New Roman',serif;
+  }
+  .brand-values *{box-sizing:border-box;}
+  .brand-values .bv-inner{
+    display:grid;grid-template-columns:minmax(280px,430px) 1fr;
+    max-width:1180px;margin:0 auto;min-height:620px;
+  }
+
+  /* LEFT BRAND PANEL */
+  .brand-values .bv-left{
+    background:var(--bv-navy-900);
+    padding:80px 50px;
+    display:flex;flex-direction:column;justify-content:center;
+    border-right:1px solid rgba(201,164,92,.22);
+  }
+  .brand-values .bv-tag{
+    font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;
+    letter-spacing:.3em;font-size:11px;color:var(--bv-gold);margin-bottom:24px;
+  }
+  .brand-values .bv-left h2{
+    font-size:clamp(30px,3.4vw,42px);font-weight:400;line-height:1.15;
+    margin:0 0 22px;color:#fff;
+  }
+  .brand-values .bv-left h2 em{color:var(--bv-gold-bright);font-style:italic;display:block;}
+  .brand-values .bv-left p{color:#aab2c4;font-size:15.5px;margin:0;line-height:1.6;}
+  .brand-values .bv-quote{
+    margin-top:34px;font-style:italic;color:var(--bv-gold-bright);
+    font-size:16px;line-height:1.5;
+    border-top:1px solid rgba(201,164,92,.25);padding-top:24px;
+  }
+
+  /* RIGHT — VALUES LIST */
+  .brand-values .bv-right{padding:58px 52px;display:grid;grid-template-columns:1fr 1fr;align-content:center;}
+  .brand-values .bv-row{padding:24px 22px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .brand-values .bv-row:nth-child(odd){border-right:1px solid rgba(255,255,255,.06);}
+
+  /* the engraved word: black fill + white outline, gold initial */
+  .brand-values .bv-word{
+    font-size:clamp(28px,2.8vw,36px);font-weight:700;color:#0b0f1a;
+    line-height:1.1;margin-bottom:10px;letter-spacing:.005em;
+    -webkit-text-stroke:1px rgba(255,255,255,.92);
+    paint-order:stroke fill;
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  .brand-values .bv-word .bv-ini{
+    color:var(--bv-gold);font-size:1.35em;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.5);
+    paint-order:stroke fill;
+    text-shadow:0 2px 20px rgba(201,164,92,.3);
+  }
+  .brand-values .bv-desc{
+    font-size:12.5px;color:var(--bv-muted);line-height:1.5;margin:0;
+    display:flex;gap:9px;align-items:flex-start;
+  }
+  .brand-values .bv-desc::before{
+    content:"\25C6";color:var(--bv-gold);font-size:9px;line-height:1.7;
+    flex-shrink:0;opacity:.9;
+  }
+
+  /* & CO. STRIP */
+  .brand-values .bv-co{
+    grid-column:1 / -1;margin-top:18px;padding:30px 22px 4px;
+    border-top:1px solid rgba(201,164,92,.2);
+    display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;
+  }
+  .brand-values .bv-co-amp{
+    font-size:46px;color:var(--bv-gold-deep);line-height:1;font-weight:700;
+  }
+  .brand-values .bv-co-item{flex:1;min-width:200px;}
+
+  @media(max-width:860px){
+    .brand-values .bv-inner{grid-template-columns:1fr;}
+    .brand-values .bv-left{border-right:none;border-bottom:1px solid rgba(201,164,92,.22);}
+    .brand-values .bv-right{grid-template-columns:1fr;}
+    .brand-values .bv-row:nth-child(odd){border-right:none;}
+    .brand-values .bv-co{flex-direction:column;gap:20px;}
+  }
+</style>
+
+<section id="brand-values" class="brand-values">
+  <div class="bv-inner">
+
+    <!-- LEFT PANEL -->
+    <div class="bv-left">
+      <span class="bv-tag">Our Foundation</span>
+      <h2>The meaning behind <em>Ledger &amp; Co.</em></h2>
+      <p>Our name is a discipline. Principles that turn hard financial lessons into lasting confidence and wealth.</p>
+      <p class="bv-quote">"Leadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and creating Opportunity for every investor."</p>
+    </div>
+
+    <!-- RIGHT: VALUES -->
+    <div class="bv-right">
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">L</span>eadership</div><p class="bv-desc">Leading with integrity, accountability, and a long-term perspective.</p></div>
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">E</span>ducation</div><p class="bv-desc">Clear, practical financial education that empowers informed decisions.</p></div>
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">D</span>iscipline</div><p class="bv-desc">Patience, consistency, and evidence-based investing over speculation.</p></div>
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">G</span>rowth</div><p class="bv-desc">Sustainable growth through continuous learning and sound strategy.</p></div>
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">E</span>xcellence</div><p class="bv-desc">Every piece of research held to the highest standard of quality.</p></div>
+      <div class="bv-row"><div class="bv-word"><span class="bv-ini">R</span>esearch</div><p class="bv-desc">Transparent, research-driven analysis that puts facts first.</p></div>
+
+      <!-- & CO. -->
+      <div class="bv-co">
+        <span class="bv-co-amp">&amp;</span>
+        <div class="bv-co-item">
+          <div class="bv-word"><span class="bv-ini">C</span>onfidence</div>
+          <p class="bv-desc">Helping members invest with greater confidence through knowledge and preparation.</p>
+        </div>
+        <div class="bv-co-item">
+          <div class="bv-word"><span class="bv-ini">O</span>pportunity</div>
+          <p class="bv-desc">Identifying long-term opportunity through disciplined research and education.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
