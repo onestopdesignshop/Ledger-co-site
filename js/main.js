@@ -62,6 +62,34 @@ function closeAuthModal(){
 function switchAuthView(view){
   document.getElementById('signinView').style.display = view === 'signin' ? 'block' : 'none';
   document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
+  var resetView = document.getElementById('resetRequestView');
+  if(resetView) resetView.style.display = view === 'reset' ? 'block' : 'none';
+}
+
+// Send a password-reset email. Supabase emails the user a secure link that
+// lands on reset-password.html, where they set a new password.
+async function handleResetRequest(e){
+  e.preventDefault();
+  const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+  const btn = document.getElementById('resetRequestBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'SENDING…'; }
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://onestopdesignshop.github.io/Ledger-co-site/reset-password.html'
+  });
+
+  if(btn){ btn.disabled = false; btn.textContent = 'SEND RESET LINK'; }
+
+  // Always show the same confirmation whether or not the email exists —
+  // this avoids revealing which emails have accounts (a privacy best practice).
+  if(error){
+    console.error('Reset request error:', error.message);
+  }
+  var formWrap = document.getElementById('resetRequestForm');
+  var doneWrap = document.getElementById('resetRequestDone');
+  if(formWrap) formWrap.style.display = 'none';
+  if(doneWrap) doneWrap.style.display = 'block';
+  return false;
 }
 
 // Look up this user's tier from the subscriptions table.
