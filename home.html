@@ -77,6 +77,22 @@
     font-size:12.5px; color:var(--slate); margin-top:14px; padding:12px 14px;
     border:1px dashed rgba(255,255,255,0.15); border-radius:8px;
   }
+
+  /* SHOP button + account nav (signed-in only) */
+  #shopNavLink, #accountNavLink{ display:none; }
+  body.is-authed #shopNavLink{ display:inline-block; }
+  body.is-authed #accountNavLink{ display:inline-block; }
+  body.is-authed .sign-in-link{ display:none; }
+  .dash-shop-btn{
+    display:inline-block; margin-top:10px;
+    font-family:'JetBrains Mono',monospace; text-transform:uppercase;
+    letter-spacing:0.12em; font-size:12px; font-weight:500;
+    color:#0a1124; background:var(--gold, #c9a13b);
+    border:none; border-radius:3px; cursor:pointer;
+    padding:13px 26px; text-decoration:none;
+    transition:background .2s ease;
+  }
+  .dash-shop-btn:hover{ background:var(--gold-bright, #e7c86a); }
 </style>
 </head>
 <body>
@@ -715,11 +731,7 @@
           </div>
         </div>
 
-        <!-- QUIZ (hidden until "Not sure" above) — a few quick questions that map to
-             a recommended tier or combination of tiers. Nothing here is graded or
-             "correct" — it's a steer, not a gate, and the result feeds straight into
-             the same single/stack fields below so the person can still see and change
-             exactly what they're signing up for before submitting. -->
+        <!-- QUIZ (hidden until "Not sure" above) -->
         <div class="form-field" id="quizFields" style="display:none;">
           <div class="quiz-question">
             <label>What's mainly on your mind right now?</label>
@@ -787,10 +799,7 @@
           </select>
         </div>
 
-        <!-- STEP 3b (hidden until "stack" chosen): check any combo of the 3 individual
-             tiers (All-Access is excluded from stacking by design — it already includes
-             everything, so stacking it with anything else is redundant), each with its
-             own billing interval. -->
+        <!-- STEP 3b (hidden until "stack" chosen) -->
         <div class="form-field" id="stackPlanFields" style="display:none;">
           <label>Choose any combination of guides to stack</label>
           <div class="stack-tier-options">
@@ -969,73 +978,13 @@
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script src="js/paddle-checkout.js"></script>
 
-</body>
-</html>
-
-<!-- ============ LEDGER & CO. — FADE-AWAY SPLASH (shows once, auto-fades after 4s) ============ -->
-<div class="ledger-splash" id="ledgerSplash">
-  <div class="ls-tag">Our Foundation</div>
-  <div class="ls-title">The meaning behind <em>Ledger &amp; Co.</em></div>
-  <p class="ls-intro">Six principles that turn hard financial lessons into lasting confidence and wealth.</p>
-
-  <div class="ls-rows">
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">L</span>eadership</div><div class="ls-d">Integrity &amp; long-term perspective.</div></div>
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>ducation</div><div class="ls-d">Practical financial education.</div></div>
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">D</span>iscipline</div><div class="ls-d">Evidence over speculation.</div></div>
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">G</span>rowth</div><div class="ls-d">Sustainable, sound strategy.</div></div>
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>xcellence</div><div class="ls-d">Highest standard of quality.</div></div>
-    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">R</span>esearch</div><div class="ls-d">Facts-first analysis.</div></div>
-  </div>
-
-  <button class="ls-skip" id="ledgerSplashSkip">Tap anywhere to enter →</button>
-</div>
-
-<script>
-(function(){
-  var splash = document.getElementById('ledgerSplash');
-  if(!splash) return;
-
-  // SHOW ONCE: if they've seen it before, hide immediately and stop.
-  // To make it show EVERY visit instead, delete these 4 lines.
-  if(localStorage.getItem('ledgerSplashSeen')){
-    splash.classList.add('is-done');
-    return;
-  }
-
-  // Prevent background scroll while splash is up.
-  document.body.style.overflow = 'hidden';
-
-  function dismiss(){
-    splash.classList.add('is-hiding');
-    localStorage.setItem('ledgerSplashSeen', '1');   // remember for next time
-    document.body.style.overflow = '';
-    setTimeout(function(){ splash.classList.add('is-done'); }, 700);
-  }
-
-  // Auto-fade after 4 seconds.
-  var timer = setTimeout(dismiss, 4000);
-
-  // Tap anywhere (or the skip text) to dismiss early.
-  splash.addEventListener('click', function(){ clearTimeout(timer); dismiss(); });
-})();
-</script>
-<!-- ============ PASSWORD RESET (self-injecting — paste before </body>) ============ -->
-<!--
-  This block adds the "Forgot password?" link + reset form to your sign-in modal
-  automatically, without you having to edit the middle of index.html.
-  Paste this whole thing right BEFORE the closing </body> tag — the same easy
-  spot where the splash script went.
--->
+<!-- ============ PASSWORD RESET (self-injecting) ============ -->
 <script>
 (function(){
   function injectReset(){
     var signinView = document.getElementById('signinView');
     if(!signinView) return;
-
-    // Don't double-inject if it's already there.
     if(document.getElementById('resetRequestView')) return;
-
-    // 1) Add the "Forgot password?" link just before the "No account yet?" line.
     var noAccountLine = signinView.querySelector('.modal-switch');
     var forgotWrap = document.createElement('div');
     forgotWrap.className = 'modal-switch';
@@ -1049,9 +998,7 @@
     } else {
       signinView.appendChild(forgotWrap);
     }
-
-    // 2) Build the reset-request view and add it to the modal box.
-    var modalBox = signinView.parentElement; // .modal-box
+    var modalBox = signinView.parentElement;
     var resetView = document.createElement('div');
     resetView.id = 'resetRequestView';
     resetView.style.display = 'none';
@@ -1073,7 +1020,6 @@
       + '<div class="modal-switch">Remembered it? <a onclick="switchAuthView(\'signin\')" tabindex="0" role="button">Back to sign in</a></div>';
     modalBox.appendChild(resetView);
   }
-
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', injectReset);
   } else {
@@ -1081,22 +1027,8 @@
   }
 })();
 </script>
-<!-- ============ SHOP BUTTON (self-injecting — paste before </body>) ============ -->
-<style>
-  #shopNavLink{ display:none; }
-  body.is-authed #shopNavLink{ display:inline-block; }
-  body.is-authed .sign-in-link{ opacity:0.75; }
-  .dash-shop-btn{
-    display:inline-block; margin-top:10px;
-    font-family:'JetBrains Mono',monospace; text-transform:uppercase;
-    letter-spacing:0.12em; font-size:12px; font-weight:500;
-    color:#0a1124; background:var(--gold, #c9a13b);
-    border:none; border-radius:3px; cursor:pointer;
-    padding:13px 26px; text-decoration:none;
-    transition:background .2s ease;
-  }
-  .dash-shop-btn:hover{ background:var(--gold-bright, #e7c86a); }
-</style>
+
+<!-- ============ SHOP BUTTON (signed-in shop entry, stays signed in) ============ -->
 <script>
 (function(){
   function injectShopNav(){
@@ -1106,7 +1038,27 @@
       a.id = 'shopNavLink';
       a.href = '#guides';
       a.textContent = 'Shop';
+      a.addEventListener('click', function(e){ e.preventDefault(); goShop(); });
       navLinks.appendChild(a);
+    }
+  }
+  function injectAccountNav(){
+    var actions = document.querySelector('header nav > div:last-child');
+    if(actions && !document.getElementById('accountNavLink')){
+      var a = document.createElement('a');
+      a.id = 'accountNavLink';
+      a.href = '#';
+      a.className = 'sign-in-link';
+      a.textContent = 'My Account';
+      a.style.display = 'none';
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        var dash = document.getElementById('dashboard');
+        if(dash){ dash.classList.add('show'); document.body.style.overflow = 'hidden'; }
+      });
+      var signInLink = actions.querySelector('.sign-in-link');
+      if(signInLink){ actions.insertBefore(a, signInLink); }
+      else { actions.appendChild(a); }
     }
   }
   function injectDashShopBtn(){
@@ -1124,14 +1076,9 @@
     var dash = document.getElementById('dashboard');
     if(dash){ dash.classList.remove('show'); }
     document.body.style.overflow = '';
+    document.body.classList.add('is-authed'); // stay signed in after closing dashboard
     var guides = document.getElementById('guides');
     if(guides){ guides.scrollIntoView({ behavior:'smooth', block:'start' }); }
-  }
-  function wireShopNav(){
-    var link = document.getElementById('shopNavLink');
-    if(link){
-      link.addEventListener('click', function(e){ e.preventDefault(); goShop(); });
-    }
   }
   function setAuthed(on){
     document.body.classList.toggle('is-authed', !!on);
@@ -1156,24 +1103,26 @@
       window.__shopWrappedLogout = true;
     }
   }
-  function checkExistingSession(){
-    try{
-      var sb = window.__ledgerSupabaseClient;
-      if(sb && sb.auth && typeof sb.auth.getSession === 'function'){
-        sb.auth.getSession().then(function(res){
-          if(res && res.data && res.data.session && res.data.session.user){
-            setAuthed(true);
-          }
-        }).catch(function(){});
-      }
-    }catch(e){}
+  function watchSession(){
+    var sb = window.__ledgerSupabaseClient;
+    if(!sb || !sb.auth) return;
+    function check(){
+      sb.auth.getSession().then(function(res){
+        var signedIn = !!(res && res.data && res.data.session && res.data.session.user);
+        setAuthed(signedIn);
+      }).catch(function(){});
+    }
+    check();
+    if(typeof sb.auth.onAuthStateChange === 'function'){
+      sb.auth.onAuthStateChange(function(){ check(); });
+    }
   }
   function init(){
     injectShopNav();
+    injectAccountNav();
     injectDashShopBtn();
-    wireShopNav();
     wrapAuthFns();
-    checkExistingSession();
+    watchSession();
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init);
@@ -1182,3 +1131,6 @@
   }
 })();
 </script>
+
+</body>
+</html>
