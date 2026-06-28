@@ -1,0 +1,45 @@
+================================================================
+PASSWORD RESET — index.html edit  (ONE small change)
+================================================================
+
+In index.html, FIND this block (it's the end of your Sign-in view,
+inside <div id="signinView">):
+
+------------------ FIND THIS ------------------
+      <div class="modal-switch">No account yet? <a onclick="switchAuthView('signup')" tabindex="0" role="button">Subscribe & create one</a></div>
+    </div>
+-----------------------------------------------
+
+REPLACE IT WITH THIS (adds a "Forgot password?" link + a new reset view):
+
+------------------ PASTE THIS -----------------
+      <div class="modal-switch" style="margin-top:10px;">
+        <a onclick="switchAuthView('reset')" tabindex="0" role="button">Forgot password?</a>
+      </div>
+      <div class="modal-switch">No account yet? <a onclick="switchAuthView('signup')" tabindex="0" role="button">Subscribe &amp; create one</a></div>
+    </div>
+
+    <!-- ===== PASSWORD RESET REQUEST VIEW ===== -->
+    <div id="resetRequestView" style="display:none;">
+      <h3>Reset your password</h3>
+      <p class="sub">Enter the email on your account and we'll send you a link to set a new password.</p>
+
+      <div id="resetRequestForm">
+        <form onsubmit="return handleResetRequest(event)">
+          <div class="form-field">
+            <label for="resetEmail">Email</label>
+            <input type="email" id="resetEmail" required placeholder="you@email.com" autocomplete="email">
+          </div>
+          <button type="submit" class="modal-submit" id="resetRequestBtn">SEND RESET LINK</button>
+        </form>
+      </div>
+
+      <div id="resetRequestDone" style="display:none;">
+        <p class="sub" style="color:var(--gold-bright);">If an account exists for that email, a reset link is on its way. Check your inbox (and spam folder), then follow the link to set a new password.</p>
+      </div>
+
+      <div class="modal-switch">Remembered it? <a onclick="switchAuthView('signin')" tabindex="0" role="button">Back to sign in</a></div>
+    </div>
+-----------------------------------------------
+
+That's the only change to index.html. Save & commit.
