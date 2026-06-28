@@ -27,10 +27,30 @@ const LIBRARY = [
     body:`<h4>This Month's Call</h4>
     <p>[Recording embed placeholder] — topics covered: reading promotional CD ladders, evaluating a member-submitted web3 yield product, and Q&A on position sizing.</p>` },
 ];
-const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access"};
 
-// DEMO STATE — in a real build this comes from your Lemon Squeezy + Supabase session, not localStorage
-let demoState = JSON.parse(localStorage.getItem('ledgerDemoState') || 'null');
+// ============================================================================
+// REAL SUPABASE AUTH (replaces the old demo/localStorage auth)
+// ============================================================================
+const SUPABASE_URL = "https://wtlftsaigiehropidurn.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0bGZ0c2FpZ2llaHJvcGlkdXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjgxMDgsImV4cCI6MjA5NzQwNDEwOH0.tXL7p_ULHp-HePXceMNbOKJAsHHlAlfR6v4UDWaZ1Z0";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Tier names now include the Capital Systems Suite (5/6/7).
+const TIER_NAMES = {
+  1:"The Yield Map",
+  2:"The Full Ledger",
+  3:"The Annotated Portfolio",
+  4:"All-Access",
+  5:"Capital Systems — Foundation",
+  6:"Capital Systems — Operator",
+  7:"Capital Systems — Institutional",
+};
+
+// Current signed-in user's resolved access. Null when logged out.
+let currentUser = null; // { email, tier, billing_interval, status }
+
+// Exposed so paddle-checkout.js can attach the email to checkout.
+window.__ledgerUserEmail = null;
 
 function openAuthModal(view){
   document.getElementById('authModal').classList.add('show');
@@ -44,88 +64,98 @@ function switchAuthView(view){
   document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
 }
 
-function handleSignIn(e){
-  e.preventDefault();
-  const email = document.getElementById('signinEmail').value;
-  // DEMO: accepts any email/password and loads a sample "Full Ledger" plan.
-  // REAL VERSION: call your auth provider, then look up this user's active
-  // Lemon Squeezy subscription tier from your database before rendering the dashboard.
-  //
-  // SINGLE-SESSION ENFORCEMENT (the real mechanism, not simulated here):
-  // Each sign-in should generate a new session token and write it to a
-  // `current_session_token` column on that user's row in Supabase, overwriting
-  // any previous token. Every authenticated request from the dashboard checks
-  // that its token still matches the one stored server-side. If someone signs
-  // in elsewhere, the old token no longer matches, and that other device is
-  // signed out next time it tries to load anything — effectively one active
-  // device per account. Supabase Auth's session management + a short
-  // Postgres trigger handles this; full snippet is in backend-wiring-guide.md.
-  if(!demoState){
-    demoState = { email: email, tier: 2, billing: "Monthly" };
-    localStorage.setItem('ledgerDemoState', JSON.stringify(demoState));
-  } else {
-    demoState.email = email;
+// Look up this user's tier from the subscriptions table.
+async function fetchAccess(email){
+  const { data, error } = await sb
+    .from("subscriptions")
+    .select("tier, billing_interval, status")
+    .eq("user_email", email)
+    .order("tier", { ascending: false }) // if multiple rows, take highest tier
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    console.error("Access lookup failed:", error.message);
+    return null;
   }
-  closeAuthModal();
-  showDashboard();
-  return false;
+  return data; // null if no active purchase yet
 }
 
-function handleSignUp(e){
+async function handleSignIn(e){
   e.preventDefault();
-  const email = document.getElementById('signupEmail').value;
-  const mode = document.querySelector('input[name="purchaseMode"]:checked').value; // 'single' or 'stack'
-  // DEMO: in production this should create the user in your auth provider,
-  // store their chosen purchase mode (single vs. stack) on their account row,
-  // then redirect to the specific Lemon Squeezy checkout(s) for the plan(s) they
-  // picked — for "stack," that means a separate checkout per tier, each its own
-  // Lemon Squeezy subscription, with a 15% stacking discount coupon applied to
-  // every tier after the first. Dashboard access unlocks per-tier as each
-  // webhook confirms payment — see backend-wiring-guide.md.
-  alert(mode === 'stack'
-    ? "In the live version, you'd now check out each tier separately, with 15% off every tier after your first. Your dashboard will show all of them together."
-    : "In the live version, this continues to Lemon Squeezy checkout for the single plan you selected. You can upgrade, downgrade, or switch to All-Access anytime from your dashboard.");
-  demoState = { email: email, tier: 2, billing: "Monthly", mode: mode, stackedTiers: mode === 'stack' ? [1,2] : null };
-  localStorage.setItem('ledgerDemoState', JSON.stringify(demoState));
-  closeAuthModal();
-  showDashboard();
+  const email = document.getElementById('signinEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signinPassword').value;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert("Sign-in failed: " + error.message);
+    return false;
+  }
+  await loadUserAndShow(email);
   return false;
 }
 
-function signOut(){
-  // Fully clear demo session state (in addition to hiding the dashboard) so a
-  // fresh sign-in doesn't inherit the previous session's plan/email. A real
-  // implementation should also invalidate the server-side session token here.
-  demoState = null;
-  localStorage.removeItem('ledgerDemoState');
+async function handleSignUp(e){
+  e.preventDefault();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const modeEl = document.querySelector('input[name="purchaseMode"]:checked');
+  const mode = modeEl ? modeEl.value : 'single';
+
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) {
+    alert("Sign-up failed: " + error.message);
+    return false;
+  }
+
+  // If "Confirm email" is ON in Supabase, there's no session until they verify.
+  if (data.session) {
+    await loadUserAndShow(email);
+    // After sign-up, send them to checkout for the plan they picked.
+    // (Their dashboard will show "No active plan" until the purchase webhook fires.)
+  } else {
+    alert("Account created. Check your email to confirm, then sign in.");
+    switchAuthView("signin");
+  }
+  return false;
+}
+
+// Shared post-auth: resolve access, expose email to checkout, show dashboard.
+async function loadUserAndShow(email){
+  const access = await fetchAccess(email);
+  currentUser = {
+    email,
+    tier: access && access.status === "active" ? (access.tier ?? 0) : 0,
+    billing_interval: access?.billing_interval ?? "—",
+    status: access?.status ?? "none",
+  };
+  window.__ledgerUserEmail = email;
+  closeAuthModal();
+  showDashboard();
+}
+
+async function signOut(){
+  await sb.auth.signOut();
+  currentUser = null;
+  window.__ledgerUserEmail = null;
   document.getElementById('dashboard').classList.remove('show');
   document.body.style.overflow = '';
 }
 
 function showDashboard(){
-  if(!demoState) return;
-  document.getElementById('demoEmailDisplay').textContent = demoState.email;
+  if(!currentUser) return;
+  const tier = currentUser.tier; // 0 = signed in, no purchase yet
+  document.getElementById('demoEmailDisplay').textContent = currentUser.email;
 
-  // In "stack" mode, a member's effective unlock level is the highest tier
-  // among their separately-purchased tiers, even though each is billed
-  // independently. In "single" mode, it's just their one active tier.
-  const effectiveTier = demoState.mode === 'stack' && demoState.stackedTiers
-    ? Math.max(...demoState.stackedTiers)
-    : demoState.tier;
-
-  const planLabel = demoState.mode === 'stack' && demoState.stackedTiers
-    ? demoState.stackedTiers.map(t => TIER_NAMES[t]).join(' + ')
-    : TIER_NAMES[demoState.tier];
-
+  const planLabel = tier >= 1 ? TIER_NAMES[tier] : "No active plan";
   document.getElementById('dashPlanName').textContent = planLabel.toUpperCase();
   document.getElementById('dashPlanVal').textContent = planLabel;
-  document.getElementById('dashBillingVal').textContent = demoState.billing;
+  document.getElementById('dashBillingVal').textContent = currentUser.billing_interval;
   renderSavings();
 
   const grid = document.getElementById('libraryGrid');
   grid.innerHTML = '';
   LIBRARY.forEach((item, idx)=>{
-    const unlocked = effectiveTier >= item.minTier;
+    const unlocked = tier >= item.minTier;
     const card = document.createElement('div');
     card.className = 'library-item' + (unlocked ? '' : ' locked');
     card.innerHTML = `
@@ -145,9 +175,22 @@ function showDashboard(){
   document.body.style.overflow = 'hidden';
 }
 
+// Restore session on page load (refresh shouldn't sign them out).
+(async function restoreSession(){
+  try {
+    const { data } = await sb.auth.getSession();
+    if (data?.session?.user?.email) {
+      window.__ledgerUserEmail = data.session.user.email;
+      // Not auto-opening the dashboard on load; just expose the email so
+      // checkout works for an already-signed-in visitor.
+    }
+  } catch (err) {
+    console.error("Session restore failed:", err);
+  }
+})();
+
 // DEMO: a simple self-reported savings tracker. In production, store this
-// per-user in your Supabase `subscriptions`-adjacent table (e.g. a `wins` table
-// keyed by user_email) rather than localStorage, so it persists across devices.
+// per-user in Supabase rather than localStorage so it persists across devices.
 function renderSavings(){
   const total = parseFloat(localStorage.getItem('ledgerTotalSavings') || '0');
   document.getElementById('totalSavings').textContent = '$' + total.toLocaleString();
@@ -165,10 +208,6 @@ function logWin(){
 }
 
 // ============ CONTENT VIEWER: PER-USER WATERMARK + COPY DETERRENCE ============
-// NOTE: this deters casual copy/paste and identifies the source of any leaked
-// screenshot or photo via the visible watermark. It does not and cannot block
-// screenshots themselves — no website can detect or prevent OS-level screenshots,
-// regardless of what JS or CSS tricks are used. Don't let anyone tell you otherwise.
 function buildWatermark(email){
   const stamp = email + ' · ' + new Date().toLocaleDateString();
   const layer = document.createElement('div');
@@ -183,32 +222,26 @@ function buildWatermark(email){
 
 function openViewer(idx){
   const item = LIBRARY[idx];
-  if(!item || !demoState) return;
+  if(!item || !currentUser) return;
   document.getElementById('viewerTitle').textContent = item.title;
-  document.getElementById('viewerLicenseEmail').textContent = demoState.email;
+  document.getElementById('viewerLicenseEmail').textContent = currentUser.email;
 
   const contentEl = document.getElementById('viewerContent');
   contentEl.innerHTML = '';
   const body = document.createElement('div');
   body.innerHTML = item.body || '<p>Content coming soon.</p>';
   contentEl.appendChild(body);
-  contentEl.appendChild(buildWatermark(demoState.email)); // per-user visible watermark
+  contentEl.appendChild(buildWatermark(currentUser.email));
 
   document.getElementById('contentViewer').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
 function closeViewer(){
   document.getElementById('contentViewer').classList.remove('show');
-  // The dashboard sits underneath the viewer and is itself a full-screen
-  // overlay, so scroll should stay locked only if the dashboard is still
-  // open. Previously this unconditionally re-locked scroll, which left the
-  // page stuck even after both overlays were closed.
   const dashboardOpen = document.getElementById('dashboard').classList.contains('show');
   document.body.style.overflow = dashboardOpen ? 'hidden' : '';
 }
 
-// Copy/right-click/print deterrence scoped to the content viewer only —
-// never applied site-wide, so the marketing pages stay normal to use and to search-engine-index.
 document.addEventListener('copy', (e)=>{
   if(document.getElementById('contentViewer').classList.contains('show')){
     e.preventDefault();
@@ -249,9 +282,6 @@ function toggleFaq(el){
 }
 
 // ============ MOBILE NAV MENU ============
-// Toggles the same .navlinks list used by desktop nav; CSS shows it as a
-// dropdown panel under 860px width. Previously the toggle button existed in
-// markup/CSS with no JS behind it, so tapping it did nothing.
 function initMobileNav(){
   const toggle = document.getElementById('navMobileToggle');
   const links = document.getElementById('navLinks');
@@ -263,7 +293,6 @@ function initMobileNav(){
     toggle.textContent = isOpen ? '×' : '☰';
   });
 
-  // Close the menu after tapping a nav link, and when clicking outside it.
   links.addEventListener('click', (e)=>{
     if(e.target.tagName === 'A'){
       links.classList.remove('mobile-open');
@@ -293,7 +322,7 @@ revealEls.forEach(el=>obs.observe(el));
 // ============ EMAIL CAPTURE POPUP ============
 function showEmailPopup(){
   if(sessionStorage.getItem('ledgerEmailPopupSeen')) return;
-  if(demoState) return; // don't bug existing members
+  if(currentUser) return; // don't bug signed-in members
   const overlay = document.getElementById('emailPopup');
   overlay.classList.add('show');
   requestAnimationFrame(()=> overlay.classList.add('in'));
@@ -307,11 +336,6 @@ function closeEmailPopup(){
 function handleEmailCapture(e){
   e.preventDefault();
   const email = document.getElementById('popupEmail').value;
-  // DEMO: in production, send this email to your list provider (e.g. via a
-  // Lemon Squeezy newsletter integration, ConvertKit, or Mailchimp API call),
-  // and trigger an automated welcome email that delivers
-  // "stock-evaluation-framework.md" (rendered as a PDF) — see build notes
-  // for the exact automation steps.
   console.log('Captured lead email:', email);
   document.getElementById('emailPopupForm').style.display = 'none';
   document.getElementById('emailPopupSuccess').style.display = 'block';
@@ -322,4 +346,88 @@ setTimeout(showEmailPopup, 4000);
 
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape'){ closeAuthModal(); closeEmailPopup(); closeViewer(); }
+});
+
+// ============================================================================
+// SIGNUP FORM UI — quiz + single/stack plan picker
+// These are referenced by onchange/onclick in index.html's signup form.
+// They control which fields show; actual checkout happens via the START
+// buttons (Paddle) — signup here just creates the account.
+// ============================================================================
+
+function updateSignupPlanUI(){
+  var wants = (document.querySelector('input[name="wantsPlan"]:checked') || {}).value || 'no';
+  var quizFields = document.getElementById('quizFields');
+  var modeField = document.getElementById('purchaseModeField');
+  var singleFields = document.getElementById('singlePlanFields');
+  var stackFields = document.getElementById('stackPlanFields');
+
+  // Show quiz only when "help me decide"
+  if(quizFields) quizFields.style.display = (wants === 'quiz') ? 'block' : 'none';
+
+  // Show purchase-mode (single/stack) only when "yes, set me up"
+  if(modeField) modeField.style.display = (wants === 'yes') ? 'block' : 'none';
+
+  if(wants === 'yes'){
+    var mode = (document.querySelector('input[name="purchaseMode"]:checked') || {}).value || 'single';
+    if(singleFields) singleFields.style.display = (mode === 'single') ? 'block' : 'none';
+    if(stackFields)  stackFields.style.display  = (mode === 'stack')  ? 'block' : 'none';
+
+    // Enable each stack tier's billing dropdown only when its checkbox is checked
+    document.querySelectorAll('.stack-tier-row').forEach(function(row){
+      var cb = row.querySelector('input[type="checkbox"]');
+      var sel = row.querySelector('.stack-tier-billing');
+      if(cb && sel) sel.disabled = !cb.checked;
+    });
+  } else {
+    if(singleFields) singleFields.style.display = 'none';
+    if(stackFields)  stackFields.style.display  = 'none';
+  }
+}
+
+function updateQuizRecommendation(){
+  var goal   = (document.getElementById('quizGoal')   || {}).value || 'web3-curious';
+  var depth  = (document.getElementById('quizDepth')  || {}).value || 'light';
+  var budget = (document.getElementById('quizBudget') || {}).value || 'low';
+
+  // Simple steer: map answers to a recommended tier (1-4).
+  var tier = 2; // default Full Ledger
+  if(goal === 'park-cash' && depth === 'light' && budget === 'low') tier = 1;
+  else if(goal === 'all-of-it' || depth === 'deep') tier = 4;
+  else if(goal === 'build-income') tier = 3;
+  else if(goal === 'web3-curious') tier = 2;
+  if(budget === 'high' && tier < 3) tier = 3;
+
+  var names = {1:'The Yield Map', 2:'The Full Ledger', 3:'The Annotated Portfolio', 4:'All-Access'};
+  var notes = {
+    1:'A low-cost start if you mainly want better places to park cash.',
+    2:'A good middle ground if web3 questions are part of what brought you here.',
+    3:'Deeper, hands-on guidance with worksheets and a monthly call.',
+    4:'Everything across all tiers, with combined priority Q&A.'
+  };
+  var nameEl = document.getElementById('quizResultName');
+  var noteEl = document.getElementById('quizResultNote');
+  if(nameEl) nameEl.textContent = names[tier];
+  if(noteEl) noteEl.textContent = notes[tier];
+
+  // stash for applyQuizRecommendation
+  window.__quizRecommendedTier = tier;
+}
+
+function applyQuizRecommendation(){
+  var tier = window.__quizRecommendedTier || 2;
+  // Switch the user into "yes, set me up" + single plan, preset to the tier.
+  var yesRadio = document.querySelector('input[name="wantsPlan"][value="yes"]');
+  if(yesRadio) yesRadio.checked = true;
+  var singleRadio = document.querySelector('input[name="purchaseMode"][value="single"]');
+  if(singleRadio) singleRadio.checked = true;
+  var tierSelect = document.getElementById('signupTier');
+  if(tierSelect) tierSelect.value = String(tier);
+  updateSignupPlanUI();
+}
+
+// Run once on load so the form starts in the right state.
+document.addEventListener('DOMContentLoaded', function(){
+  if(document.querySelector('input[name="wantsPlan"]')) updateSignupPlanUI();
+  if(document.getElementById('quizGoal')) updateQuizRecommendation();
 });
