@@ -1019,3 +1019,65 @@
   splash.addEventListener('click', function(){ clearTimeout(timer); dismiss(); });
 })();
 </script>
+<!-- ============ PASSWORD RESET (self-injecting — paste before </body>) ============ -->
+<!--
+  This block adds the "Forgot password?" link + reset form to your sign-in modal
+  automatically, without you having to edit the middle of index.html.
+  Paste this whole thing right BEFORE the closing </body> tag — the same easy
+  spot where the splash script went.
+-->
+<script>
+(function(){
+  function injectReset(){
+    var signinView = document.getElementById('signinView');
+    if(!signinView) return;
+
+    // Don't double-inject if it's already there.
+    if(document.getElementById('resetRequestView')) return;
+
+    // 1) Add the "Forgot password?" link just before the "No account yet?" line.
+    var noAccountLine = signinView.querySelector('.modal-switch');
+    var forgotWrap = document.createElement('div');
+    forgotWrap.className = 'modal-switch';
+    forgotWrap.style.marginTop = '10px';
+    forgotWrap.innerHTML = '<a tabindex="0" role="button">Forgot password?</a>';
+    forgotWrap.querySelector('a').addEventListener('click', function(){
+      switchAuthView('reset');
+    });
+    if(noAccountLine){
+      signinView.insertBefore(forgotWrap, noAccountLine);
+    } else {
+      signinView.appendChild(forgotWrap);
+    }
+
+    // 2) Build the reset-request view and add it to the modal box.
+    var modalBox = signinView.parentElement; // .modal-box
+    var resetView = document.createElement('div');
+    resetView.id = 'resetRequestView';
+    resetView.style.display = 'none';
+    resetView.innerHTML = ''
+      + '<h3>Reset your password</h3>'
+      + '<p class="sub">Enter the email on your account and we\'ll send you a link to set a new password.</p>'
+      + '<div id="resetRequestForm">'
+      +   '<form onsubmit="return handleResetRequest(event)">'
+      +     '<div class="form-field">'
+      +       '<label for="resetEmail">Email</label>'
+      +       '<input type="email" id="resetEmail" required placeholder="you@email.com" autocomplete="email">'
+      +     '</div>'
+      +     '<button type="submit" class="modal-submit" id="resetRequestBtn">SEND RESET LINK</button>'
+      +   '</form>'
+      + '</div>'
+      + '<div id="resetRequestDone" style="display:none;">'
+      +   '<p class="sub" style="color:var(--gold-bright);">If an account exists for that email, a reset link is on its way. Check your inbox (and spam folder), then follow the link to set a new password.</p>'
+      + '</div>'
+      + '<div class="modal-switch">Remembered it? <a onclick="switchAuthView(\'signin\')" tabindex="0" role="button">Back to sign in</a></div>';
+    modalBox.appendChild(resetView);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', injectReset);
+  } else {
+    injectReset();
+  }
+})();
+</script>
