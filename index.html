@@ -971,3 +971,51 @@
 
 </body>
 </html>
+
+<!-- ============ LEDGER & CO. — FADE-AWAY SPLASH (shows once, auto-fades after 4s) ============ -->
+<div class="ledger-splash" id="ledgerSplash">
+  <div class="ls-tag">Our Foundation</div>
+  <div class="ls-title">The meaning behind <em>Ledger &amp; Co.</em></div>
+  <p class="ls-intro">Six principles that turn hard financial lessons into lasting confidence and wealth.</p>
+
+  <div class="ls-rows">
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">L</span>eadership</div><div class="ls-d">Integrity &amp; long-term perspective.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>ducation</div><div class="ls-d">Practical financial education.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">D</span>iscipline</div><div class="ls-d">Evidence over speculation.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">G</span>rowth</div><div class="ls-d">Sustainable, sound strategy.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>xcellence</div><div class="ls-d">Highest standard of quality.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">R</span>esearch</div><div class="ls-d">Facts-first analysis.</div></div>
+  </div>
+
+  <button class="ls-skip" id="ledgerSplashSkip">Tap anywhere to enter →</button>
+</div>
+
+<script>
+(function(){
+  var splash = document.getElementById('ledgerSplash');
+  if(!splash) return;
+
+  // SHOW ONCE: if they've seen it before, hide immediately and stop.
+  // To make it show EVERY visit instead, delete these 4 lines.
+  if(localStorage.getItem('ledgerSplashSeen')){
+    splash.classList.add('is-done');
+    return;
+  }
+
+  // Prevent background scroll while splash is up.
+  document.body.style.overflow = 'hidden';
+
+  function dismiss(){
+    splash.classList.add('is-hiding');
+    localStorage.setItem('ledgerSplashSeen', '1');   // remember for next time
+    document.body.style.overflow = '';
+    setTimeout(function(){ splash.classList.add('is-done'); }, 700);
+  }
+
+  // Auto-fade after 4 seconds.
+  var timer = setTimeout(dismiss, 4000);
+
+  // Tap anywhere (or the skip text) to dismiss early.
+  splash.addEventListener('click', function(){ clearTimeout(timer); dismiss(); });
+})();
+</script>
