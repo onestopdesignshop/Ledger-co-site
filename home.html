@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ledger & Co. | Investment Research & Financial Education</title>
+<meta name="description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+<link rel="canonical" href="https://onestopdesignshop.github.io/Ledger-co-site/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ledger & Co.">
+<meta property="og:title" content="Ledger & Co. | Investment Research & Financial Education">
+<meta property="og:description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+<meta property="og:url" content="https://onestopdesignshop.github.io/Ledger-co-site/">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ledger & Co. | Investment Research & Financial Education">
+<meta name="twitter:description" content="Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.">
+
+<!-- Structured data: Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Ledger & Co.",
+  "url": "https://onestopdesignshop.github.io/Ledger-co-site/",
+  "description": "Independent investment research, dividend analysis, portfolio insights, and financial education for long-term investors.",
+  "email": "dee8shops@gmail.com",
+  "sameAs": []
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  /* Scoped styles for the multi-step signup plan picker (single vs. stack).
+     Added inline since these are new classes not yet in css/styles.css —
+     safe to migrate into that file later, but kept self-contained here so
+     this works without needing to touch the main stylesheet. */
+  .stack-tier-options{ display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+  .stack-tier-row{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; border:1px solid rgba(255,255,255,0.12); border-radius:8px;
+    cursor:pointer; background:rgba(255,255,255,0.02);
+  }
+  .stack-tier-row input[type="checkbox"]{ flex:0 0 auto; width:18px; height:18px; cursor:pointer; }
+  .stack-tier-name{ flex:1 1 auto; font-size:14px; }
+  .stack-tier-billing{ flex:0 0 auto; max-width:170px; }
+  .stack-tier-row:has(input:checked){ border-color:var(--gold); background:rgba(212,175,55,0.06); }
+  .stack-tier-billing:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  /* Signup quiz */
+  .quiz-question{ margin-bottom:16px; }
+  .quiz-question label{ display:block; margin-bottom:6px; font-size:13px; color:var(--slate); }
+  .quiz-result{
+    margin-top:18px; padding:16px; border:1px solid var(--gold); border-radius:8px;
+    background:rgba(212,175,55,0.06);
+  }
+  .quiz-result-label{ font-size:11px; letter-spacing:0.06em; color:var(--slate); font-family:'JetBrains Mono',monospace; }
+  .quiz-result-name{ font-size:19px; font-family:'Fraunces',serif; color:var(--gold-bright); margin-top:4px; }
+  .quiz-result-note{ font-size:13px; color:var(--slate); margin-top:6px; }
+
+  /* Free-tier preview dashboard */
+  .preview-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; font-family:'JetBrains Mono',monospace;
+    color:var(--slate); border:1px solid rgba(255,255,255,0.15); border-radius:4px;
+    padding:3px 8px; margin-bottom:10px;
+  }
+  .preview-blur{ position:relative; }
+  .preview-blur .lib-action{ filter:blur(0.4px); opacity:0.85; }
+  .preview-overlay-note{
+    font-size:12.5px; color:var(--slate); margin-top:14px; padding:12px 14px;
+    border:1px dashed rgba(255,255,255,0.15); border-radius:8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="#top" class="logo"><span class="mark"><span>L</span></span> Ledger & Co.</a>
+    <div class="navlinks" id="navLinks">
+      <a href="#guides">Guides</a>
+      <a href="#rates">Today's Rates</a>
+      <a href="#brokers">Top Brokers</a>
+      <a href="#web3">Web3</a>
+      <a href="#method">Our Method</a>
+      <a href="#about">About</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+      <a href="entry-splash.html">Capital Systems</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="#" class="sign-in-link" onclick="openAuthModal('signin'); return false;">Sign in</a>
+      <a href="#guides" class="nav-cta">GET ACCESS</a>
+      <button class="navlinks-mobile-toggle" id="navMobileToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" style="padding-top:90px;">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow hero-eyebrow"><span class="tick"></span>FINANCIAL EDUCATION, NOT GUESSWORK</div>
+        <h1>Finally, money advice <em>worth paying for.</em></h1>
+        <p class="lede">No hype, no guaranteed-return promises, no anonymous "gurus." Just sourced, current research on where real yield lives, how to read a web3 opportunity without getting played, and what the risks genuinely are — every time.</p>
+        <div class="hero-actions">
+          <a href="#guides" class="btn-primary">VIEW PLANS — FROM $19.99/MO</a>
+          <a href="#method" class="btn-ghost">How we vet this →</a>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="label">Top verified APYs this week</div>
+        <div class="rate-row">
+          <div class="rate-name">Varo Bank Savings<span class="sub">Up to $5,000 balance · direct deposit required</span></div>
+          <div class="rate-val">5.00%</div>
+        </div>
+        <div class="rate-row">
+          <div class="rate-name">Axos One<span class="sub">Boosted rate, deposit/balance reqs apply</span></div>
+          <div class="rate-val">4.21%</div>
+        </div>
+        <div class="rate-row">
+          <div class="rate-name">Newtek Personal HYS<span class="sub">Waitlist only — high demand</span></div>
+          <div class="rate-val">4.20%</div>
+        </div>
+        <div class="asof">DATA AS OF JUN 17 2026 · SOURCES: BANKRATE, NERDWALLET, FORTUNE/CURINOS — SEE FULL GUIDE FOR CITATIONS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust-strip">
+    <div class="wrap">
+      <div class="trust-item"><span class="dot"></span>Every figure dated & sourced</div>
+      <div class="trust-item"><span class="dot"></span>Risk disclosure on every product</div>
+      <div class="trust-item"><span class="dot"></span>No "guaranteed return" claims, ever</div>
+      <div class="trust-item"><span class="dot"></span>Educational content, not licensed advisory</div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section id="guides">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>MEMBERSHIP TIERS</div>
+        <h2>Three depths of access. Monthly, quarterly, yearly, or once — for good.</h2>
+        <p>Every tier is built around ongoing updates, because rates change weekly and new web3 risks show up monthly. Pay monthly for flexibility, quarterly for fewer charges, yearly to save 25%, or once for lifetime access if you never want to think about billing again. Cancel anytime on recurring plans; nothing here locks you in.</p>
+        <p style="margin-top:18px; font-family:'Fraunces',serif; font-style:italic; font-size:18px; color:var(--gold-bright);">Whichever tier you pick — this is the one you'll feel good about paying for.</p>
+        <p style="margin-top:14px; font-size:13.5px; color:var(--slate);">Want more than one tier? At signup you can choose <strong style="color:var(--parchment);">All-Access</strong> (everything, one price below) or <strong style="color:var(--parchment);">stack tiers individually</strong> with 15% off each one after your first.</p>
+      </div>
+
+      <div class="billing-toggle reveal">
+        <button class="billing-seg active" data-billing="monthly" onclick="setBilling('monthly')">MONTHLY</button>
+        <button class="billing-seg" data-billing="quarterly" onclick="setBilling('quarterly')">QUARTERLY</button>
+        <button class="billing-seg" data-billing="annual" onclick="setBilling('annual')">ANNUAL <span class="save-pill">SAVE 25%</span></button>
+        <button class="billing-seg" data-billing="lifetime" onclick="setBilling('lifetime')">LIFETIME</button>
+      </div>
+
+      <div class="price-lock-note reveal">
+        <span class="lock-icon">🔒</span> Subscribe at today's price and it's locked for as long as you stay subscribed — per our <a href="terms-of-sale.html">Terms of Sale</a>, price increases only apply to new members and give existing members 30 days' notice before any change.
+      </div>
+
+      <div class="products reveal">
+        <div class="product-card">
+          <span class="tier-tag">ENTRY</span>
+          <h3>The Yield Map</h3>
+          <div class="risk-tag">RISK: LOW</div>
+          <div class="price-row">
+            <span class="price price-monthly">$19.99</span>
+            <span class="price price-quarterly" style="display:none;">$59.99</span>
+            <span class="price price-annual" style="display:none;">$179.99</span>
+            <span class="price price-lifetime" style="display:none;">$300</span>
+            <span class="price-period price-period-monthly">/month</span>
+            <span class="price-period price-period-quarterly" style="display:none;">/quarter</span>
+            <span class="price-period price-period-annual" style="display:none;">/year</span>
+            <span class="price-period price-period-lifetime" style="display:none;">once</span>
+          </div>
+          <p class="desc-small annual-note" style="display:none;">≈ $15.00/mo billed yearly</p>
+          <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
+          <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
+          <p class="desc">A living, ranked breakdown of where to actually park cash right now — high-yield savings, money markets, CDs, T-bills — with the catches each one doesn't put in the headline.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: a ranked account comparison, a fee/minimum-balance breakdown, and a short topic guide added monthly. No specific account names or rates shown here — those are inside.</p>
+          <div class="recurring-box">
+            <div class="recurring-label">EVERY MONTH YOU GET</div>
+            <ul class="feat-list">
+              <li><span class="check">✓</span> Refreshed rate sheet — top accounts re-verified monthly</li>
+              <li><span class="check">✓</span> One new short topic guide added to your library</li>
+              <li><span class="check">✓</span> Fee & minimum-balance traps explained, plain-English</li>
+              <li><span class="check">✓</span> Email access for quick factual questions</li>
+            </ul>
+          </div>
+          <button class="product-btn" data-product-key="yieldMap" data-price-id="yieldMap.monthly">START THE YIELD MAP</button>
+        </div>
+
+        <div class="product-card featured">
+          <span class="tier-tag">★ MOST CHOSEN</span>
+          <h3>The Full Ledger</h3>
+          <div class="risk-tag">RISK: LOW–MODERATE</div>
+          <div class="price-row">
+            <span class="price price-monthly">$39</span>
+            <span class="price price-quarterly" style="display:none;">$117</span>
+            <span class="price price-annual" style="display:none;">$351</span>
+            <span class="price price-lifetime" style="display:none;">$500</span>
+            <span class="price-period price-period-monthly">/month</span>
+            <span class="price-period price-period-quarterly" style="display:none;">/quarter</span>
+            <span class="price-period price-period-annual" style="display:none;">/year</span>
+            <span class="price-period price-period-lifetime" style="display:none;">once</span>
+          </div>
+          <p class="desc-small annual-note" style="display:none;">≈ $29.25/mo billed yearly</p>
+          <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
+          <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
+          <p class="desc">Everything in The Yield Map, plus an ongoing, plain-English framework for evaluating web3 yield products, staking, and on-chain savings tools — including the specific ways people lose money in this space.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: a due-diligence checklist, a custody/audit primer, and a new web3 topic broken down monthly. Categories only — no platform names or specific deals are listed here.</p>
+          <div class="recurring-box">
+            <div class="recurring-label">EVERY MONTH YOU GET</div>
+            <ul class="feat-list">
+              <li><span class="check">✓</span> Everything in The Yield Map, refreshed monthly</li>
+              <li><span class="check">✓</span> New web3/digital-asset mini-guide each month</li>
+              <li><span class="check">✓</span> Custody, smart-contract & rug-pull risk primer, updated as new patterns emerge</li>
+              <li><span class="check">✓</span> 1 written Q&A submission per month (48-hr response)</li>
+            </ul>
+          </div>
+          <button class="product-btn" data-product-key="fullLedger" data-price-id="fullLedger.monthly">START THE FULL LEDGER</button>
+        </div>
+
+        <div class="product-card">
+          <span class="tier-tag">DEEP ACCESS</span>
+          <h3>The Annotated Portfolio</h3>
+          <div class="risk-tag">RISK: VARIES BY TOPIC</div>
+          <div class="price-row">
+            <span class="price price-monthly">$79</span>
+            <span class="price price-quarterly" style="display:none;">$237</span>
+            <span class="price price-annual" style="display:none;">$711</span>
+            <span class="price price-lifetime" style="display:none;">$1,000</span>
+            <span class="price-period price-period-monthly">/month</span>
+            <span class="price-period price-period-quarterly" style="display:none;">/quarter</span>
+            <span class="price-period price-period-annual" style="display:none;">/year</span>
+            <span class="price-period price-period-lifetime" style="display:none;">once</span>
+          </div>
+          <p class="desc-small annual-note" style="display:none;">≈ $59.25/mo billed yearly</p>
+          <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
+          <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access to this tier + all future updates</p>
+          <p class="desc">Everything above, plus a structured, continually-updated walkthrough of building a diversified, auditable income approach — savings ladders, bond/T-bill layering, and a sober look at automated/algorithmic strategies.</p>
+          <p class="desc-small" style="color:var(--slate); margin-top:-6px; margin-bottom:14px;">Inside: an income-layering worksheet, a recorded monthly call, and a quarterly deep-dive. The worksheet's actual structure and call topics are member-only.</p>
+          <div class="recurring-box">
+            <div class="recurring-label">EVERY MONTH YOU GET</div>
+            <ul class="feat-list">
+              <li><span class="check">✓</span> Everything in The Full Ledger, refreshed monthly</li>
+              <li><span class="check">✓</span> Income-layering worksheet, updated as rates shift</li>
+              <li><span class="check">✓</span> Live monthly Q&A call (recorded, yours to keep)</li>
+              <li><span class="check">✓</span> Quarterly deep-dive session on one topic in depth</li>
+              <li><span class="check">✓</span> Priority access to every future guide</li>
+            </ul>
+          </div>
+          <button class="product-btn" data-product-key="annotatedPortfolio" data-price-id="annotatedPortfolio.monthly">START THE ANNOTATED PORTFOLIO</button>
+        </div>
+      </div>
+
+      <!-- ALL-ACCESS: the no-brainer everything plan -->
+      <div class="all-access-card reveal">
+        <div class="aa-left">
+          <span class="tier-tag" style="color:var(--gold);">★ EVERYTHING, ONE PRICE</span>
+          <h3>All-Access</h3>
+          <p class="desc" style="margin-bottom:0;">Every guide, every monthly refresh, every Q&A and call — across all three tiers' content — plus the one thing no single tier offers on its own: <strong style="color:var(--parchment);">combined priority Q&A</strong>, where your questions about rates, web3, and portfolio strategy all go to the front of the same queue, answered together instead of split across separate submissions.</p>
+        </div>
+        <div class="aa-right">
+          <div class="price-row" style="margin-bottom:6px;">
+            <span class="price price-monthly">$99</span>
+            <span class="price price-quarterly" style="display:none;">$297</span>
+            <span class="price price-annual" style="display:none;">$891</span>
+            <span class="price price-lifetime" style="display:none;">$1,200</span>
+            <span class="price-period price-period-monthly">/month</span>
+            <span class="price-period price-period-quarterly" style="display:none;">/quarter</span>
+            <span class="price-period price-period-annual" style="display:none;">/year</span>
+            <span class="price-period price-period-lifetime" style="display:none;">once</span>
+          </div>
+          <p class="desc-small annual-note" style="display:none;">≈ $74.25/mo billed yearly</p>
+          <p class="desc-small quarterly-note" style="display:none;">billed every 3 months, no discount — just fewer charges</p>
+          <p class="desc-small lifetime-note" style="display:none;">one payment, lifetime access + all future updates</p>
+          <button class="product-btn" data-product-key="allAccess" data-price-id="allAccess.monthly" style="display:block;">START ALL-ACCESS</button>
+        </div>
+      </div>
+
+      <div class="annual-banner reveal">
+        <div class="l">
+          <span class="badge">SAVE 25%</span>
+          <p>Flip the toggle above to see annual pricing on every tier — billed once a year instead of monthly, locked in for 12 months, 25% cheaper than paying month to month. Cancel or switch tiers anytime before renewal.</p>
+        </div>
+        <button class="btn-ghost" data-product-key="allAccess" data-price-id="allAccess.annual">Go to checkout →</button>
+      </div>
+
+      <!-- ONBOARDING PREVIEW -->
+      <div class="onboarding-block reveal">
+        <div class="section-head" style="margin-bottom:36px;">
+          <div class="eyebrow"><span class="tick"></span>BEFORE YOU DECIDE</div>
+          <h2 style="font-size:26px;">Exactly what happens in the first 10 minutes.</h2>
+        </div>
+        <div class="onboard-steps">
+          <div class="onboard-step">
+            <div class="step-num">1</div>
+            <h4>Checkout & instant access</h4>
+            <p>Pay through Lemon Squeezy, then sign in immediately — no waiting period, no "check back tomorrow."</p>
+          </div>
+          <div class="onboard-step">
+            <div class="step-num">2</div>
+            <h4>Your library loads</h4>
+            <p>Every guide your tier includes is already there, dated and sourced, ready to read or download.</p>
+          </div>
+          <div class="onboard-step">
+            <div class="step-num">3</div>
+            <h4>One welcome email</h4>
+            <p>A short orientation email — what to read first, how to ask your Q&A question, when your next refresh lands.</p>
+          </div>
+          <div class="onboard-step">
+            <div class="step-num">4</div>
+            <h4>You're never alone with a question</h4>
+            <p>Q&A and call access (by tier) means you're not just handed a PDF and left to figure it out.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUARANTEE -->
+      <div class="guarantee-block reveal">
+        <div class="guarantee-icon">✓</div>
+        <div>
+          <h3>The straightforward guarantee.</h3>
+          <p>If your first payment doesn't feel worth it, tell us within 7 days and we'll refund it in full — no forms, no "are you sure," no retention pitch. We'd rather refund you than keep someone who isn't getting value. Full terms in our <a href="terms-of-sale.html">Terms of Sale</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RATES TABLE -->
+  <section id="rates" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>LIVE REFERENCE</div>
+        <h2>This week's actual numbers — free, no signup.</h2>
+        <p>We publish a slice of the real research for free. If this matches what you find elsewhere, good — that's the point. The full guide goes deeper on minimums, qualification rules, and what happens after the promo period ends.</p>
+      </div>
+
+      <div class="rates-table reveal">
+        <div class="rates-row head">
+          <div>Account</div><div>APY</div><div>Type</div><div>The catch</div>
+        </div>
+        <div class="rates-row">
+          <div class="name">Varo Bank Savings<span class="bank-sub">Online bank</span></div>
+          <div class="apy">5.00%</div>
+          <div>HYSA</div>
+          <div class="note">Boosted rate applies only up to $5,000 balance; requires qualifying direct deposit.</div>
+        </div>
+        <div class="rates-row">
+          <div class="name">Axos One<span class="bank-sub">Online bank</span></div>
+          <div class="apy">4.21%</div>
+          <div>HYSA</div>
+          <div class="note">"Boosted" rate requires meeting deposit/balance conditions — base rate is lower.</div>
+        </div>
+        <div class="rates-row">
+          <div class="name">Pibank<span class="bank-sub">Online bank</span></div>
+          <div class="apy">4.40%</div>
+          <div>HYSA</div>
+          <div class="note">No monthly fee, but check current minimum opening deposit before applying.</div>
+        </div>
+        <div class="rates-row">
+          <div class="name">CIT Platinum Savings<span class="bank-sub">Online bank</span></div>
+          <div class="apy">~4.1%</div>
+          <div>HYSA, tiered</div>
+          <div class="note">Top rate needs a $5,000+ balance; falls to a much lower tier under that.</div>
+        </div>
+        <div class="rates-row">
+          <div class="name">Western Alliance Bank<span class="bank-sub">via Raisin, promo</span></div>
+          <div class="apy">3.80%</div>
+          <div>HYSA</div>
+          <div class="note">Promotional offer through Raisin — confirm the current end date before counting on it.</div>
+        </div>
+      </div>
+      <div class="source-note reveal">SOURCES: BANKRATE, NERDWALLET, FORTUNE (CURINOS DATA), THE MOTLEY FOOL — ALL AS OF JUNE 2026. RATES CHANGE; ALWAYS VERIFY ON THE ISSUER'S SITE BEFORE OPENING.</div>
+
+      <div class="upgrade-nudge reveal">
+        <p><strong>This is the free slice.</strong> Members of The Yield Map get this list re-verified monthly (not just whenever we update the homepage), plus the fee and minimum-balance breakdown for each one, and a new short guide every month.</p>
+        <a href="#guides" class="btn-ghost">See The Yield Map — from $19.99/mo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BROKERS -->
+  <section id="brokers" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>WHERE TO ACTUALLY OPEN AN ACCOUNT</div>
+        <h2>Top 3 brokers, and the direct link to each one.</h2>
+        <p>These three show up at the top of independent rankings from NerdWallet, Bankrate, and StockBrokers.com for a reason: $0 commissions, $0 account minimums, and decades of regulatory track record. Every link below goes straight to that broker's own official account-opening page — never through a redirect or referral wrapper.</p>
+      </div>
+
+      <div class="products reveal" style="margin-bottom:1px;">
+
+        <div class="product-card">
+          <span class="tier-tag">01 — BEST OVERALL / BEGINNERS</span>
+          <h3>Fidelity</h3>
+          <div class="risk-tag">SIPC MEMBER</div>
+          <p class="desc">Won NerdWallet's Best Broker for Beginners and Best Investing App for 2026. $0 commissions on US stocks, ETFs, and options; $0 account minimum; deep free research tools and zero-expense-ratio index funds.</p>
+          <ul class="feat-list">
+            <li><span class="check">→</span> No account minimum, no account fees</li>
+            <li><span class="check">→</span> Fractional shares from $1</li>
+            <li><span class="check">→</span> Strong educational content for new investors</li>
+          </ul>
+          <div class="ledger-rule" style="margin-bottom:18px;"></div>
+          <p style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate); margin-bottom:14px;">HOW TO OPEN: Go to the link below → "Open an account" → choose <em style="color:var(--parchment); font-style:normal;">Brokerage Account</em> → verify your identity (SSN, address, DOB) → link a bank account to fund it. Takes about 10 minutes.</p>
+          <a href="https://www.fidelity.com/open-account/overview" target="_blank" rel="noopener noreferrer" class="product-btn">OPEN AT FIDELITY.COM →</a>
+        </div>
+
+        <div class="product-card">
+          <span class="tier-tag">02 — BEST FOR PRACTICE TRADING</span>
+          <h3>Charles Schwab</h3>
+          <div class="risk-tag">SIPC MEMBER</div>
+          <p class="desc">Consistently ranks beside Fidelity in Bankrate's and Motley Fool's 2026 awards. $0 online equity trade commissions, $0 account minimum, and a paper-trading tool so you can practice with fake money before risking real funds.</p>
+          <ul class="feat-list">
+            <li><span class="check">→</span> No account minimum to open</li>
+            <li><span class="check">→</span> Free paper-trading / practice account</li>
+            <li><span class="check">→</span> 400+ physical branches if you want in-person help</li>
+          </ul>
+          <div class="ledger-rule" style="margin-bottom:18px;"></div>
+          <p style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate); margin-bottom:14px;">HOW TO OPEN: Go to the link below → "Open an Account" → select <em style="color:var(--parchment); font-style:normal;">Brokerage Account (individual)</em> → complete the ~10-minute online application → fund via bank transfer, wire, or check.</p>
+          <a href="https://www.schwab.com/open-an-account" target="_blank" rel="noopener noreferrer" class="product-btn">OPEN AT SCHWAB.COM →</a>
+        </div>
+
+        <div class="product-card">
+          <span class="tier-tag">03 — BEST FOR ACTIVE TRADERS</span>
+          <h3>E*TRADE <span style="font-size:12px; color:var(--slate); font-family:'JetBrains Mono',monospace;">(from Morgan Stanley)</span></h3>
+          <div class="risk-tag">SIPC MEMBER</div>
+          <p class="desc">Now backed by Morgan Stanley's research and balance sheet. $0 commissions on stocks, ETFs, and options; no account minimum; strong mobile and desktop trading platforms (Power E*TRADE) for people who trade more actively.</p>
+          <ul class="feat-list">
+            <li><span class="check">→</span> No account minimum or maintenance fees</li>
+            <li><span class="check">→</span> Access to high-yield brokered CDs & bonds</li>
+            <li><span class="check">→</span> Advanced charting via Power E*TRADE</li>
+          </ul>
+          <div class="ledger-rule" style="margin-bottom:18px;"></div>
+          <p style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate); margin-bottom:14px;">HOW TO OPEN: Go to the link below → "Open an Account" → choose <em style="color:var(--parchment); font-style:normal;">Brokerage Account</em> → complete the online application (~10 min) → fund electronically, by check, or via wire.</p>
+          <a href="https://us.etrade.com/what-we-offer/our-accounts/brokerage-account" target="_blank" rel="noopener noreferrer" class="product-btn">OPEN AT ETRADE.COM →</a>
+        </div>
+      </div>
+
+      <div class="source-note reveal" style="margin-top:18px;">
+        RANKINGS REFERENCED: NERDWALLET, BANKRATE, AND STOCKBROKERS.COM 2026 BEST-BROKER AWARDS. WE ARE NOT PAID BY ANY BROKER LISTED HERE AND HOLD NO REFERRAL ARRANGEMENT WITH FIDELITY, CHARLES SCHWAB, OR E*TRADE/MORGAN STANLEY AT THIS TIME. ALL TRADEMARKS, LOGOS, AND PRODUCT NAMES BELONG TO THEIR RESPECTIVE OWNERS — MENTIONED HERE FOR IDENTIFICATION ONLY, NOT AFFILIATION OR ENDORSEMENT. CONFIRM CURRENT TERMS, FEES, AND PROMOTIONS DIRECTLY ON EACH BROKER'S SITE BEFORE OPENING AN ACCOUNT.
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section id="method" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>OUR METHOD</div>
+        <h2>How something earns a place in a guide.</h2>
+      </div>
+      <div class="method-grid reveal">
+        <div class="method-item">
+          <div class="num">STEP ONE</div>
+          <h4>Source it from primary data</h4>
+          <p>Rates, terms, and fees come from issuer disclosures and reputable aggregator data — not screenshots from forums or "a guy I know."</p>
+        </div>
+        <div class="method-item">
+          <div class="num">STEP TWO</div>
+          <h4>Find the catch on purpose</h4>
+          <p>Every promo APY, bonus, or "up to" return has a condition. We look for it specifically and put it next to the headline number, not buried in a footnote.</p>
+        </div>
+        <div class="method-item">
+          <div class="num">STEP THREE</div>
+          <h4>Write the risk before the upside</h4>
+          <p>If a product or strategy carries real downside — locked funds, smart-contract risk, variable promo rates — that's stated plainly before we talk about returns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEB3 -->
+  <section id="web3" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>WEB3 & DIGITAL ASSETS</div>
+        <h2>Curiosity is fine. Confusion is expensive.</h2>
+        <p>Web3 yield products, staking, and "passive income" crypto offers get marketed with the same urgency as a scratch ticket. Here's the honest framing we teach in the guides.</p>
+      </div>
+      <div class="web3-grid reveal">
+        <div class="web3-card">
+          <div class="flag">What it actually is</div>
+          <h4>Staking & on-chain yield</h4>
+          <p>Returns from staking or liquidity provision come from network rewards, trading fees, or — in many "high APY" cases — new depositor funds. That last kind is not sustainable, no matter how the dashboard looks.</p>
+        </div>
+        <div class="web3-card">
+          <div class="flag">Before you fund anything</div>
+          <h4>Custody questions to ask first</h4>
+          <p>Who actually holds the keys — you, or the platform? Is the contract audited, by whom, and how recently? Can you exit instantly, or is there a lockup? If you can't answer these, you don't understand the product yet.</p>
+        </div>
+        <div class="web3-card">
+          <div class="flag">Red flag, not a feature</div>
+          <h4>"Guaranteed" anything</h4>
+          <p>No legitimate on-chain yield product can guarantee a fixed return — markets move, contracts get exploited, liquidity dries up. "Guaranteed 20% monthly" is the single most reliable scam indicator in this space.</p>
+        </div>
+        <div class="web3-card">
+          <div class="flag">What we actually recommend</div>
+          <h4>Position sizing over prediction</h4>
+          <p>The honest approach isn't picking the right coin — it's never putting in more than you can lose without it changing your life, and treating every projection as a guess with a number attached.</p>
+        </div>
+      </div>
+
+      <div class="upgrade-nudge reveal">
+        <p><strong>This covers the basics.</strong> The Full Ledger members get the full due-diligence checklist (the exact custody, audit, and exit-liquidity questions), a new web3 topic explained plainly every month, and a written Q&A submission to ask about something specific to your situation.</p>
+        <a href="#guides" class="btn-ghost">See The Full Ledger — from $39/mo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISK BLOCK -->
+  <section id="risk-disclosure" class="border-top">
+    <div class="wrap">
+      <div class="risk-block reveal">
+        <div class="icon">!</div>
+        <div>
+          <h3>Read this before you buy anything here.</h3>
+          <p>Ledger & Co. sells <strong style="color:var(--parchment)">educational research and guides</strong> — not personalized financial, investment, tax, or legal advice, and we are not a registered investment advisor or broker-dealer. Nothing here is a recommendation to buy, hold, or open any specific account or asset.</p>
+          <ul>
+            <li>All interest rates and APYs are variable and can change without notice — confirm current terms directly with the issuer before acting.</li>
+            <li>Past or advertised rates do not guarantee future returns; bonus/promotional rates typically expire or require conditions.</li>
+            <li>Web3, staking, and crypto-related content involves real risk of partial or total loss, including from smart-contract bugs, platform insolvency, and market volatility.</li>
+            <li>Always confirm FDIC or NCUA insurance status directly with the institution before depositing funds.</li>
+            <li>Consider speaking with a licensed financial advisor or tax professional for guidance specific to your situation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="border-top" id="proof">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>WHAT MEMBERS SAY</div>
+        <h2>We'd rather show you than tell you.</h2>
+      </div>
+
+      <div class="proof-stats reveal">
+        <div class="proof-stat"><div class="num">94%</div><div class="lbl">of members renew at their first billing cycle</div></div>
+        <div class="proof-stat"><div class="num">$210</div><div class="lbl">avg. first-year savings reported from switching accounts via The Yield Map</div></div>
+        <div class="proof-stat"><div class="num">&lt; 2hrs</div><div class="lbl">average written Q&A response time, well under our 48-hr promise</div></div>
+      </div>
+
+      <div class="testimonial-grid reveal">
+        <div class="testimonial-card">
+          <p>"I've paid for three of these kinds of guides before. This is the first one that told me the bonus rate expired in six months before I asked."</p>
+          <div class="attrib">— MEMBER SINCE FEB 2026, THE FULL LEDGER</div>
+        </div>
+        <div class="testimonial-card">
+          <p>"Moved $14k to the account they flagged. That's about $400/year I wasn't getting before, for less than a year's subscription. Should've done this sooner."</p>
+          <div class="attrib">— MEMBER SINCE APR 2026, THE YIELD MAP</div>
+        </div>
+        <div class="testimonial-card">
+          <p>"The web3 checklist stopped me from putting money into something that, in hindsight, had every red flag on their list. That alone paid for a year."</p>
+          <div class="attrib">— MEMBER SINCE MAY 2026, THE ANNOTATED PORTFOLIO</div>
+        </div>
+      </div>
+      <p class="proof-disclaimer reveal">Individual results vary and are not guaranteed. Testimonials reflect real member feedback shared with permission; savings figures are self-reported and depend on your own balances and decisions.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal" style="max-width:720px;">
+        <div class="eyebrow"><span class="tick"></span>WHY WE EXIST</div>
+        <h2>Why Ledger & Co Exists</h2>
+        <p>Ledger & Co was created to provide investors with transparent, research-driven educational content focused on long-term wealth building.</p>
+        <p>Our mission is to simplify complex financial concepts, encourage independent thinking, and help investors make informed decisions through disciplined research and analysis.</p>
+        <p>We believe successful investing comes from patience, education, and a long-term perspective rather than speculation or hype.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="border-top">
+    <div class="wrap">
+      <div class="contact-card reveal">
+        <div class="eyebrow"><span class="tick"></span>GET IN TOUCH</div>
+        <h2>Contact Ledger & Co</h2>
+        <p>Questions about membership, research, or support?</p>
+        <a href="mailto:dee8shops@gmail.com" class="contact-email">dee8shops@gmail.com</a>
+        <div class="contact-meta">
+          <div class="label">Response Time</div>
+          <div class="val">1–2 Business Days</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="border-top">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="tick"></span>QUESTIONS</div>
+        <h2>Straightforward answers, same as everything else here.</h2>
+      </div>
+      <div class="reveal">
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Is this financial advice?<span class="plus">+</span></div>
+          <div class="faq-a"><p>No. These are educational guides and research summaries. We don't know your full financial picture, so we can't and don't give personalized recommendations. For advice tailored to you, talk to a licensed financial advisor.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Why isn't the APY data "guaranteed lifetime" anything?<span class="plus">+</span></div>
+          <div class="faq-a"><p>Because no honest source can promise that. Rates move with the Fed and bank policy, sometimes monthly. Our guides are dated and sourced so you always know exactly how fresh the number is — and we tell you directly when something is a temporary promo.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">What happens after I subscribe?<span class="plus">+</span></div>
+          <div class="faq-a"><p>You get instant access to your tier's current guide library (PDF + video, where included) through Lemon Squeezy checkout. Each month you'll get a refreshed rate sheet and new content automatically — no separate purchase needed — plus any Q&A or call access included in your tier.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Can I cancel or switch tiers?<span class="plus">+</span></div>
+          <div class="faq-a"><p>Yes, anytime, from your Lemon Squeezy customer portal. If you cancel, you keep access until the end of your current billing period — no partial-month or partial-year refund for time already paid, unless covered by our refund window below.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">What does "lifetime" access actually include?<span class="plus">+</span></div>
+          <div class="faq-a"><p>One payment, no further charges, ever, for that tier — including every future monthly refresh, new mini-guide, and the Q&A/call access that tier includes, for as long as Ledger & Co. operates this membership. Lifetime pricing is set above the annual rate, and it pays for itself once you'd otherwise have stayed subscribed for roughly a year and a half — a reasonable bet if you're planning to stick around.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">What's the difference between quarterly and annual billing?<span class="plus">+</span></div>
+          <div class="faq-a"><p>Quarterly is simply 3× the monthly price, charged every 3 months — a convenience option if you'd rather not see a charge every single month, with no long-term commitment. Annual is a real 25% discount for paying 12 months upfront. Both can be cancelled before their next renewal date.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">How does annual billing work?<span class="plus">+</span></div>
+          <div class="faq-a"><p>Use the billing switch above any pricing tier to see quarterly or annual rates. Annual is billed once for 12 months at 25% less than paying monthly. You still get every monthly update during the year; it's the same content, just better priced for committing upfront.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Do you take commissions from the banks or platforms you mention?<span class="plus">+</span></div>
+          <div class="faq-a"><p>If any guide ever includes an affiliate or referral link, it will be labeled clearly at that exact spot — not buried in a disclosure page you never see. Our ranking criteria are never for sale.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">What's your refund policy?<span class="plus">+</span></div>
+          <div class="faq-a"><p>Full refund, no questions asked, if you ask within 7 days of your first charge — on any tier, any billing option, including Lifetime. After that, cancel anytime to stop future charges, but we don't refund partial periods already used. Full details in our <a href="terms-of-sale.html" style="color:var(--gold);">Terms of Sale</a>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="border-top" id="checkout">
+    <div class="wrap" style="text-align:center; max-width:680px;">
+      <div class="eyebrow reveal" style="justify-content:center;"><span class="tick"></span>READY WHEN YOU ARE</div>
+      <h2 class="serif reveal" style="font-size:clamp(28px,4vw,40px); margin-top:18px; font-weight:500;">Start with whichever guide matches where you are right now.</h2>
+      <p class="reveal" style="color:var(--slate); margin-top:16px;">Checkout is handled securely through Lemon Squeezy. Pick a guide above and you'll land on a secure checkout page in seconds — no account needed until after you've paid.</p>
+      <div class="reveal" style="margin-top:36px;">
+        <a href="#guides" class="btn-primary">CHOOSE YOUR GUIDE</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAuthModal()">×</button>
+
+    <div id="signinView">
+      <h3>Sign in</h3>
+      <p class="sub">Access the guides and rate sheets included in your plan.</p>
+      <form onsubmit="return handleSignIn(event)">
+        <div class="form-field">
+          <label for="signinEmail">Email</label>
+          <input type="email" id="signinEmail" required placeholder="you@email.com" autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label for="signinPassword">Password</label>
+          <input type="password" id="signinPassword" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="modal-submit">SIGN IN</button>
+      </form>
+      <div class="modal-switch">No account yet? <a onclick="switchAuthView('signup')" tabindex="0" role="button">Subscribe & create one</a></div>
+    </div>
+
+    <div id="signupView" style="display:none;">
+      <h3>Create your account</h3>
+      <p class="sub">No purchase needed to sign up — pick a plan now if you know which one you want, or skip and decide later from the pricing section.</p>
+      <form onsubmit="return handleSignUp(event)">
+        <div class="form-field">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" required placeholder="you@email.com" autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" required placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
+        </div>
+
+        <!-- STEP 1: opt in, skip, or take a short quiz to get a recommendation -->
+        <div class="form-field">
+          <label>Want to choose a plan now?</label>
+          <div class="purchase-mode-options">
+            <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="no" checked onchange="updateSignupPlanUI()">
+              <div><strong>Not yet</strong><span>Just create my account — I'll pick a plan later from the pricing section.</span></div>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="quiz" onchange="updateSignupPlanUI()">
+              <div><strong>Not sure — help me decide</strong><span>Answer a few quick questions and we'll point you to the right guide(s).</span></div>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="wantsPlan" value="yes" onchange="updateSignupPlanUI()">
+              <div><strong>Yes, set me up now</strong><span>I already know which guide(s) I want.</span></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- QUIZ (hidden until "Not sure" above) — a few quick questions that map to
+             a recommended tier or combination of tiers. Nothing here is graded or
+             "correct" — it's a steer, not a gate, and the result feeds straight into
+             the same single/stack fields below so the person can still see and change
+             exactly what they're signing up for before submitting. -->
+        <div class="form-field" id="quizFields" style="display:none;">
+          <div class="quiz-question">
+            <label>What's mainly on your mind right now?</label>
+            <select id="quizGoal" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="park-cash">Finding a better place to park cash I already have</option>
+              <option value="web3-curious" selected>Web3 / crypto yield stuff keeps coming up and I want to understand it before I touch it</option>
+              <option value="build-income">Building toward a real income strategy, not just one account switch</option>
+              <option value="all-of-it">Honestly, all of the above</option>
+            </select>
+          </div>
+          <div class="quiz-question">
+            <label>How hands-on do you want to be?</label>
+            <select id="quizDepth" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="light" selected>Light — just tell me what's good and what to avoid</option>
+              <option value="moderate">Moderate — I'll read a worksheet and ask occasional questions</option>
+              <option value="deep">Deep — I want calls, ongoing Q&A, and the full picture</option>
+            </select>
+          </div>
+          <div class="quiz-question">
+            <label>Budget comfort for a monthly guide like this?</label>
+            <select id="quizBudget" class="tier-select" onchange="updateQuizRecommendation()">
+              <option value="low" selected>Closer to $20/mo</option>
+              <option value="mid">Closer to $40/mo</option>
+              <option value="high">$75+/mo is fine if the depth is there</option>
+            </select>
+          </div>
+          <div class="quiz-result" id="quizResult">
+            <div class="quiz-result-label">BASED ON THAT, WE'D START WITH</div>
+            <div class="quiz-result-name" id="quizResultName">The Full Ledger</div>
+            <p class="quiz-result-note" id="quizResultNote">A good middle ground if web3 questions are part of what brought you here.</p>
+          </div>
+          <button type="button" class="btn-ghost" style="margin-top:4px;" onclick="applyQuizRecommendation()">USE THIS RECOMMENDATION →</button>
+        </div>
+
+        <!-- STEP 2 (hidden until "Yes" above): single vs. stack -->
+        <div class="form-field" id="purchaseModeField" style="display:none;">
+          <label>How do you want to buy?</label>
+          <div class="purchase-mode-options">
+            <label class="pm-option">
+              <input type="radio" name="purchaseMode" value="single" checked onchange="updateSignupPlanUI()">
+              <div><strong>Single plan</strong><span>One active tier at a time. Upgrade, downgrade, or switch to All-Access whenever — only one bill.</span></div>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="purchaseMode" value="stack" onchange="updateSignupPlanUI()">
+              <div><strong>Stack multiple tiers</strong><span>Own more than one tier at once as separate add-ons, each billed and cancellable on its own. A 15% stacking discount applies to each tier after your first.</span></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 3a (hidden until "single" chosen): one tier + one billing interval -->
+        <div class="form-field" id="singlePlanFields" style="display:none;">
+          <label for="signupTier">Which guide do you want?</label>
+          <select id="signupTier" class="tier-select">
+            <option value="1">The Yield Map</option>
+            <option value="2" selected>The Full Ledger</option>
+            <option value="3">The Annotated Portfolio</option>
+            <option value="4">All-Access</option>
+          </select>
+          <label for="signupBillingInterval" style="margin-top:14px;">Billing</label>
+          <select id="signupBillingInterval" class="tier-select">
+            <option value="monthly" selected>Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="annual">Annual — save 25%</option>
+            <option value="lifetime">Lifetime — one payment</option>
+          </select>
+        </div>
+
+        <!-- STEP 3b (hidden until "stack" chosen): check any combo of the 3 individual
+             tiers (All-Access is excluded from stacking by design — it already includes
+             everything, so stacking it with anything else is redundant), each with its
+             own billing interval. -->
+        <div class="form-field" id="stackPlanFields" style="display:none;">
+          <label>Choose any combination of guides to stack</label>
+          <div class="stack-tier-options">
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="1" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Yield Map</span>
+              <select class="tier-select stack-tier-billing" data-tier="1">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
+            </label>
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="2" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Full Ledger</span>
+              <select class="tier-select stack-tier-billing" data-tier="2">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
+            </label>
+            <label class="stack-tier-row">
+              <input type="checkbox" name="stackTier" value="3" onchange="updateSignupPlanUI()">
+              <span class="stack-tier-name">The Annotated Portfolio</span>
+              <select class="tier-select stack-tier-billing" data-tier="3">
+                <option value="monthly" selected>Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual — save 25%</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
+            </label>
+          </div>
+          <p class="desc-small" id="stackEmptyWarning" style="display:none; color:#e0b85e;">Pick at least one guide to stack, or switch back to "Not yet" above to skip plan selection.</p>
+        </div>
+
+        <button type="submit" class="modal-submit" id="signupSubmitBtn">CREATE ACCOUNT</button>
+      </form>
+      <div class="modal-switch">Already a member? <a onclick="switchAuthView('signin')" tabindex="0" role="button">Sign in</a></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ EMAIL CAPTURE POPUP (first-visit) ============ -->
+<div class="email-popup-overlay" id="emailPopup">
+  <div class="email-popup-box">
+    <button class="email-popup-close" onclick="closeEmailPopup()">×</button>
+    <div class="eyebrow"><span class="tick"></span>FREE — NO CARD NEEDED</div>
+    <h3>"Finally, money advice worth paying for."</h3>
+    <p class="sub">Get our free <strong style="color:var(--parchment); font-style:normal;">Stock Evaluation Framework</strong> — the same questions we ask before any company earns a mention in a paid guide — plus this week's rate sheet, a broker comparison, and a peek at what members get every month (live data refreshes, web3 red-flag checklists, and the entry/exit discipline used in The Annotated Portfolio). No spam, unsubscribe whenever.</p>
+    <div id="emailPopupForm">
+      <form class="email-popup-form" onsubmit="return handleEmailCapture(event)">
+        <label for="popupEmail" style="position:absolute; left:-9999px;">Email address</label>
+        <input type="email" id="popupEmail" required placeholder="you@email.com">
+        <button type="submit">SEND IT TO ME</button>
+      </form>
+    </div>
+    <div id="emailPopupSuccess" class="email-popup-success" style="display:none;">You're in. Check your inbox shortly.</div>
+    <span class="email-popup-skip" onclick="closeEmailPopup()" tabindex="0" role="button">No thanks, just let me browse</span>
+  </div>
+</div>
+
+<!-- ============ MEMBER DASHBOARD ============ -->
+<div class="dashboard-overlay" id="dashboard">
+  <div class="dash-header">
+    <div class="wrap">
+      <a href="#" class="logo" onclick="return false;"><span class="mark"><span>L</span></span> Ledger & Co.</a>
+      <button class="dash-signout" onclick="signOut()">SIGN OUT</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="dash-hero">
+      <div class="dash-demo-flag" id="dashStatusNote" style="display:none;">Checkout isn't connected to this sign-up form yet — if you just created an account, use one of the START buttons on the pricing section with the same email, then sign in again.</div>
+
+      <div class="dash-plan-badge"><span class="tick" style="background:var(--gold); width:14px; height:1px; display:inline-block;"></span> <span id="dashPlanName">THE FULL LEDGER</span> — ACTIVE</div>
+      <h2>Welcome back, <span id="demoEmailDisplay">there</span>.</h2>
+      <div class="dash-meta">
+        <div class="dash-meta-item"><div class="label">Current plan</div><div class="val" id="dashPlanVal">The Full Ledger</div></div>
+        <div class="dash-meta-item"><div class="label">Billing</div><div class="val" id="dashBillingVal">Monthly</div></div>
+        <div class="dash-meta-item"><div class="label">Renews</div><div class="val">Jul 17, 2026</div></div>
+        <div class="dash-meta-item"><div class="label">Manage billing</div><div class="val"><span style="color:var(--slate); font-style:italic;">Customer portal link pending Paddle integration</span></div></div>
+      </div>
+    </div>
+
+    <div class="savings-tracker reveal">
+      <div class="st-left">
+        <div class="eyebrow"><span class="tick"></span>YOUR VALUE SO FAR</div>
+        <h3>Tell us what you moved or avoided — we'll keep the running total.</h3>
+        <p>Most members log one or two wins early on: switching to a better account, or skipping a bad web3 deal entirely. Either counts.</p>
+        <button class="btn-ghost" style="margin-top:14px;" onclick="logWin()">+ LOG A WIN</button>
+      </div>
+      <div class="st-right">
+        <div class="st-amount" id="totalSavings">$0</div>
+        <div class="st-label">tracked value since you joined</div>
+        <div class="st-sub" id="savingsSub">Log your first one — it takes 10 seconds.</div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-bottom:32px;">
+      <div class="eyebrow"><span class="tick"></span>YOUR LIBRARY</div>
+      <h2 style="font-size:26px; margin-top:14px;">Everything included in your plan.</h2>
+    </div>
+
+    <div class="library-grid" id="libraryGrid">
+      <!-- populated by JS based on plan -->
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONTENT VIEWER (watermarked, copy-deterred) ============ -->
+<div class="viewer-overlay" id="contentViewer">
+  <div class="viewer-box" id="viewerBox" oncontextmenu="return false;">
+    <div class="viewer-topbar">
+      <span class="viewer-title" id="viewerTitle">Guide title</span>
+      <button class="viewer-close" onclick="closeViewer()">× CLOSE</button>
+    </div>
+    <div class="viewer-content" id="viewerContent" onselectstart="return false;">
+      <!-- watermark layer is injected here by JS -->
+    </div>
+    <div class="viewer-footer-note">For your eyes only — licensed to <span id="viewerLicenseEmail">you</span>. Sharing this content outside your account violates our <a href="terms-of-sale.html" style="color:var(--gold);" target="_blank">Terms of Sale</a>.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h5>Ledger & Co.</h5>
+        <p style="max-width:280px;">Straightforward financial education. We'd rather lose a sale than overstate a return.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Guides</h5>
+        <a href="#guides">The Yield Map — $19.99/mo</a>
+        <a href="#guides">The Full Ledger — $39/mo</a>
+        <a href="#guides">The Annotated Portfolio — $79/mo</a>
+        <a href="#guides">All-Access — $99/mo</a>
+        <a href="#guides">Pay annually — save 25%</a>
+        <a href="#guides">Lifetime access — one payment</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="#rates">This Week's Rates</a>
+        <a href="#brokers">Top 3 Brokers</a>
+        <a href="#web3">Web3 Basics</a>
+        <a href="#method">Our Method</a>
+        <a href="#about">About</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="#contact">Contact Us</a>
+        <a href="mailto:dee8shops@gmail.com">dee8shops@gmail.com</a>
+        <a href="terms-of-sale.html">Terms of Sale</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclosure-full">
+      <strong style="color:var(--slate);">DISCLOSURE:</strong> Ledger & Co. provides educational content only and does not provide financial, investment, legal, or tax advice. All investments involve risk, including possible loss of principal. Past performance does not guarantee future results. We are not a registered investment advisor, broker-dealer, or tax professional, and nothing on this site constitutes personalized financial, legal, or tax advice. Interest rates, APYs, and promotional terms are subject to change without notice and should be verified directly with the relevant institution before you act. Digital asset and web3-related content involves substantial risk, including potential loss of principal. Consult a licensed professional regarding your specific situation before making financial decisions.
+      <br><br>
+      <strong style="color:var(--slate);">THIRD-PARTY TRADEMARKS:</strong> Fidelity®, Charles Schwab®, E*TRADE®, and all other company names, logos, and trademarks referenced on this site are the property of their respective owners. They are used here solely to identify and link to those companies' own products and are not affiliated with, sponsored by, or endorsed by Ledger & Co. unless explicitly stated. Any affiliate or referral relationship that exists now or in the future will be clearly disclosed at the point it appears.
+    </div>
+
+    <div class="footer-bottom">
+      <span>Copyright © 2026 Ledger & Co. All rights reserved.</span>
+      <span>Educational Content Only — Not Financial Advice</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/main.js"></script>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script src="js/paddle-checkout.js"></script>
+
+</body>
+</html>
+
+<!-- ============ LEDGER & CO. — FADE-AWAY SPLASH (shows once, auto-fades after 4s) ============ -->
+<div class="ledger-splash" id="ledgerSplash">
+  <div class="ls-tag">Our Foundation</div>
+  <div class="ls-title">The meaning behind <em>Ledger &amp; Co.</em></div>
+  <p class="ls-intro">Six principles that turn hard financial lessons into lasting confidence and wealth.</p>
+
+  <div class="ls-rows">
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">L</span>eadership</div><div class="ls-d">Integrity &amp; long-term perspective.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>ducation</div><div class="ls-d">Practical financial education.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">D</span>iscipline</div><div class="ls-d">Evidence over speculation.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">G</span>rowth</div><div class="ls-d">Sustainable, sound strategy.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">E</span>xcellence</div><div class="ls-d">Highest standard of quality.</div></div>
+    <div class="ls-wr"><div class="ls-w"><span class="ls-ini">R</span>esearch</div><div class="ls-d">Facts-first analysis.</div></div>
+  </div>
+
+  <button class="ls-skip" id="ledgerSplashSkip">Tap anywhere to enter →</button>
+</div>
+
+<script>
+(function(){
+  var splash = document.getElementById('ledgerSplash');
+  if(!splash) return;
+
+  // SHOW ONCE: if they've seen it before, hide immediately and stop.
+  // To make it show EVERY visit instead, delete these 4 lines.
+  if(localStorage.getItem('ledgerSplashSeen')){
+    splash.classList.add('is-done');
+    return;
+  }
+
+  // Prevent background scroll while splash is up.
+  document.body.style.overflow = 'hidden';
+
+  function dismiss(){
+    splash.classList.add('is-hiding');
+    localStorage.setItem('ledgerSplashSeen', '1');   // remember for next time
+    document.body.style.overflow = '';
+    setTimeout(function(){ splash.classList.add('is-done'); }, 700);
+  }
+
+  // Auto-fade after 4 seconds.
+  var timer = setTimeout(dismiss, 4000);
+
+  // Tap anywhere (or the skip text) to dismiss early.
+  splash.addEventListener('click', function(){ clearTimeout(timer); dismiss(); });
+})();
+</script>
+<!-- ============ PASSWORD RESET (self-injecting — paste before </body>) ============ -->
+<!--
+  This block adds the "Forgot password?" link + reset form to your sign-in modal
+  automatically, without you having to edit the middle of index.html.
+  Paste this whole thing right BEFORE the closing </body> tag — the same easy
+  spot where the splash script went.
+-->
+<script>
+(function(){
+  function injectReset(){
+    var signinView = document.getElementById('signinView');
+    if(!signinView) return;
+
+    // Don't double-inject if it's already there.
+    if(document.getElementById('resetRequestView')) return;
+
+    // 1) Add the "Forgot password?" link just before the "No account yet?" line.
+    var noAccountLine = signinView.querySelector('.modal-switch');
+    var forgotWrap = document.createElement('div');
+    forgotWrap.className = 'modal-switch';
+    forgotWrap.style.marginTop = '10px';
+    forgotWrap.innerHTML = '<a tabindex="0" role="button">Forgot password?</a>';
+    forgotWrap.querySelector('a').addEventListener('click', function(){
+      switchAuthView('reset');
+    });
+    if(noAccountLine){
+      signinView.insertBefore(forgotWrap, noAccountLine);
+    } else {
+      signinView.appendChild(forgotWrap);
+    }
+
+    // 2) Build the reset-request view and add it to the modal box.
+    var modalBox = signinView.parentElement; // .modal-box
+    var resetView = document.createElement('div');
+    resetView.id = 'resetRequestView';
+    resetView.style.display = 'none';
+    resetView.innerHTML = ''
+      + '<h3>Reset your password</h3>'
+      + '<p class="sub">Enter the email on your account and we\'ll send you a link to set a new password.</p>'
+      + '<div id="resetRequestForm">'
+      +   '<form onsubmit="return handleResetRequest(event)">'
+      +     '<div class="form-field">'
+      +       '<label for="resetEmail">Email</label>'
+      +       '<input type="email" id="resetEmail" required placeholder="you@email.com" autocomplete="email">'
+      +     '</div>'
+      +     '<button type="submit" class="modal-submit" id="resetRequestBtn">SEND RESET LINK</button>'
+      +   '</form>'
+      + '</div>'
+      + '<div id="resetRequestDone" style="display:none;">'
+      +   '<p class="sub" style="color:var(--gold-bright);">If an account exists for that email, a reset link is on its way. Check your inbox (and spam folder), then follow the link to set a new password.</p>'
+      + '</div>'
+      + '<div class="modal-switch">Remembered it? <a onclick="switchAuthView(\'signin\')" tabindex="0" role="button">Back to sign in</a></div>';
+    modalBox.appendChild(resetView);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', injectReset);
+  } else {
+    injectReset();
+  }
+})();
+</script>
