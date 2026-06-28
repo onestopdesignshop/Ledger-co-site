@@ -1,0 +1,38 @@
+
+  <!-- ===============================
+  LEDGER & CO. — BRAND VALUES SECTION
+  Style: gold initial + black engraved word (white outline) on navy
+  =============================== -->
+  <section id="brand-values" class="brand-values">
+    <div class="bv-inner">
+
+      <div class="bv-left">
+        <div class="eyebrow"><span class="tick"></span>OUR FOUNDATION</div>
+        <h2>The meaning behind <em>Ledger &amp; Co.</em></h2>
+        <p>Our name is a discipline. Principles that turn hard financial lessons into lasting confidence and wealth.</p>
+        <p class="bv-quote">"Leadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and creating Opportunity for every investor."</p>
+      </div>
+
+      <div class="bv-right">
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">L</span>eadership</div><p class="bv-desc">Leading with integrity, accountability, and a long-term perspective.</p></div>
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">E</span>ducation</div><p class="bv-desc">Clear, practical financial education that empowers informed decisions.</p></div>
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">D</span>iscipline</div><p class="bv-desc">Patience, consistency, and evidence-based investing over speculation.</p></div>
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">G</span>rowth</div><p class="bv-desc">Sustainable growth through continuous learning and sound strategy.</p></div>
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">E</span>xcellence</div><p class="bv-desc">Every piece of research held to the highest standard of quality.</p></div>
+        <div class="bv-row"><div class="bv-word"><span class="bv-ini">R</span>esearch</div><p class="bv-desc">Transparent, research-driven analysis that puts facts first.</p></div>
+
+        <div class="bv-co">
+          <span class="bv-co-amp">&amp;</span>
+          <div class="bv-co-item">
+            <div class="bv-word"><span class="bv-ini">C</span>onfidence</div>
+            <p class="bv-desc">Helping members invest with greater confidence through knowledge and preparation.</p>
+          </div>
+          <div class="bv-co-item">
+            <div class="bv-word"><span class="bv-ini">O</span>pportunity</div>
+            <p class="bv-desc">Identifying long-term opportunity through disciplined research and education.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
