@@ -655,7 +655,22 @@
   </div>
 </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SB_URL = "https://wtlftsaigiehropidurn.supabase.co";
+  const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0bGZ0c2FpZ2llaHJvcGlkdXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjgxMDgsImV4cCI6MjA5NzQwNDEwOH0.tXL7p_ULHp-HePXceMNbOKJAsHHlAlfR6v4UDWaZ1Z0";
+  window.__ledgerSupabaseClient = window.supabase.createClient(SB_URL, SB_ANON);
+  (async () => {
+    try {
+      const { data } = await window.__ledgerSupabaseClient.auth.getSession();
+      if (data?.session?.user?.email) {
+        window.__ledgerUserEmail = data.session.user.email;
+      }
+    } catch (e) { console.error("Session restore failed:", e); }
+  })();
+</script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script src="js/paddle-checkout.js"></script>
+
 </body>
 </html>
