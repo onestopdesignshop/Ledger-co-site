@@ -369,7 +369,92 @@ const LIBRARY = [
     ☐ Diary a re-check for whenever the account grows by half.</p>` },
 ];
 
-const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access"};
+const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access", 5:"Capital Systems \u2014 Foundation", 6:"Capital Systems \u2014 Operator", 7:"Capital Systems \u2014 Institutional"};
+
+// ============ CAPITAL SYSTEMS SUITE (tiers 5-7, files in private Supabase Storage) ============
+const CAP_SYSTEMS = [
+  { key:"foundation", title:"Capital Systems \u2014 Foundation", minTier:5, tag:"FOUNDATION TIER",
+    desc:"The core capital-allocation system: the structured toolkit, implementation playbook, and every supporting template \u2014 downloadable, yours to run.",
+    body:`<h4>What Foundation includes</h4>
+    <p>The complete core system in ready-to-use form: the structured toolkit files, the implementation playbook, and the supporting templates. Everything downloads below \u2014 each file states exactly where it fits in the sequence.</p>
+    <h4>How to work through it</h4>
+    <p><strong>Step 1:</strong> Download every file below into one folder you control.<br><strong>Step 2:</strong> Open the playbook first \u2014 it is the map for everything else.<br><strong>Step 3:</strong> Set up the main toolkit with your own numbers before opening anything else.<br><strong>Step 4:</strong> Re-run the system quarterly. It is built to be operated, not read once.</p>
+    <h4>Support</h4>
+    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Foundation.</p>
+    <h4>License</h4>
+    <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
+  { key:"operator", title:"Capital Systems \u2014 Operator", minTier:6, tag:"OPERATOR TIER",
+    desc:"Everything in Foundation, plus the Operator-level systems: the expanded toolkit set and the operating cadence built on top of the core.",
+    body:`<h4>What Operator includes</h4>
+    <p>The full Foundation system plus the Operator layer: the expanded toolkit files and the operating cadence that turns the core allocation system into an ongoing process. Your downloads below include both tiers\u2019 files.</p>
+    <h4>How to work through it</h4>
+    <p><strong>Step 1:</strong> If you have not run Foundation, start there \u2014 its files are unlocked for you in the Foundation card.<br><strong>Step 2:</strong> Download the Operator files below into the same working folder.<br><strong>Step 3:</strong> Follow the Operator playbook\u2019s sequence \u2014 it assumes the Foundation setup is live.<br><strong>Step 4:</strong> Adopt the operating cadence: the system\u2019s value compounds through repetition.</p>
+    <h4>Support</h4>
+    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Operator.</p>
+    <h4>License</h4>
+    <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
+  { key:"institutional", title:"Capital Systems \u2014 Institutional", minTier:7, tag:"INSTITUTIONAL TIER",
+    desc:"The complete suite: Foundation and Operator plus the Institutional-grade systems \u2014 the full toolkit library at its deepest level.",
+    body:`<h4>What Institutional includes</h4>
+    <p>The entire Capital Systems Suite: Foundation, Operator, and the Institutional layer on top. Every tier\u2019s files are unlocked for your account \u2014 the Institutional downloads below, and the lower tiers in their own cards.</p>
+    <h4>How to work through it</h4>
+    <p><strong>Step 1:</strong> Run the tiers in order \u2014 Foundation, then Operator, then the Institutional files below. Each layer assumes the previous one is live.<br><strong>Step 2:</strong> Download everything into one working folder; keep the structure the playbooks reference.<br><strong>Step 3:</strong> The Institutional playbook defines the full operating rhythm \u2014 adopt it as written before customizing.</p>
+    <h4>Support</h4>
+    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Institutional \u2014 priority handling.</p>
+    <h4>License</h4>
+    <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
+];
+
+function renderCapSystems(eff, grid){
+  const head=document.createElement('div'); head.style.cssText='grid-column:1/-1;margin-top:30px;';
+  head.innerHTML='<div class="lib-tag">CAPITAL SYSTEMS SUITE</div>';
+  grid.appendChild(head);
+  CAP_SYSTEMS.forEach((cs,idx)=>{
+    const unlocked=eff>=cs.minTier;
+    const card=document.createElement('div');
+    card.className='library-item'+(unlocked?'':' locked');
+    card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':cs.tag)+'</div><h4>'+cs.title+'</h4><p>'+cs.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'OPEN & DOWNLOAD \u2192':'\ud83d\udd12 LOCKED \u2014 SOLD SEPARATELY')+'</div>';
+    if(unlocked){ card.querySelector('.lib-action').addEventListener('click',()=>openCapViewer(idx)); }
+    grid.appendChild(card);
+  });
+}
+
+async function openCapViewer(idx){
+  const cs=CAP_SYSTEMS[idx]; if(!cs||!currentUser) return;
+  const vt=document.getElementById('viewerTitle'); if(vt) vt.textContent=cs.title;
+  const vl=document.getElementById('viewerLicenseEmail'); if(vl) vl.textContent=currentUser.email;
+  const c=document.getElementById('viewerContent'); if(!c) return;
+  c.innerHTML='';
+  const body=document.createElement('div'); body.innerHTML=cs.body;
+  const fh=document.createElement('h4'); fh.textContent='Your downloads'; body.appendChild(fh);
+  const box=document.createElement('div'); box.textContent='Loading your files\u2026'; body.appendChild(box);
+  c.appendChild(body);
+  c.appendChild(buildWatermark(currentUser.email));
+  const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
+  try{
+    const sb=getSupabase(); if(!sb) throw new Error('no client');
+    const {data,error}=await sb.storage.from('capital-systems').list(cs.key,{limit:100,sortBy:{column:'name',order:'asc'}});
+    if(error) throw error;
+    const files=(data||[]).filter(f=>f&&f.name&&!f.name.startsWith('.'));
+    if(!files.length){ box.textContent='Your files are being provisioned for this account \u2014 check back shortly, or email dee8shops@gmail.com and we\u2019ll send them directly.'; return; }
+    box.innerHTML='';
+    for(const f of files){
+      const rowEl=document.createElement('div'); rowEl.style.cssText='margin:9px 0;';
+      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(cs.key+'/'+f.name,3600);
+      if(e2||!s||!s.signedUrl){ rowEl.textContent=f.name+' \u2014 temporarily unavailable, email dee8shops@gmail.com'; }
+      else{
+        const a=document.createElement('a'); a.href=s.signedUrl; a.textContent='\u2b07 '+f.name;
+        a.setAttribute('download',f.name); a.target='_blank'; a.rel='noopener';
+        a.style.cssText='color:var(--gold);text-decoration:underline;word-break:break-all;';
+        rowEl.appendChild(a);
+      }
+      box.appendChild(rowEl);
+    }
+    const note=document.createElement('p'); note.style.cssText='font-size:12px;opacity:.7;margin-top:14px;';
+    note.textContent='Download links are private to your account and expire after 60 minutes \u2014 reopen this card any time for fresh ones.';
+    box.appendChild(note);
+  }catch(err){ console.error('Cap Systems files error:',err); box.textContent='Could not load your files \u2014 refresh and try again, or email dee8shops@gmail.com.'; }
+}
 
 // ============ SESSION STATE ============
 let currentUser = null;
@@ -514,6 +599,7 @@ function showDashboard(){
     if(unlocked){ card.querySelector('.lib-action').addEventListener('click',()=>openViewer(idx)); }
     grid.appendChild(card);
   });
+  renderCapSystems(eff, grid);
   const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden';
 }
 
@@ -552,6 +638,7 @@ function renderPreviewLibrary(){
     card.innerHTML='<div class="lib-tag">REQUIRES '+(TIER_NAMES[item.tier]||'').toUpperCase()+'</div><h4>'+item.title+'</h4><p>'+item.teaser+'</p><div class="lib-action locked-action">🔒 LOCKED</div>';
     grid.appendChild(card);
   });
+  renderCapSystems(0, grid);
   const note=document.createElement('div'); note.className='preview-overlay-note'; note.style.gridColumn='1/-1';
   note.textContent="Titles are real. The full in-depth guides are only visible to members.";
   grid.appendChild(note);
