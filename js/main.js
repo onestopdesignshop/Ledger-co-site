@@ -38,242 +38,335 @@ function getSupabase() {
 // ============ CONTENT LIBRARY (9 in-depth guides) ============
 const LIBRARY = [
   { title:"The Cash-Placement Decision Framework", desc:"A repeatable way to decide where any dollar of cash should sit — before you chase a rate.", minTier:1,
-    body:`<h4>Start with the job the money has to do</h4>
-    <p>Every dollar of cash has a <em>time horizon</em> and a <em>certainty requirement</em>. Before comparing any rates, sort the money into three buckets:</p>
-    <p><strong>1. Spending buffer (0–1 month):</strong> Needs to be instantly accessible, zero risk to principal, and you should never optimize this for yield. Convenience beats basis points here. This is the money that pays rent, covers the card, and absorbs the week where two bills land at once. If getting to it involves a transfer delay, it's in the wrong place.</p>
-    <p><strong>2. Reserve (1–12 months):</strong> Money you'll likely need within a year — emergency fund, planned purchases, a tax bill you can see coming. This is where high-yield savings and money-market accounts earn their place: liquid, insured, competitive. The reserve is allowed to take one or two business days to reach you, in exchange for actually earning something.</p>
-    <p><strong>3. Parked capital (12+ months):</strong> Cash you're confident you won't touch soon. This can tolerate a lockup in exchange for a better, guaranteed rate — CDs and Treasury bills belong here. The key word is <em>confident</em>: if there's a realistic scenario where you'd need it in month six, it isn't parked capital, it's reserve wearing a costume.</p>
-    <h4>Why the bucket comes before the rate</h4>
-    <p>Rates are seductive because they're a single number, and single numbers feel comparable. But a 12-month CD paying more than your savings account is not "better" if the money inside it is your emergency fund — the early-withdrawal penalty on the day your car dies can erase a year of the rate advantage in one transaction. The bucket decision is what makes the rate comparison meaningful at all.</p>
-    <h4>A worked example</h4>
-    <p>Say you're holding $22,000 in cash in a checking account earning effectively nothing. Run the framework:</p>
-    <p><strong>Buffer:</strong> Monthly outflow is about $3,500, so $4,000 stays in checking. Cost of this decision: a few dollars a year of forgone interest. Value: never bouncing a payment. Easy trade.</p>
-    <p><strong>Reserve:</strong> You want four months of expenses reachable — $14,000 — so it goes to a high-yield savings account. On a competitive rate, that's hundreds of dollars a year the checking account was silently donating to the bank.</p>
-    <p><strong>Parked:</strong> The remaining $4,000 has no assignment for at least a year. A 12-month CD or T-bill locks a guaranteed rate. If rates drop next month, you're glad you locked; if they rise, your reserve is still liquid enough to catch the next opportunity. Either way you made a structural decision, not a bet.</p>
-    <p>Total time: one evening. Total risk added: none — every dollar stayed insured. The only thing that changed is that the money now has jobs.</p>
-    <h4>Only now do you compare products</h4>
-    <p>Matching the product to the bucket prevents the two most common mistakes: locking up money you'll need (and paying an early-withdrawal penalty), or leaving long-horizon cash in a checking account earning nothing. Within each bucket, comparison is simple because the candidates are genuinely alike — savings account vs. savings account, CD vs. T-bill of the same maturity.</p>
-    <h4>The one question that filters most bad options</h4>
-    <p>"What has to be true for this rate to actually apply to me?" A headline APY that requires a balance cap, a direct-deposit trigger, or a promo window that expires is a conditional rate — not the rate you'll earn. If you can't satisfy the condition effortlessly, treat the headline number as fiction.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Optimizing the buffer.</strong> Moving your bill-paying money to chase yield creates transfer friction exactly where you can least afford it. The buffer's job is reliability.</p>
-    <p><strong>One giant undifferentiated pile.</strong> When all cash sits together, it gets managed to the most conservative dollar's requirements — meaning all of it earns the least.</p>
-    <p><strong>Confusing "probably won't need it" with "won't need it."</strong> Parked capital demands the second. When in doubt, it's reserve.</p>
-    <p><strong>Re-running the decision every week.</strong> The framework is meant to be revisited when life changes — new job, new baby, big purchase on the horizon — not every time a bank runs a promotion.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Write down your true monthly outflow (look at three months of statements, not your memory).<br>
-    ☐ Assign every cash dollar to buffer, reserve, or parked.<br>
-    ☐ Confirm the buffer sits somewhere with instant access.<br>
-    ☐ Move the reserve to an insured account with a competitive standing (not promo) rate.<br>
-    ☐ For parked capital, pick a maturity you're certain you can wait out.<br>
-    ☐ Put a calendar note to re-run this after any major life change.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>By the end you'll have every dollar of your cash assigned to a job, sitting in the right type of account, earning what it should. No predictions, no products to buy from us, no theory. One evening of work.</p>
+    <h4>The core rule</h4>
+    <p>Money gets placed by <em>when you'll need it</em>, never by which account has the best rate. Rate comes second. Every cash mistake people make — penalties, dead money in checking, panic-breaking a CD — comes from doing this backwards.</p>
+    <h4>Step 1 — Find your real monthly number</h4>
+    <p>Open your last 3 months of bank and card statements. Add up everything that left: rent, food, gas, subscriptions, the random stuff. Divide by 3. That's your real monthly outflow. Don't guess — people guess low by 20–30% every time. Write the number down. Everything else in this guide is built on it.</p>
+    <h4>Step 2 — Set your buffer</h4>
+    <p>Buffer = about 1 month of outflow, plus a little slack. It stays in checking. Its job is that nothing ever bounces. Do not chase yield with this money — the interest difference on one month of expenses is a few dollars a year, and the cost of a transfer delay on rent day is a late fee and a headache.</p>
+    <p>If your checking currently holds way more than one month — that's the leak. That extra money is earning nothing for no reason. Steps 3 and 4 fix it.</p>
+    <h4>Step 3 — Build your reserve</h4>
+    <p>Reserve = 3 to 6 months of your Step 1 number. This is emergency money plus anything you'll spend inside 12 months (tax bill, trip, deposit).</p>
+    <p>Where it goes: a high-yield savings account or money-market account that is (a) federally insured — FDIC for banks, NCUA for credit unions, (b) paying a competitive <em>standing</em> rate, not a promo, and (c) able to get money to you within 1–2 business days.</p>
+    <p>How to pick one fast: check two independent rate-comparison sites, take the top handful of insured accounts with no monthly fee and no conditions, pick the one whose transfer speed and app annoy you least. Done. Don't spend a week on this — the gap between the top few is pennies.</p>
+    <h4>Step 4 — Park the rest</h4>
+    <p>Whatever's left after buffer and reserve is parked capital — money you're <em>certain</em> you won't touch for 12+ months. Certain means certain. If there's a real scenario where you'd need it in month 6, it belongs in the reserve.</p>
+    <p>Where it goes: CDs or Treasury bills, where you lock a guaranteed rate in exchange for the lockup. Pick the maturity by your honest timeline, not by which rate looks best. A 12-month instrument you hold to maturity beats an 18-month one you break, every time.</p>
+    <h4>Step 5 — Run the one-question filter on anything you open</h4>
+    <p>Before opening any account, answer in one written sentence: "What has to be true for this rate to actually apply to me?" If the sentence needs a balance cap, a direct-deposit trigger, or a promo expiry to be true — the headline rate is fiction for you. Walk.</p>
+    <h4>Worked example — $22,000 sitting in checking</h4>
+    <p><strong>Step 1:</strong> Statements say real outflow is $3,500/month.</p>
+    <p><strong>Step 2:</strong> Buffer = $4,000 stays in checking.</p>
+    <p><strong>Step 3:</strong> Reserve = 4 months = $14,000 → insured high-yield savings. On a competitive rate that's hundreds of dollars a year the checking account was donating to the bank.</p>
+    <p><strong>Step 4:</strong> Remaining $4,000 has no job for 12+ months → 12-month CD or T-bill at a locked rate.</p>
+    <p>Total time: one evening. Risk added: zero — every dollar stayed insured. The only change is that the money now has jobs.</p>
+    <h4>Step 6 — Set the maintenance schedule</h4>
+    <p>This framework is not a hobby. Re-run it only when: your income changes, a big expense appears on the horizon, or a year has passed. Put one calendar reminder 12 months out. That's it. Re-running it weekly because a bank ran a promo is how people churn themselves into worse setups.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Optimizing the buffer.</strong> Yield-chasing your bill money creates friction exactly where you can't afford it.</p>
+    <p><strong>One big pile.</strong> Undivided cash gets managed to its most conservative dollar — so all of it earns the least.</p>
+    <p><strong>"Probably won't need it" going into a CD.</strong> Parked capital requires "won't." When in doubt, it's reserve.</p>
+    <p><strong>Breaking a lockup for a non-emergency.</strong> One early-withdrawal penalty can erase a year of rate advantage. The buffer and reserve exist so this never happens.</p>
+    <h4>Do this now</h4>
+    <p>☐ Pull 3 months of statements, compute real monthly outflow.<br>
+    ☐ Leave ~1 month in checking as the buffer.<br>
+    ☐ Move 3–6 months to an insured, no-fee, no-conditions high-yield account.<br>
+    ☐ Lock anything beyond that in a maturity you're certain you can wait out.<br>
+    ☐ Write the one-sentence rate condition for every account you opened.<br>
+    ☐ Set one reminder 12 months out. Close the tab. You're done.</p>` },
   { title:"The Fee & Fine-Print Trap Guide", desc:"The recurring ways a 'great rate' quietly costs more than it pays — and how to catch each one.", minTier:1,
-    body:`<h4>The five traps, in the order you'll meet them</h4>
-    <p><strong>Trap 1 — The balance cap.</strong> A market-leading APY that only applies up to a low balance ceiling, with everything above earning a fraction of it. Always find the cap before you're impressed by the rate. A spectacular rate on the first $500 of a $20,000 balance is a rounding error dressed as a headline: the blended rate across your whole balance is the only number that matters, and it's often worse than a boring account with no cap at all.</p>
-    <p><strong>Trap 2 — The activity requirement.</strong> "Boosted" rates that require a qualifying direct deposit, a minimum number of debit transactions, or a linked account. Miss the requirement one month and you silently drop to the base rate. The danger isn't the requirement itself — it's that the penalty is invisible. No email, no alert; your money just quietly starts earning a tenth of what you thought. If you take an account like this, the requirement has to be something your life already does automatically, not something you'll remember to do.</p>
-    <p><strong>Trap 3 — The promo cliff.</strong> A rate that's real for an introductory window, then reverts. The reversion rate — not the promo rate — is your true long-term return. Ask what it becomes, not just what it is. Banks run promos precisely because most people don't move their money again when the window closes. Unless you genuinely intend to re-shop at expiry — and will actually do it — evaluate the account as if the promo didn't exist.</p>
-    <p><strong>Trap 4 — The maintenance fee.</strong> On smaller balances, a monthly fee can exceed the interest earned entirely. Always compare the fee against the dollars of interest, not against other fees. A $10 monthly fee is $120 a year; on a $4,000 balance, there is no realistic savings rate that outruns it. The account is a guaranteed loss wearing an APY badge.</p>
-    <p><strong>Trap 5 — The minimum-to-earn.</strong> Some accounts pay their advertised rate only above a minimum balance, dropping to near-zero beneath it. If your balance fluctuates near that line, your effective rate is unpredictable — you can spend half the year earning the advertised rate and half earning nothing, and the statement won't make that obvious.</p>
-    <h4>A worked example: the trap stack</h4>
-    <p>Consider a real pattern you'll see in the wild: an account advertising a chart-topping rate that, in the fine print, (a) applies only up to $5,000, (b) requires a $1,000+ monthly direct deposit, and (c) reverts to a token base rate on every dollar that misses either condition.</p>
-    <p>Run your own numbers against it. If you'd hold $15,000 there: the top rate touches only a third of your money, the rest earns the base rate, and one payroll hiccup drops the whole thing to base for the month. Compute the blended annual dollars and compare it to a plain no-strings account paying a good standing rate on the full balance. In a large share of real cases, the boring account wins outright — and it wins by more once you price in the months you'd fumble the conditions. The exercise takes ten minutes and it's the same ten minutes every time.</p>
-    <h4>How to read fine print fast</h4>
-    <p>You don't need to read the whole disclosure. Search it for four things: the word "up to" near the rate (cap), the word "qualifying" (activity requirement), any date or "introductory" language (promo cliff), and the fee schedule table (maintenance and minimums). Ninety percent of the traps live behind those four markers.</p>
-    <h4>The habit that protects you</h4>
-    <p>Before opening anything, write down the single sentence describing the exact conditions under which you personally will earn the advertised rate. If you can't write that sentence clearly, you don't understand the product yet. If the sentence has more than two "if"s in it, the product is designed for you to fail it.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Comparing headline to headline.</strong> Two advertised APYs are only comparable after you've confirmed both are unconditional — otherwise you're comparing marketing budgets.</p>
-    <p><strong>Assuming you'll maintain the conditions.</strong> People predictably overestimate their own future diligence. Price the account at the rate you'd earn on your laziest month.</p>
-    <p><strong>Ignoring exit friction.</strong> Some accounts make leaving slow or costly — closure fees, transfer delays. A trap you can't cheaply exit is worse than one you can.</p>
-    <h4>Action checklist</h4>
-    <p>☐ For any account you hold now: find the cap, the conditions, and the fee schedule. Write the one-sentence rate condition.<br>
-    ☐ Compute your blended, after-fee annual dollars on your real balance.<br>
-    ☐ Compare against one no-strings alternative.<br>
-    ☐ If you keep a conditional account, set a recurring reminder to verify you're still meeting the conditions.<br>
-    ☐ Diary any promo expiry date the day you open the account.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Banks publish one big number and hide five ways to take it back. This guide names all five traps, shows you exactly where each one hides in the disclosure, and gives you a 10-minute routine that catches every one before you open the account.</p>
+    <h4>The five traps</h4>
+    <p><strong>Trap 1 — The balance cap.</strong> The headline rate applies only "up to" some ceiling; everything above earns scraps. A spectacular rate on the first $500 of a $20,000 balance is a rounding error dressed as a headline. The only number that matters is your <em>blended</em> rate across the whole balance — and with a low cap, it's usually worse than a boring account with no cap.</p>
+    <p><strong>Trap 2 — The activity requirement.</strong> "Boosted" rates that require a qualifying direct deposit, a minimum number of debit swipes, or a linked account. Miss it one month and you silently drop to the base rate — no email, no alert. Rule: only accept a requirement your life already does automatically. If you have to <em>remember</em> it, price the account at the base rate, because that's what you'll earn on your laziest month.</p>
+    <p><strong>Trap 3 — The promo cliff.</strong> A real rate for an introductory window, then a reversion to a weak one. Banks run these because most people never move the money again. Unless you will genuinely re-shop on the expiry date — and you know whether you're that person — evaluate the account as if the promo doesn't exist. The reversion rate is your rate.</p>
+    <p><strong>Trap 4 — The maintenance fee.</strong> Compare the fee to your interest in <em>dollars</em>, not to other fees. A $10/month fee is $120/year. On a $4,000 balance there is no realistic savings rate that outruns it — the account is a guaranteed loss wearing an APY badge.</p>
+    <p><strong>Trap 5 — The minimum-to-earn.</strong> The advertised rate only applies above a floor; below it you earn near zero. If your balance crosses that line during the month, your effective rate is unpredictable and your statement won't make it obvious.</p>
+    <h4>The 10-minute disclosure routine</h4>
+    <p><strong>Step 1:</strong> Open the account's fee schedule and rate disclosure (every insured institution must publish them — usually linked in the page footer).</p>
+    <p><strong>Step 2:</strong> Search the page for "up to" near any rate. Found it? That's the cap. Write it down.</p>
+    <p><strong>Step 3:</strong> Search "qualif" (catches qualifying/qualification). That's the activity requirement. Write down exactly what and how often.</p>
+    <p><strong>Step 4:</strong> Search "introductory" and look for any dates near the rate. That's the promo cliff. Write down the reversion rate — if you can't find it, call and ask, and if they won't say plainly, walk.</p>
+    <p><strong>Step 5:</strong> Open the fee table. Write down the monthly fee and every condition that waives it. Write down any minimum balance to earn.</p>
+    <p><strong>Step 6:</strong> Now write the one sentence: "I will earn X% when ___." More than two "if"s in the blank means the product is designed for you to fail it.</p>
+    <h4>The math step — always in dollars</h4>
+    <p><strong>Step 7:</strong> Take YOUR typical balance. Apply the top rate only up to the cap, the base rate above it. Subtract 12 months of fees. Knock the result down for any month you'd realistically miss a condition. That final dollar figure is the account's true annual value to you.</p>
+    <p><strong>Step 8:</strong> Compute the same figure for one plain, no-strings, no-fee insured account. Compare. The boring account wins a huge share of real matchups — which is exactly why the flashy one needed the marketing.</p>
+    <h4>Worked example — the trap stack</h4>
+    <p>An account advertises a chart-topping rate. The disclosure shows: applies up to $5,000 only, requires $1,000+/month direct deposit, token base rate on everything else. You'd hold $15,000.</p>
+    <p>Run Step 7: top rate touches only a third of your money; two-thirds earns the base rate; one payroll hiccup drops the whole month to base. Run Step 8 against a plain account paying a good standing rate on all $15,000. The plain account wins outright — before you even price in your own forgetfulness. Ten minutes, decision made, trap avoided.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Comparing headline to headline.</strong> Two APYs are only comparable after both pass the routine. Otherwise you're comparing ad budgets.</p>
+    <p><strong>Trusting future-you to maintain conditions.</strong> Everyone overestimates their diligence. Price at your laziest month.</p>
+    <p><strong>Ignoring exit friction.</strong> Closure fees and slow transfers make a bad account expensive to leave. Check before entering.</p>
+    <p><strong>Not diarizing the promo expiry.</strong> If you do take a promo, the calendar entry goes in the same minute you open the account — or the bank wins by default.</p>
+    <h4>Do this now</h4>
+    <p>☐ Run Steps 1–6 on every account you currently hold. Write the one-sentence condition for each.<br>
+    ☐ Run the Step 7 dollar math on your real balances.<br>
+    ☐ Compare each against one no-strings alternative (Step 8).<br>
+    ☐ Move anything that loses. Diary any promo expiry you keep.<br>
+    ☐ Save the routine — it's the same 10 minutes for every account you'll ever consider.</p>` },
   { title:"How to Compare Accounts Without Getting Played", desc:"A side-by-side method that surfaces the real cost and real return, not the marketing.", minTier:1,
-    body:`<h4>Build a same-columns comparison</h4>
-    <p>Marketing wins when every product is described differently. You win by forcing them into identical columns. For each candidate account, fill in: <em>base rate</em>, <em>conditional rate &amp; its condition</em>, <em>balance cap</em>, <em>monthly fee</em>, <em>minimum to earn</em>, <em>insurance (FDIC/NCUA)</em>, <em>access speed</em>.</p>
-    <p>The act of filling the table is itself the filter. Products that survive being described in plain columns are usually sound; products that resist it — where you can't find the reversion rate, or the fee schedule is a maze — are telling you something about how they make money.</p>
-    <h4>Then compute your number, not theirs</h4>
-    <p>Estimate the interest <em>you</em> would actually earn on <em>your</em> typical balance, after fees and given whether you'll meet the conditions. This "effective yield to you" is frequently very different from the headline — and it's the only number that should drive the decision.</p>
-    <h4>A worked example</h4>
-    <p>Suppose you're placing $12,000 and comparing three candidates:</p>
-    <p><strong>Account A</strong> advertises the highest rate on the page — but only up to $5,000, with a token rate above the cap and a monthly fee unless you hold a linked checking account. On your $12,000, the blend across capped and uncapped dollars, minus twelve months of fees, lands well below the headline.</p>
-    <p><strong>Account B</strong> advertises a middling rate, unconditional, no fee, full balance. Your effective yield equals the headline exactly — nothing to maintain, nothing to fumble.</p>
-    <p><strong>Account C</strong> advertises a strong promo rate for a few months, reverting to a weak base. Unless you will genuinely move the money again at expiry, your twelve-month blend sits between the two — and requires you to act on a specific future date to avoid drifting to the base rate for years.</p>
-    <p>On paper, A looked best and C looked exciting. On <em>your</em> balance with <em>your</em> behavior, B quietly wins or ties while demanding nothing. This inversion — the boring one winning after honest math — is the single most common outcome of doing the table, which is exactly why the marketing works on people who don't.</p>
-    <h4>Weigh access speed properly</h4>
-    <p>"How fast can I get my money" is a column people skip until the day it's the only column that matters. Same-day access, next-business-day transfers, and multi-day holds are materially different products for a reserve fund. Decide the access speed your bucket requires first (see the Cash-Placement Framework), and disqualify anything slower before comparing rates at all.</p>
-    <h4>Break ties with friction and safety, never with a few basis points</h4>
-    <p>Once two accounts are within a rounding error of each other on effective yield, the tiebreakers are: is my principal insured, how fast can I get my money, and how likely am I to accidentally break a condition. A slightly lower rate with no conditions usually beats a slightly higher rate you have to actively maintain.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Letting the number of columns grow.</strong> Seven columns is enough. Add ten more and you'll drown the decision in noise the marketing put there deliberately.</p>
-    <p><strong>Comparing across buckets.</strong> A CD "beating" a savings account is a category error — they're solving different problems. Compare only within the same liquidity tier.</p>
-    <p><strong>Treating the decision as permanent.</strong> The table takes an evening. Re-run it once or twice a year, or when your balance changes materially — not never, and not weekly.</p>
-    <p><strong>Chasing the last few basis points across town.</strong> The move from a near-zero rate to a competitive one is worth real money. The move between two competitive rates rarely pays for the switching friction.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Build the seven-column table for your current account plus two candidates.<br>
-    ☐ Compute effective yield on your actual typical balance for each.<br>
-    ☐ Disqualify anything slower than your bucket's required access speed.<br>
-    ☐ Confirm insurance status on every finalist.<br>
-    ☐ Pick the winner; diary a re-check in six to twelve months.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Marketing wins when every product is described differently. You win by forcing every candidate into the same seven columns and computing one number per account: what it pays <em>you</em>, on <em>your</em> balance, after fees, at your real level of diligence. This guide is that method, start to finish.</p>
+    <h4>Step 1 — Fix the job before the shopping</h4>
+    <p>Decide which bucket this money is (buffer / reserve / parked — see the Cash-Placement Framework). That sets the required access speed. Compare only within the bucket: savings vs. savings, 12-month lockup vs. 12-month lockup. A CD "beating" a savings account is a category error — they solve different problems.</p>
+    <h4>Step 2 — Build the seven-column table</h4>
+    <p>One row per candidate (your current account plus two or three challengers — more is noise). The columns, always the same:</p>
+    <p><strong>1. Base rate</strong> — what you earn with no conditions met.<br>
+    <strong>2. Conditional rate + its condition</strong> — the boosted rate and exactly what triggers it.<br>
+    <strong>3. Balance cap</strong> — the ceiling the good rate applies to.<br>
+    <strong>4. Monthly fee</strong> — and what waives it.<br>
+    <strong>5. Minimum to earn</strong> — the floor below which you earn ~nothing.<br>
+    <strong>6. Insurance</strong> — FDIC/NCUA yes or no. No is disqualifying for cash.<br>
+    <strong>7. Access speed</strong> — instant / next-day / multi-day.</p>
+    <p>Filling the table IS the filter. A product that resists plain description — you can't find the reversion rate, the fee page is a maze — is telling you how it makes money. Treat "hard to fill in" as a red flag by itself.</p>
+    <h4>Step 3 — Disqualify before you compare</h4>
+    <p>Cross out anything uninsured. Cross out anything slower than the bucket's required access speed. Cross out anything whose fee exceeds the interest your balance would earn (do the dollar math — a $10/month fee needs $120/year of interest just to break even). Whatever survives is a real candidate.</p>
+    <h4>Step 4 — Compute YOUR number for each survivor</h4>
+    <p>For each account: your typical balance × the rate you'd actually earn (top rate up to the cap, base above it, base for any month you'd miss a condition) − 12 months of fees = <strong>effective annual dollars to you</strong>. One number per account. This is the only number that decides anything. The headline never enters the math.</p>
+    <h4>Step 5 — Break ties on friction and safety, never basis points</h4>
+    <p>If two survivors land within a rounding error: pick the one with no conditions to maintain, then the faster access, then the better app/support. A slightly lower rate you can't fumble beats a slightly higher one you must babysit. And never switch banks for the last few basis points — the move from a near-zero rate to a competitive one is worth real money; the move between two competitive rates rarely pays for the friction.</p>
+    <h4>Worked example — $12,000, three candidates</h4>
+    <p><strong>Account A:</strong> highest headline on the page — but capped at $5,000, token rate above, monthly fee unless you link checking. Step 4 math on $12,000: blended rate across capped and uncapped dollars, minus fees, lands well below the headline.</p>
+    <p><strong>Account B:</strong> middling headline, unconditional, no fee, full balance. Effective = headline exactly. Nothing to maintain.</p>
+    <p><strong>Account C:</strong> strong promo for a few months, weak reversion. Twelve-month blend sits between A and B — and requires you to act on a future date or drift to the weak rate for years.</p>
+    <p>A looked best and C looked exciting. On your balance with your behavior, B wins or ties while demanding nothing. That inversion — the boring one winning after honest math — is the most common outcome of this method, which is exactly why the marketing works on people who skip it.</p>
+    <h4>Step 6 — Execute and schedule the re-check</h4>
+    <p>Open the winner. Move the money. Write the one-sentence rate condition and file it. Set a single reminder 6–12 months out to re-run the table. Then stop looking — checking rates weekly is how people churn into worse setups one promo at a time.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Adding columns.</strong> Seven is enough. The marketing wants you drowning in feature comparisons; the seven columns are where the money actually is.</p>
+    <p><strong>Comparing across buckets.</strong> Different liquidity = different product = no comparison.</p>
+    <p><strong>Skipping the dollar math.</strong> Percentages hide caps and fees. Dollars don't.</p>
+    <p><strong>Treating it as permanent — or as a hobby.</strong> Once or twice a year, or on a life change. Not never, not weekly.</p>
+    <h4>Do this now</h4>
+    <p>☐ Name the bucket and required access speed.<br>
+    ☐ Build the seven-column table: current account + 2–3 challengers.<br>
+    ☐ Disqualify on insurance, speed, and fee-vs-interest dollars.<br>
+    ☐ Compute effective annual dollars for each survivor on your real balance.<br>
+    ☐ Pick the winner; break ties on friction, not basis points.<br>
+    ☐ Move the money, file the condition sentence, set the re-check reminder.</p>` },
   { title:"The Web3 Due-Diligence Checklist", desc:"The exact custody, audit, and exit questions to answer before funding any on-chain product.", minTier:2,
-    body:`<h4>Custody — who actually controls the money</h4>
-    <p>Ask, in order: Do I hold the private keys, or does the platform? If the platform holds them, what stops them from freezing or losing my funds? Is this "non-custodial" in name only? You cannot evaluate anything else until you know who controls the assets.</p>
-    <p>Be precise about the middle cases. Some products are genuinely non-custodial but require you to sign transactions whose effects you can't read; some are custodial but wrapped in self-custody branding. The test is behavioral, not rhetorical: <em>if the company disappeared tomorrow, could you still move your funds?</em> If the honest answer is no, you are a creditor of that company, whatever the landing page says.</p>
-    <h4>Where the yield actually comes from</h4>
-    <p>Legitimate on-chain yield has an identifiable source: network staking rewards, trading fees, or lending interest. If you can't explain in one plain sentence where the return originates, assume the worst case — that new depositor money is funding withdrawals, which is unsustainable by definition.</p>
-    <p>Each legitimate source also has a natural ceiling. Staking yields are bounded by network issuance; fee-sharing is bounded by real trading volume; lending rates are bounded by what solvent borrowers will pay. When an advertised yield sails past what its claimed source could plausibly generate, the gap is being filled by something you haven't been told about — token emissions that dilute you, hidden leverage, or the next depositor.</p>
-    <h4>Audit and code</h4>
-    <p>Has the smart contract been audited, by a reputable firm, and how recently? An audit is not a guarantee — it's a floor. No audit at all is a hard stop. An old audit on since-changed code is nearly as bad. Read the audit summary itself, not the project's tweet about it: check whether the findings were fixed or merely "acknowledged," and whether the audited contract address matches the one you'd actually deposit into.</p>
-    <h4>Exit liquidity</h4>
-    <p>Can you withdraw instantly, or is there a lockup, a queue, or a withdrawal fee that spikes under stress? The time to discover an exit is difficult is <em>before</em> you deposit, not during a panic. Test it: deposit a trivial amount, then withdraw it fully, and time the round trip. The behavior of a small withdrawal on a calm day is the <em>best case</em> you'll ever see — stress only makes it worse.</p>
-    <h4>Team, treasury, and admin keys</h4>
-    <p>Three structural questions round out the checklist. Who can change the contract — is there an admin key, and who holds it? A protocol where one anonymous key can upgrade the code can, by construction, take everything. What does the treasury look like — is the protocol's own runway held in its own token (fragile) or in hard assets (sturdier)? And is the team identifiable — not because doxxed founders can't fail, but because anonymous ones face no consequence for choosing to.</p>
-    <h4>A worked walkthrough</h4>
-    <p>Take a hypothetical "stable yield vault" advertising a double-digit return on a dollar-pegged token. Run the list: custody — the vault is a smart contract, but an admin key can pause withdrawals; source — the docs say "delta-neutral strategies," which is a category, not a source; audit — one audit, eighteen months ago, two critical findings marked "acknowledged"; exit — instant "under normal conditions," queued otherwise; team — pseudonymous. That's five yellow-to-red flags out of five categories. No single one is a smoking gun; the pattern is the verdict. You don't need to know <em>how</em> it fails to know that it's built to be able to.</p>
-    <h4>The disqualifiers</h4>
-    <p>Any one of these ends the evaluation: guaranteed fixed returns, anonymous team with no track record, pressure to deposit quickly, or a yield too high to be explained by a real source. "Too good to be true" is not a cliché in this space — it's a pattern.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Answer the disappearing-company test in writing before depositing.<br>
-    ☐ Write the one-sentence yield source; sanity-check it against the source's natural ceiling.<br>
-    ☐ Read the actual audit summary; verify the audited address matches the live contract.<br>
-    ☐ Do a small deposit-and-full-withdrawal round trip and time it.<br>
-    ☐ Identify the admin key holder and what it can change.<br>
-    ☐ If any disqualifier appears, stop — no further diligence can rescue it.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>This is the exact sequence to run on any on-chain product before a single dollar goes in. It's ordered so the cheapest checks come first — most bad products die at Step 1 or 2 and you never waste time on the rest. Run it in order. Stop at the first hard fail.</p>
+    <h4>Step 1 — The disappearing-company test (custody)</h4>
+    <p>Answer in writing: <em>if this company/team vanished tonight, could I still move my funds?</em></p>
+    <p>Yes = you actually control the assets. No = you are an unsecured creditor of that company, whatever the landing page says. "Non-custodial" branding means nothing — the test is behavioral. If the answer is no, the rest of the checklist is really credit analysis on a company you can't audit. Most people should stop here unless the platform is large, regulated, and the position is sized like a loan to it.</p>
+    <h4>Step 2 — Name the yield source in one sentence</h4>
+    <p>Write: "This pays a return because ___," naming <em>who pays</em> and <em>why they're willing to</em>.</p>
+    <p>Passes: "borrowers pay interest to borrow against collateral," "the network pays staking rewards for validation," "traders pay fees the pool shares."<br>
+    Fails: "advanced strategies," "the protocol generates yield," "more people are joining." A mechanism-shaped sentence with no mechanism inside means the marketing team wrote the yield.</p>
+    <p>Then sanity-check the size: every real source has a ceiling — staking is bounded by network issuance, fee-sharing by real volume, lending by what solvent borrowers pay. A yield far above its claimed source's ceiling is being filled by something you weren't told: token emissions that dilute you, hidden leverage, or the next depositor. Hard stop on "guaranteed" anything.</p>
+    <h4>Step 3 — Verify the audit yourself (10 minutes)</h4>
+    <p><strong>3a.</strong> Find the audit report itself — not the project's tweet about it. No audit at all = hard stop.<br>
+    <strong>3b.</strong> Check the date against the code. An old audit on since-changed contracts is nearly as bad as none.<br>
+    <strong>3c.</strong> Read the findings summary. "Fixed" is good. Critical findings marked "acknowledged" means they shipped known holes.<br>
+    <strong>3d.</strong> Confirm the audited contract address matches the address you'd actually deposit into. Mismatches are a classic shell game.</p>
+    <h4>Step 4 — Check who holds the admin key</h4>
+    <p>Find out: can anyone upgrade or pause the contract? Who — a single key, a multisig, a timelock? A protocol where one anonymous key can change the code can, by construction, take everything. A multisig with a timelock isn't perfect but it means changes are visible before they bite. Single anonymous admin key + your life savings = no.</p>
+    <h4>Step 5 — Test the exit with real (tiny) money</h4>
+    <p>Deposit a trivial amount. Withdraw 100% of it. Time the round trip. Read what conditions could slow it: lockups, queues, fees that spike under stress, exits that depend on a token only traded in one thin venue.</p>
+    <p>Understand what you measured: a small withdrawal on a calm day is the <em>best case you will ever see</em>. If the best case is already slow, vague, or conditional, the stressed case is a trap. Ask the ugly version explicitly: what happens if a quarter of depositors leave the same week?</p>
+    <h4>Step 6 — Team and treasury</h4>
+    <p>Is the team identifiable? Not because doxxed founders can't fail — because anonymous ones face no consequence for choosing to. Is the project's own treasury held in hard assets (sturdy) or its own token (fragile — the runway evaporates exactly when it's needed)?</p>
+    <h4>Step 7 — Scan for the instant disqualifiers</h4>
+    <p>Any ONE of these ends the evaluation, no matter how good everything else looked: guaranteed fixed returns · anonymous team with no track record · pressure to deposit quickly ("migrate now," countdown timers) · a yield too high for its claimed source · referral rewards as the main growth engine. "Too good to be true" is not a cliché here — it's the recurring shape of every collapse.</p>
+    <h4>Worked walkthrough — a "stable yield vault"</h4>
+    <p>Double-digit advertised return on a dollar-pegged token. Step 1: contract-based, but an admin key can pause withdrawals — yellow. Step 2: "delta-neutral strategies" — that's a category, not a source — red. Step 3: one audit, eighteen months old, two criticals "acknowledged" — red. Step 4: single admin key, holder unknown — red. Step 5: "instant under normal conditions, queued otherwise" — yellow. Step 6: pseudonymous team — yellow.</p>
+    <p>No single smoking gun. The <em>pattern</em> is the verdict: five-plus flags across every category. You don't need to know how it fails to know it's built to be able to. Pass.</p>
+    <h4>Sizing — the step people skip</h4>
+    <p>If something survives all seven steps, it's still web3: size it so a total loss changes nothing about your life. Diligence lowers the odds of failure; sizing is the only thing that caps the cost of it.</p>
+    <h4>Do this now</h4>
+    <p>☐ Write the disappearing-company answer before any deposit.<br>
+    ☐ Write the one-sentence yield source; check it against the source's ceiling.<br>
+    ☐ Read the actual audit; match the audited address to the live one.<br>
+    ☐ Identify the admin key and what it can change.<br>
+    ☐ Do the tiny deposit-and-full-withdrawal round trip; time it.<br>
+    ☐ Scan the disqualifier list. Any hit = stop.<br>
+    ☐ Size the survivor for zero.</p>` },
   { title:"Custody & Smart-Contract Risk Primer", desc:"Plain-English coverage of the ways on-chain money is lost that have nothing to do with price.", minTier:2,
-    body:`<h4>Price is not the main risk</h4>
-    <p>Most first-timers focus on whether an asset goes up or down. But the losses that wipe people out are usually structural, not directional. A position can be exactly right on price and still go to zero through the channels below. Understand these first.</p>
-    <p><strong>Key loss / mismanagement:</strong> Lose your seed phrase, and the funds are gone permanently — no support line, no reset. Self-custody trades platform risk for personal-responsibility risk. The practical mitigations are unglamorous: the phrase written physically (never photographed, never in cloud notes), stored in more than one location, and tested — actually restore a wallet from your backup once with a trivial balance, so the first time you rely on the backup isn't the emergency.</p>
-    <p><strong>Smart-contract exploits:</strong> A bug in the code governing a protocol can drain deposited funds regardless of the market. This is why audit recency and code stability matter — and why time-in-production is itself information. A contract holding significant value untouched for years has survived continuous, well-funded attack attempts; a fork deployed last month has survived nothing yet, however similar its code looks.</p>
-    <p><strong>Platform insolvency:</strong> Custodial platforms can become insolvent while your balance still "shows" on their dashboard. A number on a screen is not the same as assets you control. The historical pattern is consistent: withdrawals slow first, then pause "temporarily," then convert into a legal process in which depositors discover they are unsecured creditors. The lesson is not "never use platforms"; it's that a custodial balance is a loan to a company, and should be sized and monitored like one.</p>
-    <p><strong>Approval / permission risk:</strong> Interacting with a malicious contract can grant it standing permission to move your tokens later. Understanding and revoking token approvals is a core safety habit. The dangerous part is the word <em>standing</em>: the theft doesn't have to happen when you sign — it can happen months later, from a site you've forgotten. Periodically reviewing and revoking old approvals closes doors you didn't know you'd left open.</p>
-    <p><strong>Signature phishing and the fake front-end:</strong> A growing share of losses involve no code exploit at all — just a convincing copy of a real site, or an urgent message, walking someone into signing exactly the transaction the attacker wanted. The defense is procedural: navigate to protocols from your own bookmarks, never from links sent to you; and treat any urgency ("migrate now," "verify your wallet") as the attack signature it usually is.</p>
-    <h4>Two habits that neutralize most of this</h4>
-    <p><strong>The two-wallet structure.</strong> A "vault" wallet that holds the majority and interacts with nothing, and a "spending" wallet that touches applications and holds only what it's actively using. Most of the risks above can then only ever reach the small wallet.</p>
-    <p><strong>Reading before signing.</strong> Modern wallets describe what a transaction does. The habit of actually reading that description — and refusing anything you can't parse — is the single highest-value security behavior available, and it costs ten seconds.</p>
-    <h4>The mindset</h4>
-    <p>Treat every interaction as irreversible and every counterparty as capable of failing. Size positions so that a total loss of any single position — one protocol, one platform, one wallet — is survivable and non-life-changing. Structural risk doesn't announce itself in advance; sizing is the only defense that works retroactively.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Backing up the phrase digitally "just temporarily."</strong> Screenshots and cloud notes are the most-harvested objects in this ecosystem.</p>
-    <p><strong>Assuming a big brand equals safety.</strong> The largest platform failures were, at the time, among the most trusted names in the space.</p>
-    <p><strong>Approving unlimited amounts by default.</strong> Many interfaces request unlimited token allowances for convenience. Granting the specific amount instead costs a little gas and removes a standing threat.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Verify your seed backup by restoring it once with a trivial balance.<br>
-    ☐ Split holdings into a vault wallet and a spending wallet.<br>
-    ☐ Review and revoke stale token approvals; repeat every few months.<br>
-    ☐ Bookmark every protocol you use; never enter through sent links.<br>
-    ☐ Re-size any custodial balance you couldn't afford to have frozen for a year.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Most first-timers watch price. But the losses that wipe people out are structural — keys, exploits, insolvency, permissions, phishing. This guide names all five channels, then gives you a setup routine that neutralizes most of them in one afternoon.</p>
+    <h4>The five ways money actually disappears</h4>
+    <p><strong>1. Key loss.</strong> Lose the seed phrase, funds are gone forever. No support line, no reset. Self-custody trades platform risk for personal-responsibility risk — that's the whole deal.</p>
+    <p><strong>2. Smart-contract exploits.</strong> A bug in the protocol's code drains deposits regardless of the market. Time-in-production is real information: a contract holding serious value untouched for years has survived continuous, well-funded attack; last month's fork has survived nothing, however similar its code looks.</p>
+    <p><strong>3. Platform insolvency.</strong> A custodial balance can "show" on a dashboard long after the assets behind it are gone. The historical pattern is always the same: withdrawals slow → pause "temporarily" → become a legal process where depositors learn they're unsecured creditors. A custodial balance is a loan to a company. Size it and watch it like one.</p>
+    <p><strong>4. Standing approvals.</strong> Interacting with a malicious contract can grant it permanent permission to move your tokens <em>later</em> — months later, from a site you forgot. The theft doesn't happen when you sign; the door just stays open.</p>
+    <p><strong>5. Signature phishing.</strong> A growing share of losses involve no exploit at all — a pixel-perfect fake site or an urgent DM walks the victim into signing exactly the transaction the attacker wanted. Urgency is the attack signature.</p>
+    <h4>The setup routine — one afternoon, do it in order</h4>
+    <p><strong>Step 1 — Fix the seed phrase.</strong> Written physically. Never photographed, never typed into a cloud note, never in a password manager screenshot. Two copies, two locations. Screenshots and cloud notes are the most-harvested objects in this entire ecosystem.</p>
+    <p><strong>Step 2 — Prove the backup works.</strong> Restore a wallet from your written phrase with a trivial balance in it. The first time you rely on the backup must not be the emergency. Ten minutes, and now the backup is a fact instead of a hope.</p>
+    <p><strong>Step 3 — Split into two wallets.</strong> A <em>vault</em> wallet holds the majority and interacts with nothing — no apps, no signatures, ever. A <em>spending</em> wallet touches applications and holds only what it's actively using. Now exploits, approvals, and phishing can only ever reach the small wallet. This one structure removes most of your surface area.</p>
+    <p><strong>Step 4 — Clean your approvals.</strong> Use a reputable approval-review tool to list every standing token permission your addresses have granted. Revoke everything you don't recognize or no longer use. Repeat every few months. Each revocation closes a door you didn't know was open.</p>
+    <p><strong>Step 5 — Bookmark everything.</strong> Every protocol you use gets a bookmark, created from a verified source once. From now on you enter ONLY through bookmarks — never through links sent to you, never through search ads. This single habit defeats the fake-front-end attack outright.</p>
+    <p><strong>Step 6 — Read before signing, every time.</strong> Modern wallets describe what a transaction does. Read it. If you can't parse what you're granting, reject it. Ten seconds per signature; highest-value security habit that exists. Corollary: when an interface asks for an <em>unlimited</em> token allowance "for convenience," grant the specific amount instead.</p>
+    <p><strong>Step 7 — Size custodial balances like loans.</strong> For every platform balance, ask: could I afford this frozen for a year and possibly gone? Resize until the answer is yes. Big brands don't exempt you — the largest failures were, at the time, the most trusted names in the space.</p>
+    <h4>The mindset that ties it together</h4>
+    <p>Treat every transaction as irreversible and every counterparty as capable of failing — because both are true here. Then size every position (one protocol, one platform, one wallet) so its total loss is survivable. Structural risk gives no warning; sizing is the only defense that works retroactively.</p>
+    <h4>Mistakes that cost everything</h4>
+    <p><strong>"Temporary" digital backups.</strong> There is no temporary. The photo syncs, the cloud gets breached, the funds leave.</p>
+    <p><strong>One wallet for everything.</strong> Your life savings should never be the wallet that signs things.</p>
+    <p><strong>Trusting urgency.</strong> "Migrate now," "verify your wallet," countdown timers — real protocols don't need you to panic.</p>
+    <p><strong>Assuming the dashboard number is money.</strong> On a custodial platform it's an IOU until it's withdrawn.</p>
+    <h4>Do this now</h4>
+    <p>☐ Rewrite the seed phrase on paper; two copies, two locations; delete any digital trace.<br>
+    ☐ Test-restore from the written backup once.<br>
+    ☐ Create the vault/spending split; move the majority to the vault.<br>
+    ☐ Review and revoke stale approvals; calendar it quarterly.<br>
+    ☐ Bookmark every protocol; swear off sent links.<br>
+    ☐ Resize every custodial balance to loan-you-can-lose size.</p>` },
   { title:"Reading a Yield Opportunity: A Worked Method", desc:"A step-by-step lens for pulling apart any 'passive income' crypto offer before you commit a dollar.", minTier:2,
-    body:`<h4>Step 1 — Name the mechanism</h4>
-    <p>Write one sentence: "This pays a return because ___." Staking rewards, lending demand, fee-sharing — these are real. "Because more people are joining" is not a mechanism; it's a warning.</p>
-    <p>Hold the sentence to a standard: it should name who pays, and why they're willing to. "Borrowers pay interest to borrow against their collateral" passes. "The protocol generates yield through advanced strategies" fails — that's a mechanism-shaped sentence with no mechanism inside. If the documentation can't produce the sentence, the marketing team wrote the yield, not the engineers.</p>
-    <h4>Step 2 — Stress the rate</h4>
-    <p>Compare the advertised yield to boring, well-understood benchmarks. If it dwarfs them by an order of magnitude, the extra return is compensation for risk you haven't identified yet. Find the risk before you find it the hard way.</p>
-    <p>Then decompose the number. Many advertised APYs are a blend: a small "real" component paid in the asset you deposited, plus a large "incentive" component paid in the protocol's own token. The incentive part is real money only at the moment you sell it — its value depends on a token price that the emissions themselves push downward. Re-state the yield with the incentive component discounted or removed, and see whether you'd still be interested. Often the honest number is a quarter of the advertised one.</p>
-    <h4>Step 3 — Map the exit</h4>
-    <p>Before depositing, describe exactly how you'd get 100% of your money back and how long it would take under normal <em>and</em> stressed conditions. If the exit is vague, the position is a trap regardless of the yield.</p>
-    <p>Stress-mapping means asking the ugly versions: What happens to the withdrawal queue if a quarter of depositors leave the same week? Is the exit dependent on a liquid market for a token that only trades on one venue? Does the peg or share price I exit at depend on the very confidence that would be collapsing in that scenario? A yield product is really a package of an entry, a stream, and an exit — and the exit is the part that's tested least and matters most.</p>
-    <h4>Step 4 — Size it as if it could go to zero</h4>
-    <p>Decide the position size on the assumption that this specific product could return nothing. If that size still lets you sleep, proceed. If not, the yield was never the point — your risk tolerance was the constraint all along.</p>
-    <p>A useful discipline: compute the annual dollars the position would actually generate at your honest (Step 2) rate, and ask whether that dollar figure justifies the tail risk. A double-digit yield on a small, survivable position often earns less per year than a boring insured rate on your reserve — in which case the position is entertainment, and should be sized like entertainment.</p>
-    <h4>The method applied, end to end</h4>
-    <p>Picture a lending-market deposit advertising a strong rate on a major asset. Step 1: the sentence exists — borrowers pay to leverage against collateral. Pass. Step 2: the rate is elevated but within sight of what real borrowing demand pays; only a sliver is token incentives. Pass, with the honest rate noted. Step 3: withdrawals are instant while utilization is normal, but can queue if nearly all supplied funds are borrowed — a real, bounded, understandable risk. Conditional pass. Step 4: sized so a total loss stings but changes nothing. The result isn't "safe" — nothing here is — it's <em>understood</em>, which is the only standard available.</p>
-    <p>Now the same method on a "guaranteed" high-yield program: Step 1 fails (no payer named), and the evaluation is already over. Three steps saved.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Letting APY precision imply legitimacy.</strong> A yield quoted to two decimal places is not more real than a round number; it's just better typography.</p>
-    <p><strong>Evaluating the protocol but not the wrapper.</strong> A sound underlying protocol accessed through a third-party vault inherits the vault's risks too — you hold the weakest layer.</p>
-    <p><strong>Anchoring on the entry-day rate.</strong> Variable yields vary. Decide in advance at what rate the position no longer pays for its risk, so drift doesn't quietly strand you.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Write the one-sentence mechanism, naming who pays and why.<br>
-    ☐ Restate the yield with token incentives discounted; keep only the honest number.<br>
-    ☐ Write the exit path under calm and stress; test a small round trip.<br>
-    ☐ Size for zero; compute the honest annual dollars and judge whether they're worth it.<br>
-    ☐ Set the rate floor at which you'll exit, before you enter.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Every yield pitch — vault, staking program, lending market, "passive income" anything — gets the same four steps, in order, stopping at the first fail. Most offers die at Step 1. The method takes 30 minutes on a real candidate and 30 seconds on a scam, which is the point.</p>
+    <h4>Step 1 — Name the mechanism, with a payer</h4>
+    <p>Write one sentence: "This pays a return because ___." The sentence must name <em>who pays</em> and <em>why they're willing to</em>.</p>
+    <p>Real mechanisms: borrowers paying interest against collateral · networks paying staking rewards for validation · traders paying fees a pool shares. Fake mechanisms: "advanced strategies" · "the protocol generates yield" · "growth of the ecosystem" · anything where the honest answer is "the next depositor."</p>
+    <p>If the docs can't produce the sentence, stop here. You just saved 30 minutes and possibly everything else.</p>
+    <h4>Step 2 — Compute the honest rate</h4>
+    <p><strong>2a. Benchmark it.</strong> Put the advertised yield next to boring, well-understood rates. An order of magnitude higher = the gap is compensation for a risk you haven't found yet. Find it before it finds you.</p>
+    <p><strong>2b. Decompose it.</strong> Many advertised APYs are a blend: a small "real" part paid in the asset you deposited, plus a big "incentive" part paid in the protocol's own token. The incentive part is only money when you sell it — into a price the emissions themselves push down. Restate the yield with the incentive component discounted or removed.</p>
+    <p><strong>2c. Decide on the honest number only.</strong> Often it's a quarter of the advertised one. If the honest number doesn't interest you, you're done — you were being paid in confetti.</p>
+    <h4>Step 3 — Map the exit before the entry</h4>
+    <p>Write down, before depositing, exactly how you'd get 100% out and how long it takes — under calm AND under stress.</p>
+    <p><strong>3a. Test it.</strong> Tiny deposit, full withdrawal, time it. Calm-day behavior is your best case forever.<br>
+    <strong>3b. Stress it on paper.</strong> What happens to the queue if a quarter of depositors leave in a week? Does your exit price depend on a peg or share price that would be collapsing in exactly that scenario? Does it depend on a token that only trades in one thin venue?<br>
+    <strong>3c. Rule:</strong> vague exit = trap, regardless of yield. A yield product is an entry, a stream, and an exit — and the exit is the part tested least and needed most.</p>
+    <h4>Step 4 — Size it for zero, then check it's worth it</h4>
+    <p><strong>4a.</strong> Choose the position size assuming this specific product returns nothing. If that size costs you sleep, the size is wrong — no thesis fixes it.</p>
+    <p><strong>4b.</strong> Multiply the honest rate (Step 2c) by that survivable size. That's the real annual dollars on the table. Now judge: is that figure worth the tail risk and the monitoring? A double-digit yield on a survivable position often pays less per year than a boring insured rate on your reserve. If so, the position is entertainment — size it like entertainment or skip it.</p>
+    <p><strong>4c.</strong> Set the exit trigger now: the rate at which this stops paying for its risk, and any event (audit issue, team change, exit slowdown) that means leave immediately. Variable yields drift; deciding in advance is what stops drift from stranding you.</p>
+    <h4>The method end to end — two candidates</h4>
+    <p><strong>A lending-market deposit on a major asset:</strong> Step 1: borrowers pay to leverage against collateral — pass. Step 2: elevated but within sight of real borrowing demand; sliver of token incentives — pass, honest rate noted. Step 3: instant normally; can queue if utilization maxes — a real, bounded, understandable risk — conditional pass. Step 4: sized so total loss stings but changes nothing; honest dollars judged worth it; exit triggers written. Verdict: not "safe" — <em>understood</em>, which is the only standard available.</p>
+    <p><strong>A "guaranteed" high-yield program:</strong> Step 1: no payer nameable. Dead in one step. Three steps saved.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Letting decimal places imply legitimacy.</strong> A yield quoted to two decimals isn't more real — it's just better typography.</p>
+    <p><strong>Evaluating the protocol but not the wrapper.</strong> A sound protocol accessed through a third-party vault inherits the vault's risks too. You always hold the weakest layer.</p>
+    <p><strong>Anchoring on entry-day rates.</strong> Variable means variable. No pre-set floor = you'll ride it down out of inertia.</p>
+    <p><strong>Skipping Step 4b.</strong> People run diligence for hours on positions whose honest annual dollars wouldn't cover a dinner. Compute the dollars first next time.</p>
+    <h4>Do this now</h4>
+    <p>☐ Write the mechanism sentence with a named payer — or stop.<br>
+    ☐ Strip incentives out of the APY; keep only the honest number.<br>
+    ☐ Write the calm and stressed exit; test a tiny round trip.<br>
+    ☐ Size for zero; compute honest annual dollars; judge if it's worth it.<br>
+    ☐ Write the exit triggers before the entry.</p>` },
   { title:"The Income-Layering Framework", desc:"Building a laddered, auditable income approach across liquidity tiers — the structure, not a stock tip.", minTier:3,
-    body:`<h4>The principle: match liquidity to need, then ladder</h4>
-    <p>Instead of one lump of cash earning one rate, you split capital across instruments with staggered access and maturities. This gives you a blend of liquidity and higher guaranteed rates without gambling on timing.</p>
-    <h4>The three layers</h4>
-    <p><strong>Immediate layer:</strong> Instantly accessible savings for anything unexpected. Sized to cover near-term needs so you never have to break a longer instrument early. This layer's return is a secondary concern; its job is to make the rest of the structure unbreakable.</p>
-    <p><strong>Short-ladder layer:</strong> A sequence of short-maturity instruments (e.g. CDs or T-bills across staggered maturities) so that something is always maturing soon. As each matures, you either spend it or roll it to the back of the ladder.</p>
-    <p><strong>Anchor layer:</strong> Longer-maturity instruments for the portion you're confident you won't need, capturing the best guaranteed rates available to you.</p>
-    <h4>Building the ladder: a worked example</h4>
-    <p>Suppose $24,000 is available beyond your immediate layer. A four-rung quarterly ladder places $6,000 each into instruments maturing in 3, 6, 9, and 12 months. In three months, the first rung matures; you roll it into a new 12-month instrument. From that point on, a rung matures every quarter, and every rung in the ladder is a 12-month instrument earning 12-month rates — while you retain quarterly access to a quarter of the capital.</p>
-    <p>That's the quiet magic of the structure: after one full cycle, <em>all</em> of your laddered money earns the longer rate, but your effective liquidity is that of a much shorter instrument. You've manufactured a product no bank sells.</p>
-    <p>Choose the rung interval from your life, not from theory: quarterly rungs suit most households; monthly rungs suit tighter cash flow; semiannual rungs suit larger anchors. The interval is simply the longest you're comfortable waiting for the next unlock.</p>
-    <h4>Why laddering beats guessing</h4>
-    <p>A ladder means you never have to predict where rates go. When rates rise, maturing rungs roll into higher rates. When they fall, your longer rungs are still locked in. You've replaced a forecast with a structure — the entire point of disciplined income planning.</p>
-    <p>Notice what this does psychologically as well as financially: every rate scenario now contains good news. Rising rates? Your next roll improves. Falling rates? Your locked rungs look smarter every month. The ladder converts rate anxiety — the thing that keeps people frozen in cash — into a scheduled, boring decision that recurs on calendar dates you chose.</p>
-    <h4>Handling the roll decision</h4>
-    <p>At each maturity, the decision is deliberately small: spend, hold in the immediate layer, or roll to the back. Write the default in advance ("roll unless a planned expense is inside the next interval") so the recurring decision takes one minute, not a research project. If your situation changes — income drops, a big purchase appears — the ladder de-builds gracefully: you simply stop rolling, and the structure returns your capital in scheduled installments without a single early-withdrawal penalty.</p>
-    <h4>Keep it auditable</h4>
-    <p>Track each rung: instrument, amount, rate, maturity, and destination on maturity. A one-page ledger of your ladder turns "I have some CDs somewhere" into a system you actually control. The audit page is also your defense against drift: it's where you notice a rung quietly auto-renewed at a bad rate, or that your anchor layer has grown past what "confident I won't need it" honestly covers.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Letting instruments auto-renew.</strong> Auto-renewal defaults often roll you into uncompetitive rates. Every maturity should pass through your hands, even if the answer is almost always "roll."</p>
-    <p><strong>Building the ladder before the immediate layer.</strong> A ladder funded with money you might need next month isn't a ladder; it's a penalty schedule.</p>
-    <p><strong>Chasing exotic rungs.</strong> The framework's value is its predictability. Instruments with credit risk or unclear exit terms don't belong in it — they belong in a different, explicitly risk-bearing part of your plan.</p>
-    <p><strong>Over-engineering.</strong> Twelve rungs isn't more sophisticated than four; it's just twelve decisions instead of four. Match complexity to the size of the capital.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Confirm the immediate layer is fully funded first.<br>
-    ☐ Choose a rung interval that matches your cash-flow rhythm.<br>
-    ☐ Split the laddered amount evenly across the first cycle's maturities.<br>
-    ☐ Write your default roll rule in one sentence.<br>
-    ☐ Build the one-page rung ledger; update it at every maturity.<br>
-    ☐ Turn off auto-renewal everywhere.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Instead of one lump of cash earning one rate, you build a ladder: staggered guaranteed-rate instruments where something is always maturing soon. Result: nearly all your money earns longer-term rates while your effective liquidity stays short. No forecasting, no products to pick monthly, one small decision per interval. This guide builds it start to finish.</p>
+    <h4>Why this beats guessing at rates</h4>
+    <p>A ladder makes every rate scenario contain good news. Rates rise? Your next maturing rung rolls into the higher rate. Rates fall? Your longer rungs are locked in and look smarter monthly. You replaced a forecast with a structure — and converted rate anxiety into a boring calendar event. That's the entire trick, and it's enough.</p>
+    <h4>Step 1 — Confirm the foundation first</h4>
+    <p>The ladder only gets money that survives the Cash-Placement Framework: buffer funded, reserve funded, and only <em>parked capital</em> (won't-touch-for-12-months money) goes on the ladder. A ladder built with money you might need next month isn't a ladder — it's a penalty schedule.</p>
+    <h4>Step 2 — Pick the rung interval from your life</h4>
+    <p>The interval = the longest you're comfortable waiting for the next chunk to unlock. Quarterly suits most households. Monthly suits tight cash flow. Semiannual suits big, stable anchors. Don't overthink: quarterly is the default for a reason.</p>
+    <h4>Step 3 — Build the first cycle</h4>
+    <p>Split the total evenly across maturities that step by your interval. Quarterly with $24,000: $6,000 each into instruments maturing at 3, 6, 9, and 12 months. Instruments: CDs (insured) or Treasury bills — guaranteed rate, known maturity, no credit surprises. Nothing exotic goes on a ladder; predictability is the product.</p>
+    <p><strong>Critical sub-step: turn off auto-renewal on every instrument, the day you open it.</strong> Auto-renewal defaults roll you into whatever uncompetitive rate the institution feels like. Every maturity must pass through your hands.</p>
+    <h4>Step 4 — Write the default roll rule</h4>
+    <p>One sentence, written in advance: "At each maturity: roll into a new longest-rung instrument, unless a planned expense falls inside the next interval." Now the recurring decision takes one minute instead of becoming a quarterly research project. The rule is the machine; you're just the operator.</p>
+    <h4>Step 5 — Run the machine</h4>
+    <p>Month 3: the first rung matures. Apply the rule — roll it into a new 12-month instrument at whatever today's rate is. Month 6: same. Month 9: same. From month 12 onward, here's what you own: <em>every</em> rung is a 12-month instrument earning 12-month rates, and a rung matures every quarter.</p>
+    <p>Read that again, because it's the payoff: 100% of the laddered money earns the long rate, with effective quarterly liquidity. No bank sells that product. You manufactured it with a calendar.</p>
+    <h4>Step 6 — Keep the one-page ledger</h4>
+    <p>One row per rung: instrument · amount · rate · maturity date · action taken at maturity. Update it at every roll. This page is what turns "I have some CDs somewhere" into a system — and it's where you catch drift: a rung that quietly auto-renewed at a junk rate, or an anchor that's grown past what "won't need it" honestly covers.</p>
+    <h4>Step 7 — De-building, when life changes</h4>
+    <p>Income drops, big purchase appears? Just stop rolling. The ladder returns your capital in scheduled installments — one rung per interval — with zero early-withdrawal penalties. Graceful under stress is a feature you built in on day one by never putting reserve money on the ladder.</p>
+    <h4>Worked example — full first year</h4>
+    <p>$24,000 parked, quarterly rungs. Day 1: $6,000 × maturities of 3/6/9/12 months. Month 3: rung 1 matures → rule says roll → new 12-month instrument. Months 6, 9: same. Month 12: original 12-month rung matures → roll. Steady state achieved: four 12-month rungs, one maturing every quarter, one minute of decision per quarter, one page tracking it all. If rates rose during the year, your rolls captured it; if they fell, three of four rungs were locked before the drop. You never once had to be right about rates.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Auto-renewal left on.</strong> The single most common leak. Turn it off at purchase, every time.</p>
+    <p><strong>Reserve money on the ladder.</strong> One emergency + one penalty erases a year of rate edge.</p>
+    <p><strong>Exotic rungs.</strong> Credit risk and unclear exits don't belong here. The ladder's product is certainty.</p>
+    <p><strong>Twelve rungs because it feels sophisticated.</strong> It's just twelve decisions instead of four. Match complexity to the capital.</p>
+    <p><strong>Skipping the ledger.</strong> Untracked ladders drift. One page, updated at each maturity, is the whole cost.</p>
+    <h4>Do this now</h4>
+    <p>☐ Confirm buffer and reserve are fully funded; ladder only parked capital.<br>
+    ☐ Pick the interval (default: quarterly).<br>
+    ☐ Split evenly across the first cycle's maturities; insured/guaranteed instruments only.<br>
+    ☐ Kill auto-renewal on every rung today.<br>
+    ☐ Write the one-sentence roll rule.<br>
+    ☐ Create the one-page ledger; update at every maturity.</p>` },
   { title:"A Sober Look at Automated & Algorithmic Strategies", desc:"How to evaluate 'set it and forget it' automated income tools without the hype.", minTier:3,
-    body:`<h4>Automation amplifies whatever it's given</h4>
-    <p>An automated strategy is only as sound as its underlying logic and its risk controls. Automation doesn't reduce risk — it removes hesitation, which cuts both ways. A good rule executed without hesitation compounds; a flawed rule executed without hesitation compounds faster. Evaluate the strategy as if you were running it by hand first: if you wouldn't take these exact trades manually, wiring them to run unattended doesn't make them better — it makes them unattended.</p>
-    <h4>The questions that matter</h4>
-    <p>What exactly triggers a buy or sell? What happens in the conditions the strategy <em>wasn't</em> designed for? Is there a hard stop that limits catastrophic loss, and does it actually execute under stress (or just in the backtest)? Who holds the funds while the automation runs?</p>
-    <p>Add three operational ones that separate hobby setups from durable ones. <em>What happens when the automation itself fails</em> — an expired credential, an API outage, a platform maintenance window — does the system fail safe (flat, or holding a known position) or fail open (mid-position, unmonitored)? <em>How will you know</em> — does it alert you on every action and every error, or only on success? And <em>what's the manual override</em> — can you flatten everything from your phone in under a minute, and have you rehearsed doing it?</p>
-    <h4>Backtests lie by omission</h4>
-    <p>A strategy tuned to past data will always look good on that data. The real question is how it behaves on conditions it has never seen. Treat impressive historical returns as marketing, not evidence.</p>
-    <p>Know the three standard distortions. <em>Overfitting:</em> enough parameters can make any historical curve beautiful — and the more beautiful the backtest, the more suspicious you should be. <em>Frictionless fills:</em> backtests trade at prices real orders wouldn't get, with no spread, slippage, or missed executions; strategies that trade often are hurt most. <em>Regime dependence:</em> a strategy born in one kind of market often contains that market as a hidden assumption. Ask what regime the backtest covers, and what happens in its opposite.</p>
-    <h4>A worked evaluation</h4>
-    <p>Take a simple momentum system that rotates between a leveraged position and a defensive one on a signal. Run the questions: triggers are explicit and mechanical — good. Undesigned conditions: choppy, direction-less markets make it whipsaw, buying strength that immediately fades — known, and quantifiable in the backtest's worst stretches. Hard stop: exists, but executes at market open, so an overnight gap can jump past it — a real, bounded hole to acknowledge. Custody: funds sit at a regulated broker; the automation only sends orders — good separation. Failure mode: if the job scheduler dies, the position simply stays put and an alert fires — fail-safe, acceptable. Verdict: runnable, at a size that respects the gap risk and the whipsaw stretches. Not because it's guaranteed to work — because every failure mode has been named and priced.</p>
-    <h4>The discipline</h4>
-    <p>Never automate more capital than you'd be willing to lose to a logic flaw you didn't catch. Start small, watch it behave through a real cycle, and scale only after you've seen it handle a bad stretch — not just a good one. The bad stretch is the audition; the good stretch is just weather.</p>
-    <p>Keep a log the automation writes for you: every trade, every signal, every error, timestamped. When (not if) something surprises you, the log is the difference between a diagnosis and a shrug.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Confusing activity with edge.</strong> A bot that trades daily feels productive; frequency multiplies costs, not returns.</p>
-    <p><strong>Silent failure tolerance.</strong> The most expensive state is "I assumed it was running." Alerts on errors matter more than alerts on trades.</p>
-    <p><strong>Scaling after a lucky month.</strong> Size decisions made during a winning streak are made by the streak, not by you. Pre-commit the scaling rule.</p>
-    <p><strong>Skipping the rehearsal.</strong> If you've never practiced the emergency flatten, you don't have an emergency plan — you have an emergency hope.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Write the strategy's rules in plain language; confirm you'd take the trades by hand.<br>
-    ☐ Name the market condition it's worst in, and its worst historical stretch.<br>
-    ☐ Verify the failure mode is fail-safe and every error alerts you.<br>
-    ☐ Rehearse the manual flatten once.<br>
-    ☐ Start at a size whose total loss you'd shrug off; pre-write the scaling rule.<br>
-    ☐ Keep the full action/error log from day one.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>Automation doesn't reduce risk — it removes hesitation, which cuts both ways. A good rule executed without hesitation compounds; a flawed rule compounds faster. This guide is the full evaluation sequence for any bot, algorithm, or "set and forget" system — yours or someone else's — plus the deployment discipline that keeps a logic flaw from becoming a portfolio event.</p>
+    <h4>Step 1 — The by-hand test</h4>
+    <p>Write the strategy's rules in plain language: exactly what triggers a buy, exactly what triggers a sell. Then ask: would I take these exact trades manually? If no, automating them doesn't make them better — it makes them unattended. If the rules can't be written plainly ("proprietary AI signals"), you're not evaluating a strategy, you're trusting a stranger. Stop or size accordingly.</p>
+    <h4>Step 2 — Name the kill conditions</h4>
+    <p>Every strategy has a market it's worst in. Momentum systems get whipsawed in choppy, direction-less markets — buying strength that immediately fades. Mean-reversion systems get run over by strong trends. Find yours and say it out loud. Then find the worst historical stretch in the backtest and stare at it: that drawdown, at your intended size, in real dollars — can you sit through it without pulling the plug at the bottom? If not, the size is wrong before you've started.</p>
+    <h4>Step 3 — Interrogate the backtest (it lies by omission)</h4>
+    <p><strong>3a. Overfitting:</strong> enough parameters make any historical curve beautiful. The more beautiful the backtest, the more suspicious you should be. Ask how many versions were tried before this one — the ones that failed are the denominator you're not shown.<br>
+    <strong>3b. Frictionless fills:</strong> backtests trade at prices real orders don't get — no spread, no slippage, no missed fills. Strategies that trade often are hurt most. Mentally tax every trade and see if the edge survives.<br>
+    <strong>3c. Regime dependence:</strong> a strategy born in one kind of market contains that market as a hidden assumption. Ask what regime the test covers, and what happens in its opposite.<br>
+    Verdict rule: treat impressive historical returns as marketing. The backtest can disqualify a strategy; it can never qualify one.</p>
+    <h4>Step 4 — Audit the plumbing</h4>
+    <p><strong>4a. Custody:</strong> who holds the funds while it runs? Best structure: money sits at a regulated broker; the automation only sends orders. Anything where the bot's operator can withdraw is a different (worse) product.<br>
+    <strong>4b. Hard stop:</strong> does a maximum-loss stop exist, and does it execute in live conditions or only in the backtest? Know its holes — a stop that fires at market open can be gapped past overnight. Named and priced beats assumed.<br>
+    <strong>4c. Failure mode:</strong> when the automation itself dies — expired token, API outage, scheduler crash — does it fail SAFE (flat or holding a known position, alert fired) or fail OPEN (mid-position, silent)? Fail-open is disqualifying.<br>
+    <strong>4d. Alerting:</strong> you must be told about every action and every error. Silent success is fine; silent failure is how "I assumed it was running" becomes the most expensive sentence in trading.<br>
+    <strong>4e. Manual override:</strong> can you flatten everything from your phone in under a minute? Rehearse it once, for real. An unrehearsed emergency plan is an emergency hope.</p>
+    <h4>Step 5 — Deploy on the graduation ladder</h4>
+    <p><strong>5a.</strong> Start at a size whose <em>total loss</em> you'd shrug off — you're paying tuition to see live behavior, and live behavior always differs from the backtest.<br>
+    <strong>5b.</strong> Let it run through at least one full cycle including a bad stretch. The bad stretch is the audition; the good stretch is just weather.<br>
+    <strong>5c.</strong> Pre-write the scaling rule NOW: "after X months live including a drawdown handled correctly, size may increase to Y." Written in calm, because size decisions made during a winning streak are made by the streak, not by you.<br>
+    <strong>5d.</strong> Hard ceiling: never automate more than you'd be willing to lose to a logic flaw you didn't catch. That number exists whether you write it down or not — writing it down just means you chose it.</p>
+    <h4>Step 6 — Keep the log</h4>
+    <p>The automation writes its own diary: every signal, every trade, every error, timestamped. When (not if) something surprises you, the log is the difference between a diagnosis and a shrug. Review it briefly on a schedule — weekly is plenty — looking for drift: fill quality degrading, errors clustering, behavior diverging from the rules in Step 1.</p>
+    <h4>Worked evaluation — a signal-based rotation system</h4>
+    <p>A simple momentum system rotates between an aggressive position and a defensive one on a signal. Step 1: rules explicit and mechanical — pass. Step 2: kill condition is chop/whipsaw; worst backtest stretch identified and priced — pass with eyes open. Step 3: few parameters, modest-looking backtest, regime coverage includes both trends and chop — acceptable. Step 4: funds at a regulated broker, orders-only bot; stop exists but executes at open (gap risk named); scheduler failure = position stays put + alert fires = fail-safe; full alerting; flatten rehearsed — pass. Step 5: starts at shrug-off size, scaling rule pre-written. Verdict: runnable. Not because it's guaranteed to work — because every failure mode has been named and priced. That is the entire standard available in this domain.</p>
+    <h4>Mistakes that cost real money</h4>
+    <p><strong>Confusing activity with edge.</strong> Daily trading feels productive; frequency multiplies costs, not returns.</p>
+    <p><strong>Silent failure tolerance.</strong> Error alerts matter more than trade alerts.</p>
+    <p><strong>Scaling after a lucky month.</strong> The streak is doing your sizing. Pre-commit or it will.</p>
+    <p><strong>Trusting "proprietary."</strong> Unexplainable rules + your money = someone else's strategy, your risk.</p>
+    <h4>Do this now</h4>
+    <p>☐ Write the rules in plain language; pass the by-hand test.<br>
+    ☐ Name the kill condition and price the worst stretch at your size.<br>
+    ☐ Run the three backtest interrogations.<br>
+    ☐ Verify custody separation, fail-safe behavior, error alerts.<br>
+    ☐ Rehearse the one-minute flatten.<br>
+    ☐ Start at shrug-off size; pre-write the scaling rule; keep the log from day one.</p>` },
   { title:"Position Sizing Over Prediction", desc:"The single habit that separates durable investors from lucky ones — applied across every asset class.", minTier:3,
-    body:`<h4>You cannot reliably predict. You can always control size.</h4>
-    <p>The seductive question is "will this go up?" The durable question is "how much should I commit given I might be wrong?" The second question is answerable; the first mostly isn't. Shifting your energy from prediction to sizing is the highest-leverage change most people can make.</p>
-    <p>Here's the asymmetry that makes this true: being wrong about direction costs you the position; being wrong about size costs you the portfolio. History's blown-up accounts are overwhelmingly sizing failures wearing prediction-failure costumes — the thesis being wrong was survivable, the size made it fatal.</p>
-    <h4>The survivability test</h4>
-    <p>For any position, ask: if this went to zero, would it change my life? If yes, the position is too big — full stop, regardless of your conviction. Conviction and correct sizing are independent; you can be right about the thesis and still ruined by the size.</p>
-    <p>Make the test concrete with numbers. On a $50,000 investable base, a 4% position is $2,000 — a total loss stings for a week and changes nothing. A 30% position is $15,000 — a total loss is a year of saving, and worse, it damages the base from which you'd recover. Recovery math is brutal and worth memorizing: a 20% loss needs 25% to get back to even; a 50% loss needs 100%; an 80% loss needs 400%. Sizing isn't about avoiding losses — it's about keeping every loss in the region where the recovery math stays friendly.</p>
-    <h4>A simple sizing structure that works</h4>
-    <p>You don't need formulas; you need tiers, written down. For example: <em>core holdings</em> (broad, boring, diversified) with no single-position cap needed; <em>conviction positions</em> capped at a mid-single-digit percent each; <em>speculative positions</em> — anything that could genuinely go to zero, which includes most of web3 — capped at 1–2% each with a cap on the whole speculative sleeve. The exact numbers matter less than that they exist before the opportunity shows up, and that the highest-risk category has both a per-position and a total ceiling.</p>
-    <p>Correlation is the sleeper clause: five "different" positions that all live or die on the same underlying trend are one position wearing five names. Size the <em>theme</em>, not just the tickers.</p>
-    <h4>Concentration vs. diversification, honestly</h4>
-    <p>Concentration builds wealth; diversification protects it. Which you weight toward depends on how much you can afford to be wrong. Most people over-concentrate in what's exciting and under-diversify against what they haven't imagined. A sober allocation assumes your favorite idea is the one that fails.</p>
-    <p>There's an honest place for concentration: early, small accounts, where the dollars at risk are survivable and the knowledge gained is the real return. The mistake is carrying that posture unchanged into an account whose loss would now matter. The account grew; the sizing rules have to grow up with it.</p>
-    <h4>Write the rule before the emotion</h4>
-    <p>Decide your maximum position size as a percentage of investable assets <em>before</em> you're excited about a specific opportunity. A rule written in calm survives the moment of temptation; a decision made in excitement rarely does.</p>
-    <p>Extend the pre-commitment to adding and trimming: under what conditions will you add to a winner (and up to what cap), and at what size will you trim a position that's grown past its tier? A position that doubles has silently doubled its risk contribution too — the trim isn't a lack of conviction, it's the rule doing its job.</p>
-    <h4>Common mistakes</h4>
-    <p><strong>Sizing by dollar comfort instead of percentage.</strong> "$5,000 feels fine" means nothing without the base — it's 2% of one portfolio and 25% of another.</p>
-    <p><strong>Averaging down past the cap.</strong> Adding to a loser until it's your biggest position converts a small mistake into a defining one.</p>
-    <p><strong>Counting correlated positions as diversification.</strong> Same theme, same fate, same drawdown — no matter how many line items it spans.</p>
-    <p><strong>Rewriting the rules mid-excitement.</strong> If a "special situation" needs an exception to your caps, the caps are working. That's the feeling they exist to overrule.</p>
-    <h4>Action checklist</h4>
-    <p>☐ Write your tier structure: core / conviction / speculative, with per-position and per-sleeve caps.<br>
-    ☐ Run the survivability test on every current position; flag anything whose zero would change your life.<br>
-    ☐ Group current positions by theme and check the theme sizes, not just the tickers.<br>
-    ☐ Pre-write your add and trim rules.<br>
-    ☐ Re-check tier sizes whenever the account has grown materially.</p>` },
+    body:`<h4>What this guide does</h4>
+    <p>The seductive question is "will this go up?" The durable question is "how much do I commit given I might be wrong?" The second one is answerable, and this guide answers it: a written tier system with hard caps, the math that justifies it, and the rules for adding, trimming, and growing — all decided before the next exciting opportunity shows up.</p>
+    <h4>The asymmetry that makes sizing everything</h4>
+    <p>Being wrong about direction costs you the position. Being wrong about size costs you the portfolio. Nearly every blown-up account in history is a sizing failure wearing a prediction-failure costume — the thesis being wrong was survivable; the size made it fatal. You can't fix your hit rate much. You can fix your sizing completely, today, with a pen.</p>
+    <h4>Step 1 — Learn the recovery math (memorize these)</h4>
+    <p>Lose 10% → need 11% to get even. Lose 20% → need 25%. Lose 33% → need 50%. Lose 50% → need 100%. Lose 80% → need 400%.</p>
+    <p>The curve is brutal and it bends fast. Sizing isn't about avoiding losses — losses are certain — it's about keeping every loss in the flat part of that curve, where recovery math stays friendly. Everything below follows from these five numbers.</p>
+    <h4>Step 2 — Run the survivability test on everything you hold</h4>
+    <p>For each current position ask: <em>if this went to zero tomorrow, does my life change?</em> Yes = too big, full stop, regardless of conviction. Conviction and correct sizing are independent — you can be dead right on the thesis and still ruined by the size. Flag every position that fails. Those are your action items, today, before any new ideas.</p>
+    <h4>Step 3 — Write your three-tier structure</h4>
+    <p>Numbers below are a workable template — adjust, but write yours down:</p>
+    <p><strong>Core (60–90% of investable assets):</strong> broad, boring, diversified. No single-position cap needed because nothing in it IS a single position.<br>
+    <strong>Conviction (up to ~25% total):</strong> individual positions you've researched. Cap: mid-single-digit percent EACH — say 5%.<br>
+    <strong>Speculative (cap the whole sleeve at 5–10% total):</strong> anything that can genuinely go to zero — which includes most of web3. Cap: 1–2% each, AND the sleeve total. Two ceilings, both hard.</p>
+    <p>On a $50,000 base: a 4% conviction position is $2,000 — a total loss stings for a week and changes nothing. A 30% position is $15,000 — a year of saving gone, and the base you'd recover from is damaged too. Same thesis, same outcome, completely different life result. That's the entire argument for tiers.</p>
+    <h4>Step 4 — Size the theme, not the ticker</h4>
+    <p>Five "different" positions that all live or die on the same underlying trend are ONE position wearing five names — same theme, same fate, same drawdown. Group your holdings by what actually drives them. Apply the caps to the <em>theme totals</em>. This is the clause that catches people who think they're diversified because they own many line items of the same bet.</p>
+    <h4>Step 5 — Pre-write the add and trim rules</h4>
+    <p><strong>Adding:</strong> under what conditions do you add to a winner, and up to what cap? Write it. "I'll know it when I see it" means the excitement will decide.<br>
+    <strong>Trimming:</strong> a position that doubles has silently doubled its risk contribution. Rule template: "when any position exceeds its tier cap by half again, trim back to cap." The trim isn't lack of conviction — it's the rule doing its job.<br>
+    <strong>Averaging down:</strong> allowed only within the cap. Adding to a loser until it's your biggest position converts a small mistake into a defining one. The cap is the circuit breaker.</p>
+    <h4>Step 6 — Grow the rules with the account</h4>
+    <p>There's an honest place for concentration: early, small accounts, where the dollars at risk are survivable and the lesson is the real return. The mistake is carrying that posture unchanged into an account whose loss now matters. Rule: whenever the account has grown materially — say by half — re-run Step 2 and re-check the tier percentages in dollars. The account grew; the sizing has to grow up with it.</p>
+    <h4>Step 7 — Defend the rules from your best ideas</h4>
+    <p>The moment will come: a "special situation" that obviously deserves an exception to your caps. That feeling is precisely what the caps exist to overrule — the rule written in calm surviving the moment of temptation is the whole mechanism. If an idea is truly exceptional, it will still be exceptional at cap size. Concentration builds wealth and diversification protects it; a sober allocation assumes your favorite idea is the one that fails, because someone's favorite always is.</p>
+    <h4>Worked example — applying it in one sitting</h4>
+    <p>$50,000 investable. Written tiers: core $37,500 (75%) · conviction sleeve $10,000 (20%, max $2,500 each) · speculative sleeve $2,500 (5%, max $1,000 each). Current holdings grouped by theme: three positions turn out to be one tech-trend bet totaling 22% — over the theme cap → trim to cap. One legacy position sits at 12% — fails survivability → staged reduction rule written. Add/trim rules on one page. Time spent: one evening. The portfolio's return didn't change today — its <em>survivability</em> did, permanently.</p>
+    <h4>Mistakes that cost portfolios</h4>
+    <p><strong>Sizing by dollar comfort.</strong> "$5,000 feels fine" means nothing without the base — it's 2% of one portfolio and 25% of another. Percentages only.</p>
+    <p><strong>Counting correlated positions as diversification.</strong> Many tickers, one theme, one drawdown.</p>
+    <p><strong>Averaging down past the cap.</strong> The most common road from small mistake to defining one.</p>
+    <p><strong>Rewriting rules mid-excitement.</strong> If it needs an exception, the system is working.</p>
+    <h4>Do this now</h4>
+    <p>☐ Memorize the recovery-math table.<br>
+    ☐ Run the survivability test on every current position; flag the fails.<br>
+    ☐ Write your three tiers with per-position AND per-sleeve caps, in percentages.<br>
+    ☐ Group holdings by theme; apply caps to theme totals; trim what's over.<br>
+    ☐ Pre-write add, trim, and averaging-down rules on one page.<br>
+    ☐ Diary a re-check for whenever the account grows by half.</p>` },
 ];
 
 const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access"};
