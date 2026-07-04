@@ -1,11 +1,41 @@
-// ============ SUPABASE CLIENT ============
-// Project: onestopdesignshop's Project (wtlftsaigiehropidurn)
+// ============================================================
+// Ledger & Co. — js/main.js (HARDENED BUILD)
+// ------------------------------------------------------------
+// What changed vs. the previous version (behavior is identical):
+//  1. The Supabase client is now created LAZILY and defensively.
+//     The old version did `window.supabase.createClient(...)` at the
+//     top of the file — if the Supabase CDN script hadn't loaded yet
+//     (or the script order was wrong), that single line threw and
+//     killed the ENTIRE file: billing toggle, reveal animations,
+//     sign-in — everything. That can no longer happen.
+//  2. All page setup (nav, billing toggle, reveal observer, popup)
+//     runs inside a DOM-ready guard, so this file works whether the
+//     <script> tag is at the end of <body> or in <head>.
+//  3. If the reveal animation system fails for ANY reason, every
+//     .reveal section is force-shown instead of staying invisible.
+//  4. Sign-in now also sets window.__ledgerUserEmail so
+//     paddle-checkout.js can attach the buyer's email instantly.
+// ============================================================
+
+// ============ SUPABASE CONFIG ============
 const SUPABASE_URL = "https://wtlftsaigiehropidurn.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0bGZ0c2FpZ2llaHJvcGlkdXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjgxMDgsImV4cCI6MjA5NzQwNDEwOH0.tXL7p_ULHp-HePXceMNbOKJAsHHlAlfR6v4UDWaZ1Z0";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window.__ledgerSupabaseClient = supabase;
 
-// ============ CONTENT LIBRARY (9 in-depth guides, no calculators) ============
+let __sbClient = null;
+function getSupabase() {
+  if (__sbClient) return __sbClient;
+  try {
+    if (window.supabase && typeof window.supabase.createClient === "function") {
+      __sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      window.__ledgerSupabaseClient = __sbClient;
+    }
+  } catch (err) {
+    console.error("Supabase client could not be created:", err);
+  }
+  return __sbClient;
+}
+
+// ============ CONTENT LIBRARY (9 in-depth guides) ============
 const LIBRARY = [
   { title:"The Cash-Placement Decision Framework", desc:"A repeatable way to decide where any dollar of cash should sit — before you chase a rate.", minTier:1,
     body:`<h4>Start with the job the money has to do</h4>
@@ -99,15 +129,19 @@ const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Por
 let currentUser = null;
 let currentSubscription = null;
 
-function openAuthModal(view){ document.getElementById('authModal').classList.add('show'); switchAuthView(view||'signin'); if(view==='signup'||!view) updateSignupPlanUI(); }
-function closeAuthModal(){ document.getElementById('authModal').classList.remove('show'); }
+function setUserEmailBridge(email){ try{ window.__ledgerUserEmail = email || null; }catch(err){} }
+
+// ============ AUTH MODAL ============
+function openAuthModal(view){ const m=document.getElementById('authModal'); if(!m) return; m.classList.add('show'); switchAuthView(view||'signin'); if(view==='signup'||!view) updateSignupPlanUI(); }
+function closeAuthModal(){ const m=document.getElementById('authModal'); if(m) m.classList.remove('show'); }
 function switchAuthView(view){
-  document.getElementById('signinView').style.display = view==='signin'?'block':'none';
-  document.getElementById('signupView').style.display = view==='signup'?'block':'none';
+  const sv=document.getElementById('signinView'), su=document.getElementById('signupView');
+  if(sv) sv.style.display = view==='signin'?'block':'none';
+  if(su) su.style.display = view==='signup'?'block':'none';
   var rv=document.getElementById('resetRequestView'); if(rv) rv.style.display = view==='reset'?'block':'none';
   clearAuthError(); if(view==='signup') updateSignupPlanUI();
 }
-function showAuthError(m){ let el=document.getElementById('authError'); if(!el){ el=document.createElement('div'); el.id='authError'; el.style.cssText='color:#e08585;font-size:13px;margin-top:10px;text-align:center;'; document.querySelector('.modal-box').appendChild(el);} el.textContent=m; }
+function showAuthError(m){ let el=document.getElementById('authError'); if(!el){ el=document.createElement('div'); el.id='authError'; el.style.cssText='color:#e08585;font-size:13px;margin-top:10px;text-align:center;'; const box=document.querySelector('.modal-box'); if(box) box.appendChild(el); } el.textContent=m; }
 function clearAuthError(){ const el=document.getElementById('authError'); if(el) el.textContent=''; }
 
 function updateSignupPlanUI(){
@@ -138,19 +172,25 @@ function getQuizRecommendation(){
 function updateQuizRecommendation(){ const r=getQuizRecommendation(); const n=document.getElementById('quizResultName'),o=document.getElementById('quizResultNote'); if(n)n.textContent=TIER_NAMES[r.tier]; if(o)o.textContent=r.note; }
 function applyQuizRecommendation(){ const r=getQuizRecommendation(); const y=document.querySelector('input[name="wantsPlan"][value="yes"]'); if(y)y.checked=true; const m=document.querySelector('input[name="purchaseMode"][value="single"]'); if(m)m.checked=true; const t=document.getElementById('signupTier'); if(t)t.value=String(r.tier); updateSignupPlanUI(); const sf=document.getElementById('singlePlanFields'); if(sf)sf.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 
+// ============ SIGN IN / SIGN UP ============
 async function handleSignIn(e){
   e.preventDefault(); clearAuthError();
+  const sb=getSupabase();
+  if(!sb){ showAuthError('Connection error — please refresh the page and try again.'); return false; }
   const email=document.getElementById('signinEmail').value, password=document.getElementById('signinPassword').value;
-  const b=e.target.querySelector('.modal-submit'); b.disabled=true; b.textContent='SIGNING IN…';
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  b.disabled=false; b.textContent='SIGN IN';
+  const b=e.target.querySelector('.modal-submit'); if(b){ b.disabled=true; b.textContent='SIGNING IN…'; }
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(b){ b.disabled=false; b.textContent='SIGN IN'; }
   if(error){ showAuthError(error.message); return false; }
   currentUser={email:data.user.email,id:data.user.id};
+  setUserEmailBridge(currentUser.email);
   await loadSubscriptionAndShowDashboard(); checkStackQueue(currentUser.email); closeAuthModal(); return false;
 }
 
 async function handleSignUp(e){
   e.preventDefault(); clearAuthError();
+  const sb=getSupabase();
+  if(!sb){ showAuthError('Connection error — please refresh the page and try again.'); return false; }
   const email=document.getElementById('signupEmail').value, password=document.getElementById('signupPassword').value;
   const w=(document.querySelector('input[name="wantsPlan"]:checked')||{}).value||'no';
   let checkoutPlan=null, stackQueue=[];
@@ -160,18 +200,19 @@ async function handleSignUp(e){
     else{ const checked=Array.from(document.querySelectorAll('input[name="stackTier"]:checked')); if(checked.length===0){ const sw=document.getElementById('stackEmptyWarning'); if(sw)sw.style.display='block'; return false; }
       const plans=checked.map(cb=>{ const bs=document.querySelector('.stack-tier-billing[data-tier="'+cb.value+'"]'); return {tier:parseInt(cb.value,10),billingInterval:bs?bs.value:'monthly'}; }); checkoutPlan=plans[0]; stackQueue=plans.slice(1); }
   }
-  const b=e.target.querySelector('.modal-submit'); b.disabled=true; b.textContent='CREATING ACCOUNT…';
-  const {data,error}=await supabase.auth.signUp({email,password}); b.disabled=false;
-  if(error){ showAuthError(error.message); b.textContent=checkoutPlan?'CREATE ACCOUNT & CONTINUE TO CHECKOUT':'CREATE ACCOUNT'; return false; }
+  const b=e.target.querySelector('.modal-submit'); if(b){ b.disabled=true; b.textContent='CREATING ACCOUNT…'; }
+  const {data,error}=await sb.auth.signUp({email,password}); if(b) b.disabled=false;
+  if(error){ showAuthError(error.message); if(b) b.textContent=checkoutPlan?'CREATE ACCOUNT & CONTINUE TO CHECKOUT':'CREATE ACCOUNT'; return false; }
   if(data.session){
     currentUser={email:data.user.email,id:data.user.id};
+    setUserEmailBridge(currentUser.email);
     if(!checkoutPlan){ closeAuthModal(); await loadSubscriptionAndShowDashboard(); return false; }
     if(stackQueue.length>0){ try{ localStorage.setItem('ledgerStackQueue_'+email,JSON.stringify(stackQueue)); }catch(err){} }
     closeAuthModal();
     var g=document.getElementById('guides'); if(g) g.scrollIntoView({behavior:'smooth'});
     alert("Account created! Use the START button on your chosen plan to complete checkout.");
     return false;
-  } else { alert("Account created. Please sign in to continue."); switchAuthView('signin'); document.getElementById('signinEmail').value=email; return false; }
+  } else { alert("Account created. Please sign in to continue."); switchAuthView('signin'); const se=document.getElementById('signinEmail'); if(se) se.value=email; return false; }
 }
 
 function checkStackQueue(email){
@@ -182,11 +223,14 @@ function checkStackQueue(email){
   if(rem.length>0){ try{ localStorage.setItem('ledgerStackQueue_'+email,JSON.stringify(rem)); }catch(err){} } else { try{ localStorage.removeItem('ledgerStackQueue_'+email); }catch(err){} }
 }
 
-async function signOut(){ await supabase.auth.signOut(); currentUser=null; currentSubscription=null; document.getElementById('dashboard').classList.remove('show'); document.body.style.overflow=''; }
+async function signOut(){ const sb=getSupabase(); if(sb){ try{ await sb.auth.signOut(); }catch(err){ console.error(err); } } currentUser=null; currentSubscription=null; setUserEmailBridge(null); const d=document.getElementById('dashboard'); if(d) d.classList.remove('show'); document.body.style.overflow=''; }
 
+// ============ DASHBOARD ============
 async function loadSubscriptionAndShowDashboard(){
   if(!currentUser) return;
-  const {data,error}=await supabase.from('subscriptions').select('*').eq('user_email',currentUser.email).eq('status','active').order('created_at',{ascending:false});
+  const sb=getSupabase();
+  if(!sb){ currentSubscription=null; showDashboard(); return; }
+  const {data,error}=await sb.from('subscriptions').select('*').eq('user_email',currentUser.email).eq('status','active').order('created_at',{ascending:false});
   if(error){ console.error('Error loading subscription:',error); currentSubscription=null; }
   else if(data&&data.length>0){ currentSubscription=data; } else { currentSubscription=null; }
   showDashboard();
@@ -194,27 +238,28 @@ async function loadSubscriptionAndShowDashboard(){
 
 function showDashboard(){
   if(!currentUser) return;
-  document.getElementById('demoEmailDisplay').textContent=currentUser.email;
+  const ed=document.getElementById('demoEmailDisplay'); if(ed) ed.textContent=currentUser.email;
   if(!currentSubscription||currentSubscription.length===0){
     const sn=document.getElementById('dashStatusNote');
     if(sn){ sn.innerHTML='You\'re looking at a <strong style="color:var(--parchment);">preview</strong> — locked cards below show what each tier unlocks. <a href="#guides" onclick="closeDashboardToPricing(event)" style="color:var(--gold);">See the plans →</a>'; sn.style.display='block'; }
-    document.getElementById('dashPlanName').textContent='FREE PREVIEW';
-    document.getElementById('dashPlanVal').textContent='Free preview';
-    document.getElementById('dashBillingVal').textContent='—';
+    const pn=document.getElementById('dashPlanName'); if(pn) pn.textContent='FREE PREVIEW';
+    const pv=document.getElementById('dashPlanVal'); if(pv) pv.textContent='Free preview';
+    const bv=document.getElementById('dashBillingVal'); if(bv) bv.textContent='—';
     renderPreviewSavings(); renderPreviewLibrary();
-    document.getElementById('dashboard').classList.add('show'); document.body.style.overflow='hidden'; return;
+    const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden'; return;
   }
   hidePreviewSavingsIfPresent();
   const sn=document.getElementById('dashStatusNote'); if(sn) sn.style.display='none';
   const tiers=currentSubscription.map(r=>r.tier); const eff=Math.max(...tiers);
   const label=currentSubscription.map(r=>TIER_NAMES[r.tier]||('Tier '+r.tier)).join(' + ');
   const bl=currentSubscription[0].billing_interval?currentSubscription[0].billing_interval.charAt(0).toUpperCase()+currentSubscription[0].billing_interval.slice(1):'—';
-  document.getElementById('dashPlanName').textContent=label.toUpperCase();
-  document.getElementById('dashPlanVal').textContent=label;
-  document.getElementById('dashBillingVal').textContent=bl;
+  const pn=document.getElementById('dashPlanName'); if(pn) pn.textContent=label.toUpperCase();
+  const pv=document.getElementById('dashPlanVal'); if(pv) pv.textContent=label;
+  const bv=document.getElementById('dashBillingVal'); if(bv) bv.textContent=bl;
   const rv=document.querySelectorAll('.dash-meta .val')[2]; if(rv){ rv.textContent=currentSubscription[0].renews_at?new Date(currentSubscription[0].renews_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Lifetime — no renewal'; }
   renderSavings();
-  const grid=document.getElementById('libraryGrid'); grid.innerHTML='';
+  const grid=document.getElementById('libraryGrid'); if(!grid) return;
+  grid.innerHTML='';
   LIBRARY.forEach((item,idx)=>{
     const unlocked=eff>=item.minTier;
     const card=document.createElement('div');
@@ -223,17 +268,17 @@ function showDashboard(){
     if(unlocked){ card.querySelector('.lib-action').addEventListener('click',()=>openViewer(idx)); }
     grid.appendChild(card);
   });
-  document.getElementById('dashboard').classList.add('show'); document.body.style.overflow='hidden';
+  const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden';
 }
 
-function renderSavings(){ const t=parseFloat(localStorage.getItem('ledgerTotalSavings')||'0'); document.getElementById('totalSavings').textContent='$'+t.toLocaleString(); document.getElementById('savingsSub').textContent=t>0?"Nice. That's already more than this tier costs for the year.":"Log your first one — it takes 10 seconds."; }
+function renderSavings(){ const t=parseFloat(localStorage.getItem('ledgerTotalSavings')||'0'); const ts=document.getElementById('totalSavings'); if(ts) ts.textContent='$'+t.toLocaleString(); const ss=document.getElementById('savingsSub'); if(ss) ss.textContent=t>0?"Nice. That's already more than this tier costs for the year.":"Log your first one — it takes 10 seconds."; }
 function logWin(){ const a=prompt("Roughly how much did this save or protect you?"); const n=parseFloat(a); if(isNaN(n)||n<=0) return; const t=parseFloat(localStorage.getItem('ledgerTotalSavings')||'0')+n; localStorage.setItem('ledgerTotalSavings',t.toString()); renderSavings(); }
 
 function randomBetween(min,max){ return Math.random()*(max-min)+min; }
 function renderPreviewSavings(){
   const amt=Math.round(randomBetween(80,640)), mem=Math.round(randomBetween(1100,4200));
-  document.getElementById('totalSavings').textContent='$'+amt.toLocaleString();
-  document.getElementById('savingsSub').textContent="Example only — members have logged wins from $20 to over $1,000 this year. ("+mem.toLocaleString()+" logged sitewide.)";
+  const ts=document.getElementById('totalSavings'); if(ts) ts.textContent='$'+amt.toLocaleString();
+  const ss=document.getElementById('savingsSub'); if(ss) ss.textContent="Example only — members have logged wins from $20 to over $1,000 this year. ("+mem.toLocaleString()+" logged sitewide.)";
   const sr=document.querySelector('.savings-tracker .st-right');
   if(sr&&!document.getElementById('previewSavingsTag')){ const tag=document.createElement('div'); tag.id='previewSavingsTag'; tag.className='preview-badge'; tag.textContent='EXAMPLE — NOT YOUR DATA'; sr.insertBefore(tag,sr.firstChild); }
 }
@@ -251,7 +296,8 @@ const PREVIEW_LIBRARY_CARDS = [
   { tier:3, title:"Position Sizing Over Prediction", teaser:"The habit that separates durable investors from lucky ones." },
 ];
 function renderPreviewLibrary(){
-  const grid=document.getElementById('libraryGrid'); grid.innerHTML='';
+  const grid=document.getElementById('libraryGrid'); if(!grid) return;
+  grid.innerHTML='';
   const intro=document.createElement('p'); intro.className='desc-small'; intro.style.cssText='color:var(--slate);margin-bottom:18px;grid-column:1/-1;';
   intro.textContent="This is what's inside, tier by tier — unlocked when you join. Titles only shown here; the full guides are members-only.";
   grid.appendChild(intro);
@@ -265,23 +311,23 @@ function renderPreviewLibrary(){
   grid.appendChild(note);
 }
 
-function closeDashboardToPricing(e){ if(e)e.preventDefault(); document.getElementById('dashboard').classList.remove('show'); document.body.style.overflow=''; document.getElementById('guides').scrollIntoView({behavior:'smooth'}); }
+function closeDashboardToPricing(e){ if(e)e.preventDefault(); const d=document.getElementById('dashboard'); if(d) d.classList.remove('show'); document.body.style.overflow=''; const g=document.getElementById('guides'); if(g) g.scrollIntoView({behavior:'smooth'}); }
 
+// ============ CONTENT VIEWER ============
 function buildWatermark(email){ const stamp=email+' · '+new Date().toLocaleDateString(); const l=document.createElement('div'); l.className='watermark-layer'; for(let i=0;i<24;i++){ const s=document.createElement('span'); s.textContent=stamp; l.appendChild(s); } return l; }
 function openViewer(idx){
   const item=LIBRARY[idx]; if(!item||!currentUser) return;
-  document.getElementById('viewerTitle').textContent=item.title;
-  document.getElementById('viewerLicenseEmail').textContent=currentUser.email;
-  const c=document.getElementById('viewerContent'); c.innerHTML='';
+  const vt=document.getElementById('viewerTitle'); if(vt) vt.textContent=item.title;
+  const vl=document.getElementById('viewerLicenseEmail'); if(vl) vl.textContent=currentUser.email;
+  const c=document.getElementById('viewerContent'); if(!c) return;
+  c.innerHTML='';
   const body=document.createElement('div'); body.innerHTML=item.body||'<p>Content coming soon.</p>'; c.appendChild(body);
   c.appendChild(buildWatermark(currentUser.email));
-  document.getElementById('contentViewer').classList.add('show'); document.body.style.overflow='hidden';
+  const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
 }
-function closeViewer(){ document.getElementById('contentViewer').classList.remove('show'); const d=document.getElementById('dashboard').classList.contains('show'); document.body.style.overflow=d?'hidden':''; }
-document.addEventListener('copy',(e)=>{ if(document.getElementById('contentViewer').classList.contains('show')) e.preventDefault(); });
-document.addEventListener('keydown',(e)=>{ const v=document.getElementById('contentViewer').classList.contains('show'); if(v&&((e.ctrlKey||e.metaKey)&&['c','p','s'].includes(e.key.toLowerCase()))) e.preventDefault(); });
+function closeViewer(){ const cv=document.getElementById('contentViewer'); if(cv) cv.classList.remove('show'); const dash=document.getElementById('dashboard'); const d=dash?dash.classList.contains('show'):false; document.body.style.overflow=d?'hidden':''; }
 
-// ============ BILLING TOGGLE (original simple version — cannot throw) ============
+// ============ BILLING TOGGLE ============
 function setBilling(period){
   document.querySelectorAll('.billing-seg').forEach(b=>{ b.classList.toggle('active',b.dataset.billing===period); });
   ['monthly','quarterly','annual','lifetime'].forEach(p=>{
@@ -294,7 +340,27 @@ function setBilling(period){
   const sb=document.getElementById('signupBillingInterval'); if(sb)sb.value=period;
 }
 
-function toggleFaq(el){ const item=el.parentElement, a=item.querySelector('.faq-a'), was=item.classList.contains('open'); document.querySelectorAll('.faq-item').forEach(i=>{ i.classList.remove('open'); i.querySelector('.faq-a').style.maxHeight=null; }); if(!was){ item.classList.add('open'); a.style.maxHeight=a.scrollHeight+'px'; } }
+// ============ FAQ ============
+function toggleFaq(el){ const item=el.parentElement, a=item.querySelector('.faq-a'), was=item.classList.contains('open'); document.querySelectorAll('.faq-item').forEach(i=>{ i.classList.remove('open'); const fa=i.querySelector('.faq-a'); if(fa) fa.style.maxHeight=null; }); if(!was){ item.classList.add('open'); if(a) a.style.maxHeight=a.scrollHeight+'px'; } }
+
+// ============ EMAIL POPUP ============
+function showEmailPopup(){ try{ if(sessionStorage.getItem('ledgerEmailPopupSeen'))return; }catch(err){} if(currentUser)return; const o=document.getElementById('emailPopup'); if(!o)return; o.classList.add('show'); requestAnimationFrame(()=>o.classList.add('in')); try{ sessionStorage.setItem('ledgerEmailPopupSeen','1'); }catch(err){} }
+function closeEmailPopup(){ const o=document.getElementById('emailPopup'); if(!o)return; o.classList.remove('in'); setTimeout(()=>o.classList.remove('show'),300); }
+function handleEmailCapture(e){ e.preventDefault(); const pe=document.getElementById('popupEmail'); const email=pe?pe.value:''; console.log('Captured lead email:',email); const f=document.getElementById('emailPopupForm'); if(f) f.style.display='none'; const s=document.getElementById('emailPopupSuccess'); if(s) s.style.display='block'; setTimeout(closeEmailPopup,2200); return false; }
+
+// ============ PASSWORD RESET ============
+async function handleResetRequest(e){
+  e.preventDefault(); const re=document.getElementById('resetEmail'); const email=re?re.value:''; const b=document.getElementById('resetRequestBtn'); if(b){ b.disabled=true; b.textContent='SENDING…'; }
+  const sb=getSupabase();
+  try{ if(sb) await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://onestopdesignshop.github.io/Ledger-co-site/reset-password.html'}); }catch(err){ console.error('Reset request error:',err); }
+  const f=document.getElementById('resetRequestForm'), d=document.getElementById('resetRequestDone'); if(f)f.style.display='none'; if(d)d.style.display='block'; return false;
+}
+
+// ============================================================
+// PAGE SETUP — everything below runs when the DOM is ready,
+// each piece isolated so one failure can't take down the rest.
+// ============================================================
+function safeRun(label, fn){ try{ fn(); }catch(err){ console.error('[main.js] '+label+' failed:', err); } }
 
 function initMobileNav(){
   const t=document.getElementById('navMobileToggle'), l=document.getElementById('navLinks'); if(!t||!l) return;
@@ -302,24 +368,50 @@ function initMobileNav(){
   l.addEventListener('click',(e)=>{ if(e.target.tagName==='A'){ l.classList.remove('mobile-open'); t.setAttribute('aria-expanded','false'); t.textContent='☰'; } });
   document.addEventListener('click',(e)=>{ if(!l.classList.contains('mobile-open')) return; if(l.contains(e.target)||t.contains(e.target)) return; l.classList.remove('mobile-open'); t.setAttribute('aria-expanded','false'); t.textContent='☰'; });
 }
-initMobileNav();
-setBilling('monthly');
 
-const revealEls=document.querySelectorAll('.reveal');
-const obs=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } }); },{threshold:0.12});
-revealEls.forEach(el=>obs.observe(el));
-
-function showEmailPopup(){ if(sessionStorage.getItem('ledgerEmailPopupSeen'))return; if(currentUser)return; const o=document.getElementById('emailPopup'); if(!o)return; o.classList.add('show'); requestAnimationFrame(()=>o.classList.add('in')); sessionStorage.setItem('ledgerEmailPopupSeen','1'); }
-function closeEmailPopup(){ const o=document.getElementById('emailPopup'); if(!o)return; o.classList.remove('in'); setTimeout(()=>o.classList.remove('show'),300); }
-function handleEmailCapture(e){ e.preventDefault(); const email=document.getElementById('popupEmail').value; console.log('Captured lead email:',email); document.getElementById('emailPopupForm').style.display='none'; document.getElementById('emailPopupSuccess').style.display='block'; setTimeout(closeEmailPopup,2200); return false; }
-setTimeout(showEmailPopup,4000);
-
-async function handleResetRequest(e){
-  e.preventDefault(); const email=document.getElementById('resetEmail').value; const b=document.getElementById('resetRequestBtn'); if(b){ b.disabled=true; b.textContent='SENDING…'; }
-  try{ await supabase.auth.resetPasswordForEmail(email,{redirectTo:'https://onestopdesignshop.github.io/Ledger-co-site/reset-password.html'}); }catch(err){ console.error('Reset request error:',err); }
-  const f=document.getElementById('resetRequestForm'), d=document.getElementById('resetRequestDone'); if(f)f.style.display='none'; if(d)d.style.display='block'; return false;
+function initReveal(){
+  const revealEls=document.querySelectorAll('.reveal');
+  if(!revealEls.length) return;
+  try{
+    const obs=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } }); },{threshold:0.12});
+    revealEls.forEach(el=>obs.observe(el));
+  }catch(err){
+    // Failsafe: if the animation system breaks, NEVER leave content hidden.
+    revealEls.forEach(el=>el.classList.add('in'));
+  }
 }
 
-document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ closeAuthModal(); closeEmailPopup(); closeViewer(); } });
+function initGlobalKeys(){
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ closeAuthModal(); closeEmailPopup(); closeViewer(); } });
+  document.addEventListener('copy',(e)=>{ const cv=document.getElementById('contentViewer'); if(cv&&cv.classList.contains('show')) e.preventDefault(); });
+  document.addEventListener('keydown',(e)=>{ const cv=document.getElementById('contentViewer'); const v=cv?cv.classList.contains('show'):false; if(v&&((e.ctrlKey||e.metaKey)&&['c','p','s'].includes(e.key.toLowerCase()))) e.preventDefault(); });
+}
 
-(async function restoreSession(){ const {data}=await supabase.auth.getSession(); if(data&&data.session&&data.session.user){ currentUser={email:data.session.user.email,id:data.session.user.id}; await loadSubscriptionAndShowDashboard(); checkStackQueue(currentUser.email); } })();
+async function restoreSession(){
+  // Supabase's CDN script may finish loading slightly after this file —
+  // retry briefly instead of failing.
+  let sb=getSupabase(), tries=0;
+  while(!sb && tries<20){ await new Promise(r=>setTimeout(r,250)); sb=getSupabase(); tries++; }
+  if(!sb){ console.error('Supabase library never loaded — check the <script> tag order in the HTML.'); return; }
+  try{
+    const {data}=await sb.auth.getSession();
+    if(data&&data.session&&data.session.user){
+      currentUser={email:data.session.user.email,id:data.session.user.id};
+      setUserEmailBridge(currentUser.email);
+      await loadSubscriptionAndShowDashboard();
+      checkStackQueue(currentUser.email);
+    }
+  }catch(err){ console.error('Session restore failed:', err); }
+}
+
+function initPage(){
+  safeRun('mobile nav', initMobileNav);
+  safeRun('billing toggle', ()=>setBilling('monthly'));
+  safeRun('reveal animations', initReveal);
+  safeRun('global keys', initGlobalKeys);
+  safeRun('email popup timer', ()=>setTimeout(showEmailPopup,4000));
+  restoreSession();
+}
+
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initPage); }
+else{ initPage(); }
