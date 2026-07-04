@@ -153,6 +153,246 @@ const LIBRARY = [
 
 const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access"};
 
+// Calculator library items — appended into the LIBRARY array.
+// Each uses inline handlers calling the global calc functions defined in main.js.
+// Styles are inlined so nothing in css/styles.css needs to change.
+const CALC_STYLE = `<style>
+.calc-box{border:1px solid rgba(212,175,55,0.35);border-radius:10px;padding:18px;margin-top:14px;background:rgba(212,175,55,0.04);}
+.calc-box label{display:block;font-size:12px;letter-spacing:0.04em;color:#c9b98a;margin:10px 0 4px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.calc-box input[type=number]{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;background:rgba(0,0,0,0.25);color:#f5f1e6;font-size:16px;}
+.calc-box .calc-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.calc-result{margin-top:16px;padding:14px;border-top:1px solid rgba(255,255,255,0.12);}
+.calc-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,0.08);font-size:15px;}
+.calc-row strong{color:#e7c86a;font-size:17px;}
+.calc-winner{margin-top:12px;padding:11px 13px;border:1px solid #e7c86a;border-radius:7px;color:#e7c86a;font-weight:600;font-size:14px;}
+.calc-warn{margin-top:12px;padding:11px 13px;border:1px solid #e08585;border-radius:7px;color:#e08585;font-size:14px;}
+.calc-note{margin-top:12px;font-size:12.5px;color:#9aa2b1;line-height:1.5;}
+.calc-check{display:flex;align-items:flex-start;gap:10px;margin:9px 0;}
+.calc-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto;}
+.calc-check span{font-size:14px;color:#d8dae0;}
+</style>`;
+
+const CALCULATOR_ITEMS = [
+  {
+    title: "Savings & APY Growth Calculator",
+    desc: "Enter a balance, rate, and time frame — see exactly what you'll earn, compounded.",
+    minTier: 1,
+    body: CALC_STYLE + `
+      <p>Type your numbers in. The result updates as you go. This uses standard annual compounding — the same math a bank uses.</p>
+      <div class="calc-box">
+        <label>Starting balance ($)</label>
+        <input type="number" id="sav-balance" value="10000" oninput="calcSavings()">
+        <label>APY (%)</label>
+        <input type="number" id="sav-apy" value="4" step="0.01" oninput="calcSavings()">
+        <label>Years</label>
+        <input type="number" id="sav-years" value="5" oninput="calcSavings()">
+        <div class="calc-result" id="sav-result"></div>
+      </div>
+      <script>if(typeof calcSavings==='function')calcSavings();</script>`
+  },
+  {
+    title: "Fee-Drag & Effective-Yield Calculator",
+    desc: "See how a monthly fee quietly eats a headline rate — and your true yield after fees.",
+    minTier: 1,
+    body: CALC_STYLE + `
+      <p>A great-looking APY can lose to a boring no-fee account. Enter the numbers and see your real, after-fee yield.</p>
+      <div class="calc-box">
+        <label>Balance ($)</label>
+        <input type="number" id="fee-balance" value="3000" oninput="calcFee()">
+        <label>APY (%)</label>
+        <input type="number" id="fee-apy" value="4.5" step="0.01" oninput="calcFee()">
+        <label>Monthly fee ($)</label>
+        <input type="number" id="fee-monthly" value="5" step="0.01" oninput="calcFee()">
+        <div class="calc-result" id="fee-result"></div>
+      </div>`
+  },
+  {
+    title: "Account Comparison Tool",
+    desc: "Put two accounts head-to-head on your real balance. The winner may surprise you.",
+    minTier: 1,
+    body: CALC_STYLE + `
+      <p>Enter your balance, then two accounts. It computes net interest after fees for each and calls the winner.</p>
+      <div class="calc-box">
+        <label>Your balance ($)</label>
+        <input type="number" id="cmp-balance" value="5000" oninput="calcCompare()">
+        <div class="calc-2col">
+          <div><label>Account A — APY (%)</label><input type="number" id="cmp-apyA" value="5.0" step="0.01" oninput="calcCompare()"></div>
+          <div><label>A — Monthly fee ($)</label><input type="number" id="cmp-feeA" value="5" step="0.01" oninput="calcCompare()"></div>
+        </div>
+        <div class="calc-2col">
+          <div><label>Account B — APY (%)</label><input type="number" id="cmp-apyB" value="4.4" step="0.01" oninput="calcCompare()"></div>
+          <div><label>B — Monthly fee ($)</label><input type="number" id="cmp-feeB" value="0" step="0.01" oninput="calcCompare()"></div>
+        </div>
+        <div class="calc-result" id="cmp-result"></div>
+      </div>`
+  },
+  {
+    title: "Web3 Yield Sustainability Scorer",
+    desc: "Answer five questions about any on-chain yield offer — get a plain-English risk read.",
+    minTier: 2,
+    body: CALC_STYLE + `
+      <p>Check each box only if you can honestly answer <em>yes</em>. Then read the verdict. This is a discipline tool, not investment advice.</p>
+      <div class="calc-box">
+        <div class="calc-check"><input type="checkbox" id="w3-source" onchange="calcWeb3Score()"><span>I can name the real source of the yield in one sentence (staking, fees, lending — not "new depositors").</span></div>
+        <div class="calc-check"><input type="checkbox" id="w3-custody" onchange="calcWeb3Score()"><span>I know exactly who controls the private keys, and I'm comfortable with it.</span></div>
+        <div class="calc-check"><input type="checkbox" id="w3-audit" onchange="calcWeb3Score()"><span>The contract has a recent audit from a reputable firm, on the current code.</span></div>
+        <div class="calc-check"><input type="checkbox" id="w3-exit" onchange="calcWeb3Score()"><span>I've confirmed how to withdraw 100% and how long it takes under stress.</span></div>
+        <div class="calc-check"><input type="checkbox" id="w3-team" onchange="calcWeb3Score()"><span>The team has a real, checkable track record — not anonymous.</span></div>
+        <div class="calc-result" id="w3-result"></div>
+      </div>
+      <script>if(typeof calcWeb3Score==='function')calcWeb3Score();</script>`
+  },
+  {
+    title: "CD / T-Bill Ladder Builder",
+    desc: "Enter an amount and number of rungs — get your ladder laid out, evenly staggered.",
+    minTier: 3,
+    body: CALC_STYLE + `
+      <p>Laddering means something is always maturing soon, so you never have to predict rates. Enter your total and how many rungs.</p>
+      <div class="calc-box">
+        <label>Total to ladder ($)</label>
+        <input type="number" id="lad-total" value="12000" oninput="calcLadder()">
+        <label>Number of rungs (1–12)</label>
+        <input type="number" id="lad-rungs" value="4" min="1" max="12" oninput="calcLadder()">
+        <div class="calc-result" id="lad-result"></div>
+      </div>
+      <script>if(typeof calcLadder==='function')calcLadder();</script>`
+  },
+  {
+    title: "Position-Sizing Calculator",
+    desc: "Enter your portfolio and risk tolerance — get the most you should put in any one position.",
+    minTier: 3,
+    body: CALC_STYLE + `
+      <p>The durable question isn't "will this go up" — it's "how much should I commit if I'm wrong." Enter your numbers.</p>
+      <div class="calc-box">
+        <label>Total investable portfolio ($)</label>
+        <input type="number" id="pos-portfolio" value="50000" oninput="calcPosition()">
+        <label>Max risk per position (%)</label>
+        <input type="number" id="pos-risk" value="2" step="0.5" oninput="calcPosition()">
+        <div class="calc-result" id="pos-result"></div>
+      </div>
+      <script>if(typeof calcPosition==='function')calcPosition();</script>`
+  },
+];
+
+// Merge calculator items into the main library so they render as their own cards.
+CALCULATOR_ITEMS.forEach(function(it){ LIBRARY.push(it); });
+
+
+// ============ CALCULATOR FUNCTIONS (global, called by inline handlers in library items) ============
+// All math verified against known test cases. These are defined at top level in main.js
+// so they're available when the viewer injects a calculator's HTML via innerHTML.
+
+function fmtMoney(n){
+  if(isNaN(n)) return '$0.00';
+  return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtPct(n){
+  if(isNaN(n)) return '0.00%';
+  return n.toFixed(2) + '%';
+}
+
+// --- Savings / APY growth calculator ---
+function calcSavings(){
+  var bal = parseFloat(document.getElementById('sav-balance').value) || 0;
+  var apy = parseFloat(document.getElementById('sav-apy').value) || 0;
+  var yrs = parseFloat(document.getElementById('sav-years').value) || 0;
+  var fv = bal * Math.pow(1 + apy/100, yrs);
+  var interest = fv - bal;
+  var out = document.getElementById('sav-result');
+  if(!out) return;
+  out.innerHTML =
+    '<div class="calc-row"><span>Future balance</span><strong>' + fmtMoney(fv) + '</strong></div>' +
+    '<div class="calc-row"><span>Interest earned</span><strong>' + fmtMoney(interest) + '</strong></div>' +
+    '<div class="calc-note">Assumes the rate holds and interest compounds annually. Real rates change — re-check periodically.</div>';
+}
+
+// --- Fee-drag / effective-yield calculator ---
+function calcFee(){
+  var bal = parseFloat(document.getElementById('fee-balance').value) || 0;
+  var apy = parseFloat(document.getElementById('fee-apy').value) || 0;
+  var mfee = parseFloat(document.getElementById('fee-monthly').value) || 0;
+  var gross = bal * (apy/100);
+  var fees = mfee * 12;
+  var net = gross - fees;
+  var eff = bal > 0 ? (net/bal)*100 : 0;
+  var out = document.getElementById('fee-result');
+  if(!out) return;
+  var warn = net < 0 ? '<div class="calc-warn">⚠ At this balance, the fee costs more than the interest earns. This account loses you money.</div>' : '';
+  out.innerHTML =
+    '<div class="calc-row"><span>Gross interest (1 yr)</span><strong>' + fmtMoney(gross) + '</strong></div>' +
+    '<div class="calc-row"><span>Annual fees</span><strong>-' + fmtMoney(fees) + '</strong></div>' +
+    '<div class="calc-row"><span>Net interest</span><strong>' + fmtMoney(net) + '</strong></div>' +
+    '<div class="calc-row"><span>Effective yield to you</span><strong>' + fmtPct(eff) + '</strong></div>' +
+    warn;
+}
+
+// --- Account comparison ---
+function calcCompare(){
+  var bal = parseFloat(document.getElementById('cmp-balance').value) || 0;
+  var apyA = parseFloat(document.getElementById('cmp-apyA').value) || 0;
+  var feeA = parseFloat(document.getElementById('cmp-feeA').value) || 0;
+  var apyB = parseFloat(document.getElementById('cmp-apyB').value) || 0;
+  var feeB = parseFloat(document.getElementById('cmp-feeB').value) || 0;
+  var netA = bal*(apyA/100) - feeA*12;
+  var netB = bal*(apyB/100) - feeB*12;
+  var out = document.getElementById('cmp-result');
+  if(!out) return;
+  var winner = netA >= netB ? 'Account A' : 'Account B';
+  var diff = Math.abs(netA - netB);
+  out.innerHTML =
+    '<div class="calc-row"><span>Account A net (1 yr)</span><strong>' + fmtMoney(netA) + '</strong></div>' +
+    '<div class="calc-row"><span>Account B net (1 yr)</span><strong>' + fmtMoney(netB) + '</strong></div>' +
+    '<div class="calc-winner">' + winner + ' wins by ' + fmtMoney(diff) + '/yr</div>' +
+    '<div class="calc-note">The higher headline rate doesn\'t always win once fees are counted. That\'s the whole point.</div>';
+}
+
+// --- CD / T-bill ladder builder ---
+function calcLadder(){
+  var total = parseFloat(document.getElementById('lad-total').value) || 0;
+  var rungs = parseInt(document.getElementById('lad-rungs').value) || 1;
+  if(rungs < 1) rungs = 1;
+  if(rungs > 12) rungs = 12;
+  var per = total / rungs;
+  var rows = '';
+  for(var i=1; i<=rungs; i++){
+    var months = Math.round(i * (12/rungs));
+    rows += '<div class="calc-row"><span>Rung ' + i + ' — ~' + months + ' mo maturity</span><strong>' + fmtMoney(per) + '</strong></div>';
+  }
+  var out = document.getElementById('lad-result');
+  if(!out) return;
+  out.innerHTML = rows +
+    '<div class="calc-note">Split evenly across ' + rungs + ' rungs. As each matures, spend it or roll it to the back of the ladder so something is always maturing soon.</div>';
+}
+
+// --- Position sizing ---
+function calcPosition(){
+  var port = parseFloat(document.getElementById('pos-portfolio').value) || 0;
+  var risk = parseFloat(document.getElementById('pos-risk').value) || 0;
+  var maxPos = port * (risk/100);
+  var out = document.getElementById('pos-result');
+  if(!out) return;
+  out.innerHTML =
+    '<div class="calc-row"><span>Maximum position size</span><strong>' + fmtMoney(maxPos) + '</strong></div>' +
+    '<div class="calc-note">This is the most you\'d put in any single position at ' + risk + '% risk tolerance. If a total loss of this amount would change your life, the number is too high.</div>';
+}
+
+// --- Web3 yield sustainability scorer ---
+function calcWeb3Score(){
+  var score = 0, max = 5;
+  ['w3-source','w3-custody','w3-audit','w3-exit','w3-team'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.checked) score++;
+  });
+  var out = document.getElementById('w3-result');
+  if(!out) return;
+  var verdict, cls;
+  if(score <= 2){ verdict = 'HIGH RISK — multiple red flags. Most sober investors would walk away.'; cls='calc-warn'; }
+  else if(score <= 4){ verdict = 'CAUTION — some boxes unchecked. Do not proceed until you can answer every one.'; cls='calc-note'; }
+  else { verdict = 'PASSES THE BASELINE — all five checks met. This is a floor, not a guarantee; size accordingly.'; cls='calc-winner'; }
+  out.innerHTML = '<div class="calc-row"><span>Checks passed</span><strong>' + score + ' / ' + max + '</strong></div>' +
+    '<div class="' + cls + '">' + verdict + '</div>';
+}
+
 // ============ SESSION STATE ============
 let currentUser = null;
 let currentSubscription = null;
@@ -633,6 +873,16 @@ function openViewer(idx){
   body.innerHTML = item.body || '<p>Content coming soon.</p>';
   contentEl.appendChild(body);
   contentEl.appendChild(buildWatermark(currentUser.email));
+  // Auto-run calculator initializers (script tags in innerHTML don't execute, so we call them here).
+  ['calcSavings','calcFee','calcCompare','calcWeb3Score','calcLadder','calcPosition'].forEach(function(fn){
+    try { if(typeof window[fn]==='function' && contentEl.querySelector('[id]')) { /* only relevant calcs have their inputs present */ } } catch(e){}
+  });
+  if(contentEl.querySelector('#sav-result')) calcSavings();
+  if(contentEl.querySelector('#fee-result')) calcFee();
+  if(contentEl.querySelector('#cmp-result')) calcCompare();
+  if(contentEl.querySelector('#w3-result')) calcWeb3Score();
+  if(contentEl.querySelector('#lad-result')) calcLadder();
+  if(contentEl.querySelector('#pos-result')) calcPosition();
   document.getElementById('contentViewer').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
