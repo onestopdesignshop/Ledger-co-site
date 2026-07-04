@@ -919,4 +919,12 @@ a:focus-visible, button:focus-visible{
     .ledger-splash .ls-wr{ text-align:center; }
     .ledger-splash .ls-d{ justify-content:center; }
   }
+/* EMERGENCY OVERRIDE — force reveal sections visible */
+.reveal,
+.reveal-up,
+.fade-in {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
 
