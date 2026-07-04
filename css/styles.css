@@ -927,4 +927,22 @@ a:focus-visible, button:focus-visible{
   transform: none !important;
   visibility: visible !important;
 }
+/* Log-a-win button — brand style */
+button[onclick*="logWin"],
+.log-win-btn {
+  background: transparent !important;
+  color: var(--gold) !important;
+  border: 1px solid var(--gold) !important;
+  padding: 12px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+button[onclick*="logWin"]:hover,
+.log-win-btn:hover {
+  background: var(--gold) !important;
+  color: #0b1626 !important;
+}
 
