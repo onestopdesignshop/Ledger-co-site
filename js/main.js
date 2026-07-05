@@ -26,6 +26,13 @@
 //     Capital Operating System, Due-Diligence Scorecard). They run live
 //     in the dashboard and auto-save entries to the buyer's device.
 //     The Excel downloads remain available as the portable copies.
+//  7. Product change: the downloadable Excel workbooks are now an
+//     INSTITUTIONAL EXCLUSIVE "Reference Workbooks" set — one tier-7
+//     card listing every file (Foundation + Operator + Institutional),
+//     matched by a tier-7-only storage policy in Supabase. Foundation
+//     and Operator buyers get the interactive toolkits; Institutional
+//     adds the master files with worked example numbers to confirm
+//     their own process against.
 // ============================================================
 
 // ============ SUPABASE CONFIG ============
@@ -382,36 +389,19 @@ const LIBRARY = [
 
 const TIER_NAMES = {1:"The Yield Map", 2:"The Full Ledger", 3:"The Annotated Portfolio", 4:"All-Access", 5:"Capital Systems \u2014 Foundation", 6:"Capital Systems \u2014 Operator", 7:"Capital Systems \u2014 Institutional"};
 
-// ============ CAPITAL SYSTEMS SUITE (tiers 5-7, files in private Supabase Storage) ============
+// ============ CAPITAL SYSTEMS REFERENCE WORKBOOKS (Institutional exclusive) ============
+// All three tiers get the INTERACTIVE toolkits below. The downloadable Excel
+// master workbooks (real files, worked example numbers) are tier-7 only,
+// enforced by the storage RLS policy AND this card gate.
 const CAP_SYSTEMS = [
-  { key:"foundation", title:"Capital Systems \u2014 Foundation", minTier:5, tag:"FOUNDATION TIER",
-    desc:"The core capital-allocation system: the structured toolkit, implementation playbook, and every supporting template \u2014 downloadable, yours to run.",
-    body:`<h4>What Foundation includes</h4>
-    <p>The complete core system in ready-to-use form: the structured toolkit files, the implementation playbook, and the supporting templates. Everything downloads below \u2014 each file states exactly where it fits in the sequence.</p>
-    <h4>How to work through it</h4>
-    <p><strong>Step 1:</strong> Download every file below into one folder you control.<br><strong>Step 2:</strong> Open the playbook first \u2014 it is the map for everything else.<br><strong>Step 3:</strong> Set up the main toolkit with your own numbers before opening anything else.<br><strong>Step 4:</strong> Re-run the system quarterly. It is built to be operated, not read once.</p>
+  { key:"all", title:"Capital Systems \u2014 Reference Workbooks", minTier:7, tag:"INSTITUTIONAL EXCLUSIVE",
+    desc:"The complete master set: every Capital Systems tool as a real Excel workbook with worked example numbers \u2014 Foundation, Operator, and Institutional \u2014 to confirm your own process against. Exclusive to the Institutional tier.",
+    body:`<h4>What this includes</h4>
+    <p>Every Capital Systems workbook and playbook as downloadable files \u2014 the master copies. Each workbook carries worked example numbers, so you can open it beside the interactive toolkits on your dashboard and confirm that your own entries and process match the intended structure.</p>
+    <h4>How to use them</h4>
+    <p><strong>Step 1:</strong> Download the set below into one folder you control.<br><strong>Step 2:</strong> Work in the interactive toolkits on your dashboard \u2014 they run the same math live and auto-save.<br><strong>Step 3:</strong> When you want to confirm a result, open the matching workbook and compare your numbers against the worked examples.<br><strong>Step 4:</strong> The playbooks are the map \u2014 read each tier\u2019s playbook before running its system.</p>
     <h4>Support</h4>
-    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Foundation.</p>
-    <h4>License</h4>
-    <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
-  { key:"operator", title:"Capital Systems \u2014 Operator", minTier:6, tag:"OPERATOR TIER",
-    desc:"Everything in Foundation, plus the Operator-level systems: the expanded toolkit set and the operating cadence built on top of the core.",
-    body:`<h4>What Operator includes</h4>
-    <p>The full Foundation system plus the Operator layer: the expanded toolkit files and the operating cadence that turns the core allocation system into an ongoing process. Your downloads below include both tiers\u2019 files.</p>
-    <h4>How to work through it</h4>
-    <p><strong>Step 1:</strong> If you have not run Foundation, start there \u2014 its files are unlocked for you in the Foundation card.<br><strong>Step 2:</strong> Download the Operator files below into the same working folder.<br><strong>Step 3:</strong> Follow the Operator playbook\u2019s sequence \u2014 it assumes the Foundation setup is live.<br><strong>Step 4:</strong> Adopt the operating cadence: the system\u2019s value compounds through repetition.</p>
-    <h4>Support</h4>
-    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Operator.</p>
-    <h4>License</h4>
-    <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
-  { key:"institutional", title:"Capital Systems \u2014 Institutional", minTier:7, tag:"INSTITUTIONAL TIER",
-    desc:"The complete suite: Foundation and Operator plus the Institutional-grade systems \u2014 the full toolkit library at its deepest level.",
-    body:`<h4>What Institutional includes</h4>
-    <p>The entire Capital Systems Suite: Foundation, Operator, and the Institutional layer on top. Every tier\u2019s files are unlocked for your account \u2014 the Institutional downloads below, and the lower tiers in their own cards.</p>
-    <h4>How to work through it</h4>
-    <p><strong>Step 1:</strong> Run the tiers in order \u2014 Foundation, then Operator, then the Institutional files below. Each layer assumes the previous one is live.<br><strong>Step 2:</strong> Download everything into one working folder; keep the structure the playbooks reference.<br><strong>Step 3:</strong> The Institutional playbook defines the full operating rhythm \u2014 adopt it as written before customizing.</p>
-    <h4>Support</h4>
-    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Institutional \u2014 priority handling.</p>
+    <p>Questions while implementing: email dee8shops@gmail.com from your account email and reference Capital Systems \u2014 priority handling.</p>
     <h4>License</h4>
     <p>Licensed to the account shown in the watermark, for personal use. Redistribution outside your account violates the Terms of Sale.</p>` },
 ];
@@ -437,13 +427,13 @@ async function openCapViewer(idx){
   const c=document.getElementById('viewerContent'); if(!c) return;
   c.innerHTML='';
   const body=document.createElement('div'); body.innerHTML=cs.body;
-  const fh=document.createElement('h4'); fh.textContent='Your downloads'; body.appendChild(fh);
-  // How-to-open tip: the toolkits are real Excel workbooks. The browser's
-  // built-in preview (Quick Look on iPhone/iPad) is a read-only snapshot and
-  // cannot run formulas — buyers must open the files in a spreadsheet app.
+  const fh=document.createElement('h4'); fh.textContent='Your reference workbooks'; body.appendChild(fh);
+  // How-to-open tip: these are real Excel workbooks. The browser's built-in
+  // preview (Quick Look on iPhone/iPad) is a read-only snapshot and cannot
+  // run formulas -- they must be opened in a spreadsheet app.
   const tip=document.createElement('p');
   tip.style.cssText='font-size:13px;line-height:1.65;padding:12px 14px;border:1px solid var(--gold, #c9a24b);border-radius:4px;margin:10px 0 14px;';
-  tip.innerHTML='<strong>How to use the toolkits:</strong> tapping a link below saves the file to your device. Open the saved .xlsx files in <strong>Numbers</strong> (free on iPhone/iPad), <strong>Excel</strong>, or <strong>Google Sheets</strong> \u2014 that\u2019s where the calculations run live. The browser\u2019s built-in preview is view-only and will not calculate.';
+  tip.innerHTML='<strong>How to use the reference set:</strong> tapping a link below saves the file to your device. Open the saved .xlsx files in <strong>Numbers</strong> (free on iPhone/iPad), <strong>Excel</strong>, or <strong>Google Sheets</strong> \u2014 that\u2019s where the calculations run live. The browser\u2019s built-in preview is view-only and will not calculate. Each workbook carries worked example numbers \u2014 keep the matching one open beside the interactive toolkits to confirm your own process.';
   body.appendChild(tip);
   const box=document.createElement('div'); box.textContent='Loading your files\u2026'; body.appendChild(box);
   c.appendChild(body);
@@ -451,32 +441,41 @@ async function openCapViewer(idx){
   const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
   try{
     const sb=getSupabase(); if(!sb) throw new Error('no client');
-    // Folder lookup tolerates either capitalization (e.g. foundation / Foundation)
-    const variants=[cs.key, cs.key.charAt(0).toUpperCase()+cs.key.slice(1)];
-    let files=[], folder=cs.key;
-    for(const v of variants){
-      const {data,error}=await sb.storage.from('capital-systems').list(v,{limit:100,sortBy:{column:'name',order:'asc'}});
-      if(error) continue;
-      const found=(data||[]).filter(f=>f&&f.name&&!f.name.startsWith('.'));
-      if(found.length){ files=found; folder=v; break; }
-    }
-    if(!files.length){ box.textContent='Your files are being provisioned for this account \u2014 check back shortly, or email dee8shops@gmail.com and we\u2019ll send them directly.'; return; }
+    const SECTIONS=[{folder:'foundation',label:'FOUNDATION'},{folder:'operator',label:'OPERATOR'},{folder:'institutional',label:'INSTITUTIONAL'}];
     box.innerHTML='';
-    for(const f of files){
-      const rowEl=document.createElement('div'); rowEl.style.cssText='margin:9px 0;';
-      // { download: f.name } adds ?download= to the signed URL, which makes
-      // Supabase serve it with Content-Disposition: attachment — the browser
-      // SAVES the file instead of opening the read-only preview.
-      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(folder+'/'+f.name,3600,{download:f.name});
-      if(e2||!s||!s.signedUrl){ rowEl.textContent=f.name+' \u2014 temporarily unavailable, email dee8shops@gmail.com'; }
-      else{
-        const a=document.createElement('a'); a.href=s.signedUrl; a.textContent='\u2b07 '+f.name;
-        a.setAttribute('download',f.name); a.rel='noopener';
-        a.style.cssText='color:var(--gold);text-decoration:underline;word-break:break-all;';
-        rowEl.appendChild(a);
+    let any=false;
+    for(const sec of SECTIONS){
+      // Folder lookup tolerates either capitalization (e.g. foundation / Foundation)
+      const variants=[sec.folder, sec.folder.charAt(0).toUpperCase()+sec.folder.slice(1)];
+      let files=[], folder=sec.folder;
+      for(const v of variants){
+        const {data,error}=await sb.storage.from('capital-systems').list(v,{limit:100,sortBy:{column:'name',order:'asc'}});
+        if(error) continue;
+        const found=(data||[]).filter(f=>f&&f.name&&!f.name.startsWith('.'));
+        if(found.length){ files=found; folder=v; break; }
       }
-      box.appendChild(rowEl);
+      if(!files.length) continue;
+      any=true;
+      const h=document.createElement('div'); h.textContent=sec.label;
+      h.style.cssText='margin:16px 0 4px;font-size:11px;letter-spacing:.12em;opacity:.75;';
+      box.appendChild(h);
+      for(const f of files){
+        const rowEl=document.createElement('div'); rowEl.style.cssText='margin:9px 0;';
+        // { download: f.name } adds ?download= to the signed URL, which makes
+        // Supabase serve it with Content-Disposition: attachment -- the browser
+        // SAVES the file instead of opening the read-only preview.
+        const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(folder+'/'+f.name,3600,{download:f.name});
+        if(e2||!s||!s.signedUrl){ rowEl.textContent=f.name+' \u2014 temporarily unavailable, email dee8shops@gmail.com'; }
+        else{
+          const a=document.createElement('a'); a.href=s.signedUrl; a.textContent='\u2b07 '+f.name;
+          a.setAttribute('download',f.name); a.rel='noopener';
+          a.style.cssText='color:var(--gold);text-decoration:underline;word-break:break-all;';
+          rowEl.appendChild(a);
+        }
+        box.appendChild(rowEl);
+      }
     }
+    if(!any){ box.textContent='Your files are being provisioned for this account \u2014 check back shortly, or email dee8shops@gmail.com and we\u2019ll send them directly.'; return; }
     const note=document.createElement('p'); note.style.cssText='font-size:12px;opacity:.7;margin-top:14px;';
     note.textContent='Each link saves the file straight to your device (check your Downloads / Files app). Links are private to your account and expire after 60 minutes \u2014 reopen this card any time for fresh ones.';
     box.appendChild(note);
@@ -872,6 +871,23 @@ function openCapTool(idx){
   const c=document.getElementById('viewerContent'); if(!c) return;
   c.innerHTML='';
   const box=document.createElement('div');
+  // Reference-copy note: the master Excel workbooks (worked example numbers)
+  // are an Institutional exclusive — link them for tier 7, upsell otherwise.
+  const __tiers=(currentSubscription||[]).map(function(r){ return r.tier; });
+  const __eff=__tiers.length?Math.max.apply(null,__tiers):0;
+  const wbName=(t.minTier===7?'Institutional':(t.minTier===6?'Operator':'Foundation'));
+  const ref=document.createElement('p');
+  ref.style.cssText='font-size:13px;line-height:1.65;padding:12px 14px;border:1px solid var(--gold, #c9a24b);border-radius:4px;margin:0 0 6px;';
+  if(__eff>=7){
+    ref.innerHTML='<strong>Reference copy:</strong> the '+wbName+' master workbook \u2014 a real Excel file with worked example numbers \u2014 is in your Reference Workbooks card. Keep it open beside this tool to confirm your own process. ';
+    const refLink=document.createElement('a'); refLink.href='#'; refLink.textContent='Open the reference workbooks \u2192';
+    refLink.style.cssText='color:var(--gold);text-decoration:underline;';
+    refLink.addEventListener('click',function(e){ e.preventDefault(); openCapViewer(0); });
+    ref.appendChild(refLink);
+  } else {
+    ref.innerHTML='<strong>Institutional exclusive:</strong> the Institutional tier adds the master Excel workbooks \u2014 every Capital Systems tool as a real file with worked example numbers \u2014 so you can confirm your own process against the reference set.';
+  }
+  box.appendChild(ref);
   try{ t.build(box); }catch(err){ console.error('Cap tool error:',err); box.textContent='This tool hit an error \u2014 refresh and try again.'; }
   c.appendChild(box);
   c.appendChild(buildWatermark(currentUser.email));
@@ -956,6 +972,60 @@ const TOOLS = [
       }
       calc();
     } },
+  { title:"Fee Break-Even Calculator", minTier:1,
+    desc:"Enter any account's monthly fee and see the balance you'd need just to break even — and what the fee really costs YOU per year. A $10 fee needs $120/year of interest before you earn a cent.",
+    build:function(c){
+      const fB=tField('Your balance ($)','4000',calc);
+      const fR=tField('Account APY (%)','1.0',calc);
+      const fF=tField('Monthly fee ($)','10',calc);
+      const out=tResultBox();
+      [fB,fR,fF].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const B=tNum(fB.__input.value), r=tNum(fR.__input.value)/100, F=tNum(fF.__input.value);
+        if(B<=0){ out.textContent='Enter a balance.'; return; }
+        const interest=B*r, fees=12*F, net=interest-fees;
+        const be= r>0 ? (12*F)/r : 0;
+        out.innerHTML='Interest at your balance: <strong>'+tMoney(interest)+'</strong>/yr<br>Fees: <strong>'+tMoney(fees)+'</strong>/yr<br><strong>Net to you: '+(net>=0?'+':'')+tMoney(net)+'/yr</strong><br><br>Break-even balance for this fee at this rate: <strong>'+(r>0?tMoney(be):'\u2014 no rate can outrun the fee')+'</strong>'+(net<0?'<br><strong>This account is a guaranteed loss wearing an APY badge. Move.</strong>':'<br>Above break-even \u2014 but a no-fee account keeps the whole '+tMoney(interest)+'.');
+      }
+      calc();
+    } },
+  { title:"Promo Cliff Analyzer", minTier:1,
+    desc:"A teaser rate for a few months, then the cliff. See your true 12-month blended rate and dollars — versus a boring no-promo account — before the marketing decides for you.",
+    build:function(c){
+      const fB=tField('Your balance ($)','15000',calc);
+      const fP=tField('Promo APY (%)','5.5',calc);
+      const fM=tField('Promo length (months)','4',calc);
+      const fRv=tField('Reversion APY after the promo (%)','0.6',calc);
+      const fPl=tField('Plain no-promo account APY (%)','4.0',calc);
+      const out=tResultBox();
+      [fB,fP,fM,fRv,fPl].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const B=tNum(fB.__input.value), rp=tNum(fP.__input.value)/100, rv=tNum(fRv.__input.value)/100, rc=tNum(fPl.__input.value)/100;
+        let m=Math.min(12,Math.max(0,Math.round(tNum(fM.__input.value))));
+        if(B<=0){ out.textContent='Enter a balance.'; return; }
+        const promoDollars=B*(m*rp+(12-m)*rv)/12, plainDollars=B*rc;
+        const blended=promoDollars/B*100;
+        out.innerHTML='Promo account, true 12-month blend: <strong>'+tPct(blended)+'</strong> = <strong>'+tMoney(promoDollars)+'</strong>/yr<br>Plain account: <strong>'+tPct(rc*100)+'</strong> = <strong>'+tMoney(plainDollars)+'</strong>/yr<br><br>'+(plainDollars>=promoDollars?'<strong>The boring account wins.</strong> That inversion is the most common outcome of honest math \u2014 which is exactly why the marketing works on people who skip it.':'<strong>The promo wins by '+tMoney(promoDollars-plainDollars)+'</strong> \u2014 but ONLY if you actually move the money on expiry day. Diary the date the same minute you open the account, or the reversion rate becomes your rate for years.');
+      }
+      calc();
+    } },
+  { title:"Outflow Reality Check", minTier:1,
+    desc:"Everyone guesses their monthly spending low by 20–30%. Enter your guess, then three real months of statements — and see the gap that has been quietly mis-sizing every other financial decision.",
+    build:function(c){
+      const fG=tField('Your guess: monthly spending ($)','2800',calc);
+      const f1=tField('Month 1 actual total ($)','3400',calc);
+      const f2=tField('Month 2 actual total ($)','3600',calc);
+      const f3=tField('Month 3 actual total ($)','3500',calc);
+      const out=tResultBox();
+      [fG,f1,f2,f3].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const g=tNum(fG.__input.value), real=(tNum(f1.__input.value)+tNum(f2.__input.value)+tNum(f3.__input.value))/3;
+        if(real<=0){ out.textContent='Enter three months from real statements.'; return; }
+        const gap=real-g, pct=g>0?gap/g*100:0;
+        out.innerHTML='<strong>Real monthly outflow: '+tMoney(real)+'</strong><br>Your guess: '+tMoney(g)+'<br><strong>Gap: '+(gap>=0?'+':'')+tMoney(gap)+(g>0?' ('+(pct>=0?'+':'')+tPct(pct)+')':'')+'</strong><br><br>'+(gap>Math.max(0,g*0.05)?'Right in the classic under-guess zone. Every buffer, reserve, and emergency-fund number built on the guess was undersized by the same amount \u2014 re-run them on the real figure.':'Tight guess \u2014 rare. Your bucket sizing can be trusted as-is.');
+      }
+      calc();
+    } },
   { title:"Honest APY Decomposer", minTier:2,
     desc:"Strips the token-incentive confetti out of any advertised crypto yield and shows the number you'd actually bank — often a quarter of the billboard figure. Run it BEFORE you deposit.",
     build:function(c){
@@ -1001,6 +1071,62 @@ const TOOLS = [
         const breakeven=y/(1+y);
         const ev=P*y*(1-p)-P*p;
         out.innerHTML='<strong>Break-even risk: '+tPct(breakeven*100)+'</strong> — if the chance of losing everything in a year is above this, the yield is a losing bet before it starts.<br><br>At YOUR estimate ('+tPct(p*100)+'), expected outcome on '+tMoney(P)+': <strong>'+(ev>=0?'+':'')+tMoney(ev)+'</strong> per year.'+(ev<0?'<br><strong>Negative expectancy — the honest answer is walk.</strong>':'<br>Positive — but only as reliable as your risk estimate. Size it so zero changes nothing.');
+      }
+      calc();
+    } },
+  { title:"Yield Reality Check", minTier:2,
+    desc:"Any advertised crypto yield next to a boring insured benchmark: the multiple, and what that gap is really telling you. Every real yield source has a ceiling — this shows when a number has blown past its own.",
+    build:function(c){
+      const fA=tField('Advertised yield (%)','18',calc);
+      const fB=tField('Boring insured benchmark (%)','4.0',calc);
+      const out=tResultBox();
+      [fA,fB].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const a=tNum(fA.__input.value), b=tNum(fB.__input.value);
+        if(b<=0){ out.textContent='Enter a benchmark above zero.'; return; }
+        const x=a/b;
+        let read;
+        if(x<1.5) read='Modest premium over insured. The remaining question is only custody and exit \u2014 run the due-diligence checklist.';
+        else if(x<3) read='<strong>Elevated.</strong> The gap is compensation for a risk you have not found yet. Find it before it finds you \u2014 name the payer in one plain sentence.';
+        else if(x<10) read='<strong>The gap IS the risk.</strong> Real sources have ceilings \u2014 staking is bounded by issuance, fees by volume, lending by what solvent borrowers pay. Something you were not told is filling this: emissions that dilute you, leverage, or the next depositor.';
+        else read='<strong>Near-certain that no real source generates this.</strong> Hard stop \u2014 and remember the disqualifier: guaranteed anything ends the evaluation on its own.';
+        out.innerHTML='This yield is <strong>'+(Math.round(x*10)/10)+'\u00d7</strong> the boring insured rate.<br><br>'+read;
+      }
+      calc();
+    } },
+  { title:"Custody Exposure Sizer", minTier:2,
+    desc:"A custodial balance is a loan to a company. Enter what's sitting on platforms versus your total assets and get the honest read: could you afford it frozen for a year and possibly gone?",
+    build:function(c){
+      const fC=tField('Total balances held ON platforms/exchanges ($)','6000',calc);
+      const fV=tField('Total investable assets ($)','50000',calc);
+      const fM=tField('Max you would accept losing to a platform failure (% of assets)','2',calc);
+      const out=tResultBox();
+      [fC,fV,fM].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const cst=tNum(fC.__input.value), V=tNum(fV.__input.value), mp=tNum(fM.__input.value)/100;
+        if(V<=0){ out.textContent='Enter your total assets.'; return; }
+        const pct=cst/V*100, cap=V*mp, over=cst-cap;
+        out.innerHTML='Custodial exposure: <strong>'+tPct(pct)+'</strong> of assets ('+tMoney(cst)+')<br>Your stated ceiling: '+tMoney(cap)+'<br><br>'+(over>0?'<strong>Over by '+tMoney(over)+'.</strong> Withdraw down to the ceiling \u2014 the dashboard number is an IOU until it is in your custody. Big brands do not exempt you; the largest failures were, at the time, the most trusted names in the space.':'<strong>Within your ceiling.</strong> Keep sizing it like a loan \u2014 because that is what it is.');
+      }
+      calc();
+    } },
+  { title:"Round-Trip Cost Calculator", minTier:2,
+    desc:"Entry fees, exit fees, and network costs against the honest yield: how many months you must stay in before the position even pays for its own plumbing.",
+    build:function(c){
+      const fP=tField('Position size ($)','2000',calc);
+      const fE=tField('Entry cost (%)','0.5',calc);
+      const fX=tField('Exit cost (%)','0.5',calc);
+      const fG=tField('Fixed network/transaction costs, round trip ($)','15',calc);
+      const fY=tField('Honest APY after incentives (%)','9',calc);
+      const out=tResultBox();
+      [fP,fE,fX,fG,fY].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const P=tNum(fP.__input.value), e=tNum(fE.__input.value)/100, x=tNum(fX.__input.value)/100, g=tNum(fG.__input.value), y=tNum(fY.__input.value)/100;
+        if(P<=0){ out.textContent='Enter a position size.'; return; }
+        const cost=P*(e+x)+g, monthly=P*y/12;
+        if(monthly<=0){ out.innerHTML='Round-trip cost: <strong>'+tMoney(cost)+'</strong> \u2014 and at zero honest yield it is never recovered.'; return; }
+        const months=cost/monthly;
+        out.innerHTML='Round-trip cost: <strong>'+tMoney(cost)+'</strong> ('+tPct(cost/P*100)+' of the position)<br>Honest yield: '+tMoney(monthly)+'/month<br><br><strong>Break-even on the plumbing alone: '+(Math.round(months*10)/10)+' months.</strong><br>'+(months>12?'<strong>Over a year just to pay for entry and exit</strong> \u2014 at this size, the position works for the fee-takers before it works for you. Bigger size or better venue, or skip.':months>3?'Meaningful drag \u2014 any exit inside '+Math.ceil(months)+' months is a guaranteed loss on costs alone. Factor that into your exit triggers.':'Costs are a minor drag at this size. Proceed to the real diligence.');
       }
       calc();
     } },
@@ -1056,6 +1182,61 @@ const TOOLS = [
         const now=C*y/12;
         const gap=need-C;
         out.innerHTML='<strong>Capital required for '+tMoney(T)+'/month at '+tPct(y*100)+': '+tMoney(need)+'</strong><br>Your '+tMoney(C)+' produces today: <strong>'+tMoney(now)+'/month</strong><br>Gap to close: <strong>'+(gap>0?tMoney(gap):'none — you are there')+'</strong><br><br>The honest read: the gap closes through contributions and time — not by reaching for a yield number that makes this math look prettier. If a double-digit rate is tempting you, run it through the Break-Even Risk Calculator first.';
+      }
+      calc();
+    } },
+  { title:"Break-or-Hold CD Calculator", minTier:3,
+    desc:"Rates moved and you're locked in. Computes whether paying the early-withdrawal penalty to jump to a new rate actually pays — the answer is HOLD more often than the excitement says.",
+    build:function(c){
+      const fB=tField('CD balance ($)','10000',calc);
+      const fC=tField('Your locked rate (%)','3.5',calc);
+      const fN=tField('New rate available (%)','5.0',calc);
+      const fM=tField('Months remaining on the CD','9',calc);
+      const fP=tField('Early-withdrawal penalty (months of interest)','6',calc);
+      const out=tResultBox();
+      [fB,fC,fN,fM,fP].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const B=tNum(fB.__input.value), rc=tNum(fC.__input.value)/100, rn=tNum(fN.__input.value)/100;
+        const m=Math.max(0,tNum(fM.__input.value)), pm=Math.max(0,tNum(fP.__input.value));
+        if(B<=0){ out.textContent='Enter a balance.'; return; }
+        const penalty=B*rc/12*pm, extra=B*(rn-rc)*(m/12), net=extra-penalty;
+        out.innerHTML='Extra interest at the new rate over the remaining '+m+' months: <strong>'+tMoney(extra)+'</strong><br>Penalty to break: <strong>'+tMoney(penalty)+'</strong><br><br><strong>Net from breaking: '+(net>=0?'+':'')+tMoney(net)+'</strong><br>'+(net>25?'<strong>Breaking pays.</strong> Move it \u2014 and turn auto-renewal off on the new instrument the day you open it.':'<strong>HOLD.</strong> '+(net>=0?'The gain does not cover the friction.':'The penalty eats more than the new rate returns.')+' One penalty can erase a year of rate edge \u2014 this is exactly why Reserve money never goes on a ladder.');
+      }
+      calc();
+    } },
+  { title:"APR \u2192 APY Converter", minTier:3,
+    desc:"Banks alternate between the two numbers depending on which looks better. Convert any APR at any compounding frequency into the APY you'd actually earn — and compare two quotes on equal footing, in dollars.",
+    build:function(c){
+      const fA=tField('Quoted APR (%)','4.85',calc);
+      const fN=tField('Compounding periods per year (12 = monthly, 365 = daily)','365',calc);
+      const fQ=tField('Competing quote, already as APY (%)','4.95',calc);
+      const fB=tField('Your balance ($)','15000',calc);
+      const out=tResultBox();
+      [fA,fN,fQ,fB].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const r=tNum(fA.__input.value)/100; let n=Math.max(1,Math.round(tNum(fN.__input.value)));
+        const q=tNum(fQ.__input.value)/100, B=tNum(fB.__input.value);
+        const apy=Math.pow(1+r/n,n)-1;
+        const d1=B*apy, d2=B*q;
+        out.innerHTML='That APR compounds to a true APY of <strong>'+tPct(apy*100)+'</strong><br><br>On '+tMoney(B)+':<br>Quote 1: <strong>'+tMoney(d1)+'</strong>/yr \u00b7 Quote 2: <strong>'+tMoney(d2)+'</strong>/yr<br><strong>'+(Math.abs(d1-d2)<25?'Within a rounding error \u2014 break the tie on friction and access, never basis points.':(d1>d2?'Quote 1':'Quote 2')+' wins by '+tMoney(Math.abs(d1-d2))+'/yr.')+'</strong>';
+      }
+      calc();
+    } },
+  { title:"Trade Expectancy Calculator", minTier:3,
+    desc:"Win rate, average win, average loss — the three numbers that decide whether a strategy makes money before a single prediction. Computes expectancy and profit factor, and flat-out tells you when the math is negative.",
+    build:function(c){
+      const fW=tField('Win rate (%)','55',calc);
+      const fAw=tField('Average win ($)','120',calc);
+      const fAl=tField('Average loss ($)','150',calc);
+      const fT=tField('Trades per month','12',calc);
+      const out=tResultBox();
+      [fW,fAw,fAl,fT].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const w=Math.min(100,Math.max(0,tNum(fW.__input.value)))/100;
+        const aw=tNum(fAw.__input.value), al=tNum(fAl.__input.value), tr=Math.max(0,tNum(fT.__input.value));
+        const exp=w*aw-(1-w)*al;
+        const pf=((1-w)*al)>0?(w*aw)/((1-w)*al):Infinity;
+        out.innerHTML='<strong>Expectancy: '+(exp>=0?'+':'')+tMoney(exp)+' per trade</strong><br>Profit factor: <strong>'+(pf===Infinity?'\u221e':(Math.round(pf*100)/100))+'</strong><br>At '+tr+' trades/month: <strong>'+(exp>=0?'+':'')+tMoney(exp*tr)+'</strong>/month before costs<br><br>'+(exp<0?'<strong>Negative expectancy \u2014 this loses money regardless of how it feels.</strong> A high win rate with small wins and larger losses is the classic trap: many good days, negative year.':pf<1.5?'Positive but thin \u2014 real spreads, slippage, and missed fills eat edges this size. Mentally tax every trade and see if it survives, and remember: the backtest can disqualify a strategy, never qualify one.':'Healthy on paper. Now the standard applies: paper trade it forward in real time, start at shrug-off size, and pre-write the scaling rule before a winning streak writes it for you.');
       }
       calc();
     } },
