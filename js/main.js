@@ -1268,6 +1268,70 @@ function openTool(idx){
   const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
 }
 
+// ============ TIER-ORGANIZED DASHBOARD LAYOUT ============
+// Groups every product under its plan so buyers see exactly what each tier
+// includes at a glance: guides + tools per membership tier, then the
+// Capital Systems Suite tier by tier. Replaces the old by-content-type
+// sections (guides / downloads / toolkits / tools).
+const TIER_SECTIONS=[
+  {tier:1, name:'THE YIELD MAP \u2014 TIER 1', sub:'The starting plan. Everything here is included in every plan above it.'},
+  {tier:2, name:'THE FULL LEDGER \u2014 TIER 2', sub:'Everything in The Yield Map, plus:'},
+  {tier:3, name:'THE ANNOTATED PORTFOLIO \u2014 TIER 3', sub:'Everything in Tiers 1\u20132, plus:'},
+  {tier:5, name:'CAPITAL SYSTEMS \u2014 FOUNDATION', sub:'The Capital Systems Suite \u2014 a separate product line from the membership tiers. Foundation is the entry tier.'},
+  {tier:6, name:'CAPITAL SYSTEMS \u2014 OPERATOR', sub:'Everything in Foundation, plus:'},
+  {tier:7, name:'CAPITAL SYSTEMS \u2014 INSTITUTIONAL', sub:'Everything in Foundation and Operator, plus:'}
+];
+function tierSectionHeader(grid, name, sub){
+  const head=document.createElement('div'); head.style.cssText='grid-column:1/-1;margin-top:34px;';
+  const tag=document.createElement('div'); tag.className='lib-tag'; tag.textContent=name; head.appendChild(tag);
+  if(sub){ const p=document.createElement('p'); p.textContent=sub; p.style.cssText='margin:6px 0 0;font-size:13px;opacity:.75;'; head.appendChild(p); }
+  grid.appendChild(head);
+}
+function addGuideCard(grid, item, idx, unlocked){
+  const card=document.createElement('div');
+  card.className='library-item'+(unlocked?'':' locked');
+  card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':'REQUIRES '+(TIER_NAMES[item.minTier]||'').toUpperCase())+'</div><h4>'+item.title+'</h4><p>'+item.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'VIEW \u2192':'\ud83d\udd12 LOCKED \u2014 UPGRADE TO UNLOCK')+'</div>';
+  if(unlocked){ card.querySelector('.lib-action').addEventListener('click',function(){ openViewer(idx); }); }
+  grid.appendChild(card);
+}
+function addToolCard(grid, t, idx, unlocked, opener, lockedLabel){
+  const card=document.createElement('div');
+  card.className='library-item'+(unlocked?'':' locked');
+  card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':'REQUIRES '+(TIER_NAMES[t.minTier]||'').toUpperCase())+'</div><h4>'+t.title+'</h4><p>'+t.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'OPEN TOOL \u2192':(lockedLabel||'\ud83d\udd12 LOCKED \u2014 UPGRADE TO UNLOCK'))+'</div>';
+  if(unlocked){ card.querySelector('.lib-action').addEventListener('click',function(){ opener(idx); }); }
+  grid.appendChild(card);
+}
+function addRefWorkbooksCard(grid, eff){
+  const cs=CAP_SYSTEMS[0]; if(!cs) return;
+  const unlocked=eff>=cs.minTier;
+  const card=document.createElement('div');
+  card.className='library-item'+(unlocked?'':' locked');
+  card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':cs.tag)+'</div><h4>'+cs.title+'</h4><p>'+cs.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'OPEN & DOWNLOAD \u2192':'\ud83d\udd12 LOCKED \u2014 INSTITUTIONAL ONLY')+'</div>';
+  if(unlocked){ card.querySelector('.lib-action').addEventListener('click',function(){ openCapViewer(0); }); }
+  grid.appendChild(card);
+}
+function renderDashboardSections(eff, grid, preview){
+  TIER_SECTIONS.forEach(function(sec){
+    tierSectionHeader(grid, sec.name, sec.sub);
+    if(sec.tier<=3){
+      if(preview){
+        PREVIEW_LIBRARY_CARDS.forEach(function(item){
+          if(item.tier!==sec.tier) return;
+          const card=document.createElement('div'); card.className='library-item locked preview-blur';
+          card.innerHTML='<div class="lib-tag">REQUIRES '+(TIER_NAMES[item.tier]||'').toUpperCase()+'</div><h4>'+item.title+'</h4><p>'+item.teaser+'</p><div class="lib-action locked-action">\ud83d\udd12 LOCKED</div>';
+          grid.appendChild(card);
+        });
+      } else {
+        LIBRARY.forEach(function(item,idx){ if(item.minTier===sec.tier) addGuideCard(grid,item,idx,eff>=item.minTier); });
+      }
+      TOOLS.forEach(function(t,idx){ if(t.minTier===sec.tier) addToolCard(grid,t,idx,eff>=t.minTier,openTool); });
+    } else {
+      CAP_TOOLS.forEach(function(t,idx){ if(t.minTier===sec.tier) addToolCard(grid,t,idx,eff>=t.minTier,openCapTool,'\ud83d\udd12 LOCKED \u2014 SOLD SEPARATELY'); });
+      if(sec.tier===7) addRefWorkbooksCard(grid, eff);
+    }
+  });
+}
+
 // ============ SESSION STATE ============
 let currentUser = null;
 let currentSubscription = null;
@@ -1403,17 +1467,7 @@ function showDashboard(){
   renderSavings();
   const grid=document.getElementById('libraryGrid'); if(!grid) return;
   grid.innerHTML='';
-  LIBRARY.forEach((item,idx)=>{
-    const unlocked=eff>=item.minTier;
-    const card=document.createElement('div');
-    card.className='library-item'+(unlocked?'':' locked');
-    card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':'REQUIRES '+(TIER_NAMES[item.minTier]||'').toUpperCase())+'</div><h4>'+item.title+'</h4><p>'+item.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'" data-idx="'+idx+'">'+(unlocked?'VIEW →':'🔒 LOCKED — UPGRADE TO UNLOCK')+'</div>';
-    if(unlocked){ card.querySelector('.lib-action').addEventListener('click',()=>openViewer(idx)); }
-    grid.appendChild(card);
-  });
-  renderCapSystems(eff, grid);
-  renderCapTools(eff, grid);
-  renderTools(eff, grid);
+  renderDashboardSections(eff, grid, false);
   const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden';
 }
 
@@ -1447,14 +1501,8 @@ function renderPreviewLibrary(){
   const intro=document.createElement('p'); intro.className='desc-small'; intro.style.cssText='color:var(--slate);margin-bottom:18px;grid-column:1/-1;';
   intro.textContent="This is what's inside, tier by tier — unlocked when you join. Titles only shown here; the full guides are members-only.";
   grid.appendChild(intro);
-  PREVIEW_LIBRARY_CARDS.forEach(item=>{
-    const card=document.createElement('div'); card.className='library-item locked preview-blur';
-    card.innerHTML='<div class="lib-tag">REQUIRES '+(TIER_NAMES[item.tier]||'').toUpperCase()+'</div><h4>'+item.title+'</h4><p>'+item.teaser+'</p><div class="lib-action locked-action">🔒 LOCKED</div>';
-    grid.appendChild(card);
-  });
-  renderCapSystems(0, grid);
-  renderCapTools(0, grid);
-  renderTools(0, grid);
+  PREVIEW_LIBRARY_CARDS.length; // teasers are rendered per-tier inside renderDashboardSections
+  renderDashboardSections(0, grid, true);
   const note=document.createElement('div'); note.className='preview-overlay-note'; note.style.gridColumn='1/-1';
   note.textContent="Titles are real. The full in-depth guides are only visible to members.";
   grid.appendChild(note);
