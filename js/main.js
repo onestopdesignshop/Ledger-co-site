@@ -456,6 +456,160 @@ async function openCapViewer(idx){
   }catch(err){ console.error('Cap Systems files error:',err); box.textContent='Could not load your files \u2014 refresh and try again, or email dee8shops@gmail.com.'; }
 }
 
+// ============ INTERACTIVE TOOLS (calculators, tier-gated) ============
+function tNum(v){ const n=parseFloat(String(v).replace(/[,$%\s]/g,'')); return isNaN(n)?0:n; }
+function tMoney(n){ const neg=n<0; const a=Math.abs(n); const s='$'+a.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:(a<100?2:0)}); return neg?'-'+s:s; }
+function tPct(n){ return (Math.round(n*100)/100).toLocaleString(undefined,{maximumFractionDigits:2})+'%'; }
+function tField(labelText, initial, oninput){
+  const wrap=document.createElement('div'); wrap.style.cssText='margin:10px 0;';
+  const lab=document.createElement('label'); lab.textContent=labelText; lab.style.cssText='display:block;font-size:12px;letter-spacing:.05em;opacity:.85;margin-bottom:4px;';
+  const inp=document.createElement('input'); inp.type='text'; inp.inputMode='decimal'; inp.value=initial;
+  inp.style.cssText='width:100%;max-width:260px;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:inherit;font-size:15px;';
+  inp.addEventListener('input',oninput);
+  wrap.appendChild(lab); wrap.appendChild(inp); wrap.__input=inp;
+  return wrap;
+}
+function tResultBox(){ const r=document.createElement('div'); r.style.cssText='margin-top:16px;padding:14px 16px;border:1px solid var(--gold, #c9a24b);border-radius:4px;line-height:1.7;font-size:14px;'; return r; }
+function tNote(container){ const p=document.createElement('p'); p.style.cssText='font-size:11px;opacity:.6;margin-top:14px;'; p.textContent='Educational tool for your own math — not financial advice. Verify rates and terms with the institution before acting.'; container.appendChild(p); }
+
+const TOOLS = [
+  { title:"Effective Yield Calculator", minTier:1,
+    desc:"The rate you'd ACTUALLY earn on an account — after the balance cap, the fee, and the months you'd miss the conditions.",
+    build:function(c){
+      const fB=tField('Your balance ($)','12000',calc);
+      const fR1=tField('Advertised APY (%)','4.5',calc);
+      const fCap=tField('Balance cap the good rate applies to ($, 0 = no cap)','0',calc);
+      const fR0=tField('Base APY above the cap / when conditions missed (%)','0.25',calc);
+      const fFee=tField('Monthly fee ($)','0',calc);
+      const fM=tField('Months per year you would realistically miss the conditions (0-12)','0',calc);
+      const out=tResultBox();
+      [fB,fR1,fCap,fR0,fFee,fM].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const B=tNum(fB.__input.value), r1=tNum(fR1.__input.value)/100, capIn=tNum(fCap.__input.value), r0=tNum(fR0.__input.value)/100, F=tNum(fFee.__input.value); let m=Math.min(12,Math.max(0,Math.round(tNum(fM.__input.value))));
+        if(B<=0){ out.textContent='Enter a balance to see your numbers.'; return; }
+        const cap=capIn>0?Math.min(capIn,B):B;
+        const goodMonthly=(cap*r1+Math.max(0,B-cap)*r0)/12;
+        const missMonthly=(B*r0)/12;
+        const annual=(12-m)*goodMonthly+m*missMonthly-12*F;
+        const eff=annual/B*100;
+        out.innerHTML='<strong>Effective annual interest to you: '+tMoney(annual)+'</strong><br>Effective rate on your full balance: <strong>'+tPct(eff)+'</strong><br>Headline rate: '+tPct(r1*100)+' — the gap is the cap, the fee, and the missed months.'+(annual<0?'<br><strong>This account LOSES you money at these settings.</strong>':'');
+      }
+      calc();
+    } },
+  { title:"Savings Growth Calculator", minTier:1,
+    desc:"Where a starting balance plus a monthly habit lands in 1, 5, or 10 years at a given rate.",
+    build:function(c){
+      const fP=tField('Starting balance ($)','5000',calc);
+      const fA=tField('Monthly addition ($)','200',calc);
+      const fR=tField('APY (%)','4.0',calc);
+      const fY=tField('Years','5',calc);
+      const out=tResultBox();
+      [fP,fA,fR,fY].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const P=tNum(fP.__input.value), A=tNum(fA.__input.value), r=tNum(fR.__input.value)/100, y=Math.max(0,tNum(fY.__input.value));
+        const i=r/12, n=Math.round(y*12);
+        const fv= i>0 ? P*Math.pow(1+i,n)+A*((Math.pow(1+i,n)-1)/i) : P+A*n;
+        const contributed=P+A*n;
+        out.innerHTML='<strong>Balance after '+y+' year'+(y===1?'':'s')+': '+tMoney(fv)+'</strong><br>You put in: '+tMoney(contributed)+'<br>Interest earned: <strong>'+tMoney(fv-contributed)+'</strong>';
+      }
+      calc();
+    } },
+  { title:"Honest APY Decomposer", minTier:2,
+    desc:"Strips the token-incentive confetti out of an advertised crypto yield and shows the number you'd actually bank.",
+    build:function(c){
+      const fA=tField('Advertised APY (%)','24',calc);
+      const fS=tField('Share of that yield paid in the protocol\u2019s own token (%)','75',calc);
+      const fH=tField('Haircut you apply to token value \u2014 dilution/sell pressure (%)','60',calc);
+      const fP=tField('Position size ($)','2000',calc);
+      const out=tResultBox();
+      [fA,fS,fH,fP].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const A=tNum(fA.__input.value)/100, s=Math.min(1,tNum(fS.__input.value)/100), h=Math.min(1,tNum(fH.__input.value)/100), P=tNum(fP.__input.value);
+        const honest=A*(1-s)+A*s*(1-h);
+        out.innerHTML='<strong>Honest APY: '+tPct(honest*100)+'</strong> (advertised '+tPct(A*100)+')<br>Honest annual dollars on '+tMoney(P)+': <strong>'+tMoney(P*honest)+'</strong><br>Now ask: is that dollar figure worth the tail risk? If it\u2019s dinner money, size it like entertainment \u2014 or skip it.';
+      }
+      calc();
+    } },
+  { title:"Risk-Sized Exposure Calculator", minTier:2,
+    desc:"Your speculative sleeve and per-position caps in real dollars — sized so a total loss changes nothing.",
+    build:function(c){
+      const fV=tField('Total investable assets ($)','50000',calc);
+      const fS=tField('Speculative sleeve cap (% of assets)','5',calc);
+      const fP=tField('Per-position cap (% of assets)','1.5',calc);
+      const out=tResultBox();
+      [fV,fS,fP].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const V=tNum(fV.__input.value), s=tNum(fS.__input.value)/100, p=tNum(fP.__input.value)/100;
+        const L=p; const rec= L<1 ? (L/(1-L))*100 : 0;
+        out.innerHTML='<strong>Max speculative sleeve: '+tMoney(V*s)+'</strong> total, across everything that can go to zero<br><strong>Max per position: '+tMoney(V*p)+'</strong><br>If one position zeroes: you lose '+tPct(p*100)+' of assets and need '+tPct(rec)+' back to break even \u2014 the flat part of the recovery curve.<br>Positions on the same theme count as ONE position against these caps.';
+      }
+      calc();
+    } },
+  { title:"Ladder Builder", minTier:3,
+    desc:"Turns an amount and an interval into your actual rung schedule — amounts, maturity dates, and the steady state.",
+    build:function(c){
+      const fT=tField('Total to ladder ($)','24000',calc);
+      const fN=tField('Number of rungs (2-12)','4',calc);
+      const fI=tField('Interval between rungs (months)','3',calc);
+      const out=tResultBox();
+      [fT,fN,fI].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const T=tNum(fT.__input.value); let N=Math.round(tNum(fN.__input.value)); let I=Math.round(tNum(fI.__input.value));
+        N=Math.min(12,Math.max(2,N||4)); I=Math.max(1,I||3);
+        if(T<=0){ out.textContent='Enter an amount to build the ladder.'; return; }
+        const per=T/N; const today=new Date(); let rows='';
+        for(let k=1;k<=N;k++){
+          const d=new Date(today); d.setMonth(d.getMonth()+k*I);
+          rows+='<tr><td style="padding:4px 10px 4px 0;">Rung '+k+'</td><td style="padding:4px 10px 4px 0;">'+tMoney(per)+'</td><td style="padding:4px 0;">'+d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</td></tr>';
+        }
+        out.innerHTML='<table style="border-collapse:collapse;font-size:13px;"><tr><td style="padding:4px 10px 4px 0;opacity:.7;">RUNG</td><td style="padding:4px 10px 4px 0;opacity:.7;">AMOUNT</td><td style="padding:4px 0;opacity:.7;">MATURES</td></tr>'+rows+'</table><br>Rule at each maturity: roll into a new '+(N*I)+'-month instrument unless a planned expense falls inside the next '+I+' months.<br><strong>Steady state after one cycle:</strong> every dollar earns '+(N*I)+'-month rates with access to '+tMoney(per)+' every '+I+' months. Turn OFF auto-renewal on every rung.';
+      }
+      calc();
+    } },
+  { title:"Position Size & Recovery Calculator", minTier:3,
+    desc:"Your three-tier caps in dollars, plus the recovery math that makes the case for them.",
+    build:function(c){
+      const fV=tField('Total investable assets ($)','50000',calc);
+      const fCv=tField('Conviction cap per position (%)','5',calc);
+      const fSp=tField('Speculative cap per position (%)','2',calc);
+      const fL=tField('Test a loss: position falls by (%)','50',calc);
+      const out=tResultBox();
+      [fV,fCv,fSp,fL].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const V=tNum(fV.__input.value), cv=tNum(fCv.__input.value)/100, sp=tNum(fSp.__input.value)/100; let L=Math.min(99.9,Math.max(0,tNum(fL.__input.value)))/100;
+        const rec=L<1?(L/(1-L))*100:0;
+        out.innerHTML='<strong>Conviction positions: max '+tMoney(V*cv)+' each</strong><br><strong>Speculative positions: max '+tMoney(V*sp)+' each</strong><br><br>Recovery math on a '+tPct(L*100)+' loss: you need <strong>'+tPct(rec)+'</strong> just to get back to even.<br>Memorize the curve: \u221210% needs +11% \u00b7 \u221220% needs +25% \u00b7 \u221250% needs +100% \u00b7 \u221280% needs +400%.<br>Sizing keeps every loss on the flat part of that curve.';
+      }
+      calc();
+    } },
+];
+
+function renderTools(eff, grid){
+  const head=document.createElement('div'); head.style.cssText='grid-column:1/-1;margin-top:30px;';
+  head.innerHTML='<div class="lib-tag">INTERACTIVE TOOLS</div>';
+  grid.appendChild(head);
+  TOOLS.forEach((t,idx)=>{
+    const unlocked=eff>=t.minTier;
+    const card=document.createElement('div');
+    card.className='library-item'+(unlocked?'':' locked');
+    card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':'REQUIRES '+(TIER_NAMES[t.minTier]||'').toUpperCase())+'</div><h4>'+t.title+'</h4><p>'+t.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'OPEN TOOL \u2192':'\ud83d\udd12 LOCKED \u2014 UPGRADE TO UNLOCK')+'</div>';
+    if(unlocked){ card.querySelector('.lib-action').addEventListener('click',()=>openTool(idx)); }
+    grid.appendChild(card);
+  });
+}
+
+function openTool(idx){
+  const t=TOOLS[idx]; if(!t||!currentUser) return;
+  const vt=document.getElementById('viewerTitle'); if(vt) vt.textContent=t.title;
+  const vl=document.getElementById('viewerLicenseEmail'); if(vl) vl.textContent=currentUser.email;
+  const c=document.getElementById('viewerContent'); if(!c) return;
+  c.innerHTML='';
+  const box=document.createElement('div');
+  try{ t.build(box); }catch(err){ console.error('Tool error:',err); box.textContent='This tool hit an error \u2014 refresh and try again.'; }
+  c.appendChild(box);
+  const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
+}
+
 // ============ SESSION STATE ============
 let currentUser = null;
 let currentSubscription = null;
@@ -600,6 +754,7 @@ function showDashboard(){
     grid.appendChild(card);
   });
   renderCapSystems(eff, grid);
+  renderTools(eff, grid);
   const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden';
 }
 
@@ -639,6 +794,7 @@ function renderPreviewLibrary(){
     grid.appendChild(card);
   });
   renderCapSystems(0, grid);
+  renderTools(0, grid);
   const note=document.createElement('div'); note.className='preview-overlay-note'; note.style.gridColumn='1/-1';
   note.textContent="Titles are real. The full in-depth guides are only visible to members.";
   grid.appendChild(note);
