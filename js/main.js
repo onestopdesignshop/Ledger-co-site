@@ -15,6 +15,11 @@
 //     .reveal section is force-shown instead of staying invisible.
 //  4. Sign-in now also sets window.__ledgerUserEmail so
 //     paddle-checkout.js can attach the buyer's email instantly.
+//  5. Capital Systems download links are now signed with the
+//     download flag, so tapping SAVES the file instead of opening
+//     Safari's read-only preview — plus an "open it in Numbers /
+//     Excel / Google Sheets" tip above the file list, because the
+//     browser preview cannot run spreadsheet formulas.
 // ============================================================
 
 // ============ SUPABASE CONFIG ============
@@ -427,6 +432,13 @@ async function openCapViewer(idx){
   c.innerHTML='';
   const body=document.createElement('div'); body.innerHTML=cs.body;
   const fh=document.createElement('h4'); fh.textContent='Your downloads'; body.appendChild(fh);
+  // How-to-open tip: the toolkits are real Excel workbooks. The browser's
+  // built-in preview (Quick Look on iPhone/iPad) is a read-only snapshot and
+  // cannot run formulas — buyers must open the files in a spreadsheet app.
+  const tip=document.createElement('p');
+  tip.style.cssText='font-size:13px;line-height:1.65;padding:12px 14px;border:1px solid var(--gold, #c9a24b);border-radius:4px;margin:10px 0 14px;';
+  tip.innerHTML='<strong>How to use the toolkits:</strong> tapping a link below saves the file to your device. Open the saved .xlsx files in <strong>Numbers</strong> (free on iPhone/iPad), <strong>Excel</strong>, or <strong>Google Sheets</strong> \u2014 that\u2019s where the calculations run live. The browser\u2019s built-in preview is view-only and will not calculate.';
+  body.appendChild(tip);
   const box=document.createElement('div'); box.textContent='Loading your files\u2026'; body.appendChild(box);
   c.appendChild(body);
   c.appendChild(buildWatermark(currentUser.email));
@@ -446,18 +458,21 @@ async function openCapViewer(idx){
     box.innerHTML='';
     for(const f of files){
       const rowEl=document.createElement('div'); rowEl.style.cssText='margin:9px 0;';
-      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(folder+'/'+f.name,3600);
+      // { download: f.name } adds ?download= to the signed URL, which makes
+      // Supabase serve it with Content-Disposition: attachment — the browser
+      // SAVES the file instead of opening the read-only preview.
+      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(folder+'/'+f.name,3600,{download:f.name});
       if(e2||!s||!s.signedUrl){ rowEl.textContent=f.name+' \u2014 temporarily unavailable, email dee8shops@gmail.com'; }
       else{
         const a=document.createElement('a'); a.href=s.signedUrl; a.textContent='\u2b07 '+f.name;
-        a.setAttribute('download',f.name); a.target='_blank'; a.rel='noopener';
+        a.setAttribute('download',f.name); a.rel='noopener';
         a.style.cssText='color:var(--gold);text-decoration:underline;word-break:break-all;';
         rowEl.appendChild(a);
       }
       box.appendChild(rowEl);
     }
     const note=document.createElement('p'); note.style.cssText='font-size:12px;opacity:.7;margin-top:14px;';
-    note.textContent='Download links are private to your account and expire after 60 minutes \u2014 reopen this card any time for fresh ones.';
+    note.textContent='Each link saves the file straight to your device (check your Downloads / Files app). Links are private to your account and expire after 60 minutes \u2014 reopen this card any time for fresh ones.';
     box.appendChild(note);
   }catch(err){ console.error('Cap Systems files error:',err); box.textContent='Could not load your files \u2014 refresh and try again, or email dee8shops@gmail.com.'; }
 }
