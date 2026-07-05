@@ -474,7 +474,7 @@ function tNote(container){ const p=document.createElement('p'); p.style.cssText=
 
 const TOOLS = [
   { title:"Effective Yield Calculator", minTier:1,
-    desc:"The rate you'd ACTUALLY earn on an account — after the balance cap, the fee, and the months you'd miss the conditions.",
+    desc:"Paste in any account's terms and see the rate you'd ACTUALLY earn — after the cap, the fee, and the months you'd miss conditions. It will flat-out tell you when an account loses you money.",
     build:function(c){
       const fB=tField('Your balance ($)','12000',calc);
       const fR1=tField('Advertised APY (%)','4.5',calc);
@@ -497,7 +497,7 @@ const TOOLS = [
       calc();
     } },
   { title:"Savings Growth Calculator", minTier:1,
-    desc:"Where a starting balance plus a monthly habit lands in 1, 5, or 10 years at a given rate.",
+    desc:"Where your starting balance plus a monthly habit lands in 1, 5, or 10 years — and exactly how much of it is interest doing the work.",
     build:function(c){
       const fP=tField('Starting balance ($)','5000',calc);
       const fA=tField('Monthly addition ($)','200',calc);
@@ -514,8 +514,28 @@ const TOOLS = [
       }
       calc();
     } },
+  { title:"Switch-or-Stay Analyzer", minTier:1,
+    desc:"Your current account vs. a candidate, head to head: dollars gained per year and over 5 years — and it will honestly tell you when a switch is NOT worth the friction.",
+    build:function(c){
+      const fB=tField('Your balance ($)','15000',calc);
+      const fA=tField('Current account APY (%)','0.5',calc);
+      const fC=tField('Candidate account APY (%)','4.0',calc);
+      const fF=tField('Candidate monthly fee ($)','0',calc);
+      const out=tResultBox();
+      [fB,fA,fC,fF].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const B=tNum(fB.__input.value), a=tNum(fA.__input.value)/100, cr=tNum(fC.__input.value)/100, F=tNum(fF.__input.value);
+        if(B<=0){ out.textContent='Enter your balance.'; return; }
+        const gain1=B*(cr-a)-12*F;
+        const fv=(r)=>B*Math.pow(1+r/12,60);
+        const gain5=(fv(cr)-60*F)-fv(a);
+        const worth=gain1>=25;
+        out.innerHTML='<strong>Year one: '+(gain1>=0?'+':'')+tMoney(gain1)+'</strong> by switching<br>Over 5 years (compounded): <strong>'+(gain5>=0?'+':'')+tMoney(gain5)+'</strong><br>'+(worth?'<strong>Verdict: worth the switch.</strong> That is real money for one afternoon of paperwork.':'<strong>Verdict: not worth the friction.</strong> Under roughly $25/yr of gain, staying put is the disciplined move — do not churn accounts for basis points.');
+      }
+      calc();
+    } },
   { title:"Honest APY Decomposer", minTier:2,
-    desc:"Strips the token-incentive confetti out of an advertised crypto yield and shows the number you'd actually bank.",
+    desc:"Strips the token-incentive confetti out of any advertised crypto yield and shows the number you'd actually bank — often a quarter of the billboard figure. Run it BEFORE you deposit.",
     build:function(c){
       const fA=tField('Advertised APY (%)','24',calc);
       const fS=tField('Share of that yield paid in the protocol\u2019s own token (%)','75',calc);
@@ -531,7 +551,7 @@ const TOOLS = [
       calc();
     } },
   { title:"Risk-Sized Exposure Calculator", minTier:2,
-    desc:"Your speculative sleeve and per-position caps in real dollars — sized so a total loss changes nothing.",
+    desc:"Turns your assets into hard dollar ceilings for speculative bets — sized so a total loss stings for a week and changes nothing. The recovery math is printed right in the result.",
     build:function(c){
       const fV=tField('Total investable assets ($)','50000',calc);
       const fS=tField('Speculative sleeve cap (% of assets)','5',calc);
@@ -545,8 +565,25 @@ const TOOLS = [
       }
       calc();
     } },
+  { title:"Break-Even Risk Calculator", minTier:2,
+    desc:"The question nobody runs: at this yield, how likely does TOTAL LOSS have to be before the bet is a loser? Computes the break-even and the expected dollars at your own risk estimate.",
+    build:function(c){
+      const fY=tField('Honest APY after incentives (%)','9',calc);
+      const fP=tField('Position size ($)','2000',calc);
+      const fR=tField('Your estimate: chance of total loss within a year (%)','5',calc);
+      const out=tResultBox();
+      [fY,fP,fR].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const y=tNum(fY.__input.value)/100, P=tNum(fP.__input.value); let p=Math.min(99.9,Math.max(0,tNum(fR.__input.value)))/100;
+        if(P<=0){ out.textContent='Enter a position size.'; return; }
+        const breakeven=y/(1+y);
+        const ev=P*y*(1-p)-P*p;
+        out.innerHTML='<strong>Break-even risk: '+tPct(breakeven*100)+'</strong> — if the chance of losing everything in a year is above this, the yield is a losing bet before it starts.<br><br>At YOUR estimate ('+tPct(p*100)+'), expected outcome on '+tMoney(P)+': <strong>'+(ev>=0?'+':'')+tMoney(ev)+'</strong> per year.'+(ev<0?'<br><strong>Negative expectancy — the honest answer is walk.</strong>':'<br>Positive — but only as reliable as your risk estimate. Size it so zero changes nothing.');
+      }
+      calc();
+    } },
   { title:"Ladder Builder", minTier:3,
-    desc:"Turns an amount and an interval into your actual rung schedule — amounts, maturity dates, and the steady state.",
+    desc:"Three inputs become your actual ladder: rung amounts, real maturity dates, the roll rule, and the steady state where ALL your money earns long rates with access every interval.",
     build:function(c){
       const fT=tField('Total to ladder ($)','24000',calc);
       const fN=tField('Number of rungs (2-12)','4',calc);
@@ -567,7 +604,7 @@ const TOOLS = [
       calc();
     } },
   { title:"Position Size & Recovery Calculator", minTier:3,
-    desc:"Your three-tier caps in dollars, plus the recovery math that makes the case for them.",
+    desc:"Your three-tier position caps in real dollars, plus the loss-to-recovery curve (−50% needs +100% back) that makes the case for every one of them.",
     build:function(c){
       const fV=tField('Total investable assets ($)','50000',calc);
       const fCv=tField('Conviction cap per position (%)','5',calc);
@@ -579,6 +616,24 @@ const TOOLS = [
         const V=tNum(fV.__input.value), cv=tNum(fCv.__input.value)/100, sp=tNum(fSp.__input.value)/100; let L=Math.min(99.9,Math.max(0,tNum(fL.__input.value)))/100;
         const rec=L<1?(L/(1-L))*100:0;
         out.innerHTML='<strong>Conviction positions: max '+tMoney(V*cv)+' each</strong><br><strong>Speculative positions: max '+tMoney(V*sp)+' each</strong><br><br>Recovery math on a '+tPct(L*100)+' loss: you need <strong>'+tPct(rec)+'</strong> just to get back to even.<br>Memorize the curve: \u221210% needs +11% \u00b7 \u221220% needs +25% \u00b7 \u221250% needs +100% \u00b7 \u221280% needs +400%.<br>Sizing keeps every loss on the flat part of that curve.';
+      }
+      calc();
+    } },
+  { title:"Income Target Calculator", minTier:3,
+    desc:"Name the monthly income you want and it computes the capital that honestly produces it at a sane yield — plus what your current capital generates today, and the gap between them.",
+    build:function(c){
+      const fT=tField('Target monthly income ($)','500',calc);
+      const fC=tField('Your current income-producing capital ($)','40000',calc);
+      const fY=tField('Blended yield you can honestly sustain (%)','4.5',calc);
+      const out=tResultBox();
+      [fT,fC,fY].forEach(f=>c.appendChild(f)); c.appendChild(out); tNote(c);
+      function calc(){
+        const T=tNum(fT.__input.value), C=tNum(fC.__input.value), y=tNum(fY.__input.value)/100;
+        if(y<=0){ out.textContent='Enter a yield above zero.'; return; }
+        const need=T*12/y;
+        const now=C*y/12;
+        const gap=need-C;
+        out.innerHTML='<strong>Capital required for '+tMoney(T)+'/month at '+tPct(y*100)+': '+tMoney(need)+'</strong><br>Your '+tMoney(C)+' produces today: <strong>'+tMoney(now)+'/month</strong><br>Gap to close: <strong>'+(gap>0?tMoney(gap):'none — you are there')+'</strong><br><br>The honest read: the gap closes through contributions and time — not by reaching for a yield number that makes this math look prettier. If a double-digit rate is tempting you, run it through the Break-Even Risk Calculator first.';
       }
       calc();
     } },
