@@ -4,15 +4,18 @@
  *
  * ============================================================
  * SETUP — STATUS: COMPLETE
- * ============================================================
- * 1. PADDLE_TOKENS  — DONE. Both sandbox and production tokens filled in.
- * 2. PADDLE_ENVIRONMENT — "production" (live mode).
- * 3. PRICE_IDS — DONE. All 28 real Price IDs filled in.
+ * 1. PADDLE_TOKENS — filled in. 2. Environment: production.
+ * 3. PRICE_IDS — all 28 live Price IDs.
  *
- * UPDATED: openPaddleCheckout now passes the signed-in user's email to
- * Paddle (as customer.email + customData.email) so the webhook can match
- * the purchase to the right account. The email comes from
- * window.__ledgerUserEmail, which main.js sets after sign-in.
+ * NEW IN THIS VERSION — the post-purchase experience:
+ * When Paddle reports checkout.completed, the page now:
+ *   1. Closes the overlay and shows "Purchase complete — unlocking
+ *      your library…" full-screen.
+ *   2. Polls the database until the webhook has written the buyer's
+ *      access row (usually 2–5 seconds).
+ *   3. Then either opens the member dashboard right there (index.html)
+ *      or shows a "OPEN YOUR LIBRARY →" button (Capital Systems page).
+ * No more silent overlay-close leaving the buyer wondering.
  * ============================================================
  */
 
@@ -27,7 +30,6 @@ const PADDLE_ENVIRONMENT = "production"; // live mode
 
 // ---- 3. Price ID map ----
 const PRICE_IDS = {
-  // ---------- Ledger & Co. main site membership tiers ----------
   yieldMap: {
     monthly:   "pri_01kw30xwd5e5vqb1ys1jwdcmv4",
     quarterly: "pri_01kw30wq20hwz77sf8cw9dqgv9",
@@ -52,8 +54,6 @@ const PRICE_IDS = {
     annual:    "pri_01kw32hgyx1j9g2hvx0na6gde2",
     lifetime:  "pri_01kw32g13r3vmtnxmmcqx20f6p",
   },
-
-  // ---------- Capital Systems Suite ----------
   foundation: {
     payInFull: "pri_01kw35kg3nebnzrqkcx8kzgc0b",
     weekly:    "pri_01kw392b9fxb2ra8j1n2mwkjnb",
@@ -74,10 +74,18 @@ const PRICE_IDS = {
   },
 };
 
-// ============================================================
-// Below this line: integration logic.
-// ============================================================
+// Which database tier each product family unlocks (must match the webhook)
+const TIER_OF_FAMILY = {
+  yieldMap: 1, fullLedger: 2, annotatedPortfolio: 3, allAccess: 4,
+  foundation: 5, operator: 6, institutional: 7,
+};
 
+// Remembered at click time so the completion handler knows what to wait for
+let __lastPurchase = { tier: null, family: null };
+
+// ============================================================
+// Init
+// ============================================================
 (function initPaddle() {
   if (typeof Paddle === "undefined") {
     console.error(
@@ -87,31 +95,140 @@ const PRICE_IDS = {
     );
     return;
   }
-
   Paddle.Environment.set(PADDLE_ENVIRONMENT);
   Paddle.Initialize({
     token: PADDLE_TOKENS[PADDLE_ENVIRONMENT],
     eventCallback: function (data) {
-      if (data.name === "checkout.completed") {
+      if (data && data.name === "checkout.completed") {
         console.log("Checkout completed:", data);
-        // Optional: redirect to a thank-you page here.
+        try { handlePurchaseComplete(); } catch (e) { console.error(e); }
       }
     },
   });
-
   console.log("Paddle initialized in " + PADDLE_ENVIRONMENT + " mode.");
 })();
 
-/**
- * Opens a Paddle checkout overlay for the given Price ID.
- * Passes the signed-in user's email through so the webhook can match the
- * purchase to the correct account.
- *
- * IMPORTANT: we resolve the email from the LIVE Supabase session at click
- * time — not just window.__ledgerUserEmail, which can be stale (e.g. after a
- * page refresh). This means: as long as the user has a valid session, the
- * email is always attached, and they never need to sign out to buy.
- */
+// ============================================================
+// Post-purchase experience
+// ============================================================
+function purchaseOverlayEl() {
+  let o = document.getElementById("purchaseCompleteOverlay");
+  if (o) return o;
+  o = document.createElement("div");
+  o.id = "purchaseCompleteOverlay";
+  o.style.cssText =
+    "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;" +
+    "background:rgba(6,12,22,.96);color:#f4efe4;font-family:Georgia,serif;text-align:center;padding:24px;";
+  o.innerHTML =
+    '<div style="max-width:440px;">' +
+    '<div style="font-size:44px;line-height:1;">✓</div>' +
+    '<h2 style="font-size:26px;margin:14px 0 8px;color:#f4efe4;">Purchase complete</h2>' +
+    '<p id="pcStatus" style="color:#c9a24b;font-size:15px;letter-spacing:.03em;">Unlocking your library…</p>' +
+    '<div id="pcAction" style="margin-top:22px;"></div>' +
+    '<p style="margin-top:26px;font-size:12px;opacity:.55;">A receipt has been emailed to you by our payment partner.</p>' +
+    "</div>";
+  document.body.appendChild(o);
+  return o;
+}
+
+function pcSetStatus(msg) {
+  const s = document.getElementById("pcStatus");
+  if (s) s.textContent = msg;
+}
+function pcShowButton(label, onclick) {
+  const a = document.getElementById("pcAction");
+  if (!a) return;
+  a.innerHTML = "";
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.style.cssText =
+    "background:transparent;color:#c9a24b;border:1px solid #c9a24b;padding:14px 30px;" +
+    "font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.1em;cursor:pointer;";
+  b.addEventListener("click", onclick);
+  a.appendChild(b);
+}
+
+async function getSessionEmail() {
+  try {
+    if (window.__ledgerSupabaseClient) {
+      const { data } = await window.__ledgerSupabaseClient.auth.getSession();
+      return data?.session?.user?.email?.toLowerCase() ?? null;
+    }
+  } catch (e) {}
+  return (window.__ledgerUserEmail || null);
+}
+
+async function accessRowExists(email, tier) {
+  try {
+    const sb = window.__ledgerSupabaseClient;
+    if (!sb || !email) return false;
+    let q = sb.from("subscriptions").select("tier").eq("user_email", email).eq("status", "active");
+    if (tier) q = q.eq("tier", tier);
+    const { data, error } = await q.limit(1);
+    if (error) return false;
+    return !!(data && data.length);
+  } catch (e) { return false; }
+}
+
+async function handlePurchaseComplete() {
+  // Close the Paddle overlay so our confirmation owns the screen
+  try { Paddle.Checkout.close(); } catch (e) {}
+  purchaseOverlayEl();
+  pcSetStatus("Unlocking your library…");
+
+  const email = await getSessionEmail();
+  const tier = __lastPurchase.tier;
+  const onIndex = typeof loadSubscriptionAndShowDashboard === "function";
+
+  // Poll for the webhook-written access row: every 1.5s, up to 30s
+  let unlocked = false;
+  for (let i = 0; i < 20; i++) {
+    if (await accessRowExists(email, tier)) { unlocked = true; break; }
+    await new Promise((r) => setTimeout(r, 1500));
+    if (i === 4) pcSetStatus("Confirming your payment with the bank…");
+    if (i === 12) pcSetStatus("Almost there — finalizing your access…");
+  }
+
+  if (unlocked) {
+    pcSetStatus("Your library is unlocked.");
+    if (onIndex) {
+      pcShowButton("OPEN YOUR LIBRARY →", async function () {
+        const o = document.getElementById("purchaseCompleteOverlay");
+        if (o) o.remove();
+        try {
+          // Refresh session state and open the dashboard in place
+          if (typeof restoreSession === "function") { await restoreSession(); }
+          else { await loadSubscriptionAndShowDashboard(); }
+        } catch (e) { location.reload(); }
+      });
+      // Also auto-open after a short beat for buyers who don't tap
+      setTimeout(async function () {
+        const o = document.getElementById("purchaseCompleteOverlay");
+        if (!o) return;
+        o.remove();
+        try {
+          if (typeof restoreSession === "function") { await restoreSession(); }
+          else { await loadSubscriptionAndShowDashboard(); }
+        } catch (e) { location.reload(); }
+      }, 3500);
+    } else {
+      // Capital Systems page (no dashboard here) — send them to it
+      pcShowButton("OPEN YOUR LIBRARY →", function () {
+        location.href = "index.html";
+      });
+    }
+  } else {
+    // Payment succeeded but the row hasn't shown up yet — never leave them stranded
+    pcSetStatus("Payment received. Your access is being provisioned and appears within a few minutes.");
+    pcShowButton(onIndex ? "REFRESH MY ACCOUNT" : "GO TO MY ACCOUNT", function () {
+      if (onIndex) location.reload(); else location.href = "index.html";
+    });
+  }
+}
+
+// ============================================================
+// Checkout open
+// ============================================================
 async function openPaddleCheckout(priceId) {
   if (!priceId || priceId.startsWith("pri_REPLACE_ME")) {
     alert(
@@ -140,8 +257,6 @@ async function openPaddleCheckout(priceId) {
       (typeof window !== "undefined" && window.__ledgerUserEmail) || null;
   }
 
-  // If we STILL have no email, the user isn't signed in. Stop and prompt them,
-  // because a purchase with no email can't be linked to an account.
   if (!userEmail) {
     alert(
       "Please sign in or create your account first, then choose your plan — " +
@@ -162,9 +277,8 @@ async function openPaddleCheckout(priceId) {
 }
 
 /**
- * Automatically wires up any element with a [data-price-id] attribute.
- * Usage in HTML:
- *   <button data-price-id="foundation.payInFull">Get Foundation</button>
+ * Wires up any element with a [data-price-id] attribute.
+ * Usage: <button data-price-id="foundation.payInFull">Get Foundation</button>
  */
 function wireUpButtons() {
   const buttons = document.querySelectorAll("[data-price-id]");
@@ -173,6 +287,9 @@ function wireUpButtons() {
       e.preventDefault();
       const path = btn.getAttribute("data-price-id");
       const priceId = resolvePricePath(path);
+      // Remember what was bought so the completion handler can wait for it
+      const family = String(path || "").split(".")[0];
+      __lastPurchase = { family: family, tier: TIER_OF_FAMILY[family] ?? null };
       await openPaddleCheckout(priceId);
     });
   });
