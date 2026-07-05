@@ -1588,6 +1588,39 @@ function buildGreeting(){
   const tag=document.createElement('div'); tag.className='lib-tag'; tag.textContent='LEDGER & CO.'; wrap.appendChild(tag);
   const h=document.createElement('h4'); h.id='ledgerGreetingTitle'; h.style.cssText='margin:10px 0 8px;font-size:24px;'; wrap.appendChild(h);
   const p=document.createElement('p'); p.id='ledgerGreetingBody'; p.style.cssText='margin:0 0 10px;font-size:14px;line-height:1.7;opacity:.9;'; wrap.appendChild(p);
+  // ---- The L.E.D.G.E.R. & C.O. brand acronym — the name, spelled out ----
+  const acr=document.createElement('div');
+  acr.style.cssText='margin:14px 0 12px;padding-top:14px;border-top:1px solid rgba(201,162,75,.35);';
+  const LETTERS=[
+    ['L','Leadership','Guiding investors with integrity.'],
+    ['E','Education','Empowering members through knowledge.'],
+    ['D','Discipline','Encouraging consistent, thoughtful investing.'],
+    ['G','Growth','Focusing on long-term financial progress.'],
+    ['E','Excellence','Maintaining high standards in research and content.'],
+    ['R','Research','Providing thorough, evidence-based analysis.'],
+    ['\u0026','\u0026 Co.',''],
+    ['C','Confidence','Helping members invest with greater understanding.'],
+    ['O','Opportunity','Equipping members to recognize potential opportunities responsibly.']
+  ];
+  LETTERS.forEach(function(row){
+    if(row[0]==='\u0026'){
+      const dv=document.createElement('div'); dv.textContent='\u0026 CO.';
+      dv.style.cssText='margin:10px 0 4px;font-size:12px;letter-spacing:.14em;color:var(--gold, #c9a24b);';
+      acr.appendChild(dv); return;
+    }
+    const r=document.createElement('div'); r.style.cssText='display:flex;gap:12px;align-items:baseline;margin:6px 0;';
+    const l=document.createElement('span'); l.textContent=row[0];
+    l.style.cssText='flex:none;width:20px;font-size:18px;font-weight:700;color:var(--gold, #c9a24b);';
+    const t=document.createElement('span');
+    t.innerHTML='<strong>'+row[1]+'</strong> \u2014 '+row[2];
+    t.style.cssText='font-size:13px;line-height:1.6;opacity:.88;';
+    r.appendChild(l); r.appendChild(t); acr.appendChild(r);
+  });
+  const tagline=document.createElement('p');
+  tagline.textContent='\u201cLeadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and Creating Opportunity for every investor.\u201d';
+  tagline.style.cssText='margin:12px 0 0;font-size:13px;font-style:italic;opacity:.8;border-left:2px solid var(--gold, #c9a24b);padding-left:12px;line-height:1.7;';
+  acr.appendChild(tagline);
+  wrap.appendChild(acr);
   const st=document.createElement('p'); st.id='ledgerGreetingStatus'; st.style.cssText='margin:0;font-size:13px;letter-spacing:.03em;'; wrap.appendChild(st);
   const nav=document.querySelector('nav');
   if(nav&&nav.parentNode){ nav.parentNode.insertBefore(wrap, nav.nextSibling); }
