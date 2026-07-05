@@ -1310,8 +1310,28 @@ function addRefWorkbooksCard(grid, eff){
   if(unlocked){ card.querySelector('.lib-action').addEventListener('click',function(){ openCapViewer(0); }); }
   grid.appendChild(card);
 }
+function addCapSuiteEntrance(grid, eff){
+  const wrap=document.createElement('div');
+  wrap.style.cssText='grid-column:1/-1;margin-top:48px;padding:28px 26px;border:1px solid var(--gold, #c9a24b);border-radius:4px;background:rgba(201,162,75,.05);';
+  const tag=document.createElement('div'); tag.className='lib-tag'; tag.textContent='CAPITAL SYSTEMS SUITE'; wrap.appendChild(tag);
+  const h=document.createElement('h4'); h.textContent='Welcome to the Capital Systems Suite'; h.style.cssText='margin:10px 0 8px;font-size:24px;'; wrap.appendChild(h);
+  const p=document.createElement('p');
+  p.textContent='An operating system for your capital, in three tiers that build on each other: Foundation places it, Operator runs it, Institutional governs it. Every tier below is a set of live interactive toolkits \u2014 enter your real numbers and the system computes, flags, and audits alongside you.';
+  p.style.cssText='margin:0 0 10px;font-size:14px;line-height:1.7;opacity:.9;'; wrap.appendChild(p);
+  const st=document.createElement('p'); st.style.cssText='margin:0;font-size:13px;letter-spacing:.03em;';
+  let ownedName=null;
+  if(eff>=7) ownedName=TIER_NAMES[7]; else if(eff>=6) ownedName=TIER_NAMES[6]; else if(eff>=5) ownedName=TIER_NAMES[5];
+  if(ownedName){
+    st.innerHTML='<strong style="color:var(--gold, #c9a24b);">YOUR ACCESS: '+ownedName.toUpperCase()+'</strong> \u2014 everything it unlocks is open below.';
+  } else {
+    st.innerHTML='<strong style="color:var(--gold, #c9a24b);">SOLD SEPARATELY FROM THE MEMBERSHIP TIERS</strong> \u2014 explore what each tier unlocks below.';
+  }
+  wrap.appendChild(st);
+  grid.appendChild(wrap);
+}
 function renderDashboardSections(eff, grid, preview){
   TIER_SECTIONS.forEach(function(sec){
+    if(sec.tier===5) addCapSuiteEntrance(grid, eff);
     tierSectionHeader(grid, sec.name, sec.sub);
     if(sec.tier<=3){
       if(preview){
@@ -1391,7 +1411,7 @@ async function handleSignIn(e){
   if(error){ showAuthError(error.message); return false; }
   currentUser={email:data.user.email,id:data.user.id};
   setUserEmailBridge(currentUser.email);
-  await loadSubscriptionAndShowDashboard(); checkStackQueue(currentUser.email); closeAuthModal(); return false;
+  await loadSubscriptionAndShowDashboard(); checkStackQueue(currentUser.email); try{ updateGreeting(); }catch(err){} closeAuthModal(); return false;
 }
 
 async function handleSignUp(e){
@@ -1430,7 +1450,7 @@ function checkStackQueue(email){
   if(rem.length>0){ try{ localStorage.setItem('ledgerStackQueue_'+email,JSON.stringify(rem)); }catch(err){} } else { try{ localStorage.removeItem('ledgerStackQueue_'+email); }catch(err){} }
 }
 
-async function signOut(){ const sb=getSupabase(); if(sb){ try{ await sb.auth.signOut(); }catch(err){ console.error(err); } } currentUser=null; currentSubscription=null; setUserEmailBridge(null); const d=document.getElementById('dashboard'); if(d) d.classList.remove('show'); document.body.style.overflow=''; }
+async function signOut(){ const sb=getSupabase(); if(sb){ try{ await sb.auth.signOut(); }catch(err){ console.error(err); } } currentUser=null; currentSubscription=null; setUserEmailBridge(null); const d=document.getElementById('dashboard'); if(d) d.classList.remove('show'); document.body.style.overflow=''; try{ updateGreeting(); }catch(err){} }
 
 // ============ DASHBOARD ============
 async function loadSubscriptionAndShowDashboard(){
@@ -1554,6 +1574,61 @@ async function handleResetRequest(e){
 }
 
 // ============================================================
+// HOME PAGE GREETING — a welcome panel injected at the top of the
+// main page (styled like the Capital Systems entrance). Greets
+// visitors generically; switches to a personalized "Welcome back"
+// with their plan once a session exists. Only renders on the home
+// page (guarded by the #guides section existing).
+// ============================================================
+function buildGreeting(){
+  if(!document.getElementById('guides')) return;            // home page only
+  if(document.getElementById('ledgerGreeting')) { updateGreeting(); return; }
+  const wrap=document.createElement('div'); wrap.id='ledgerGreeting';
+  wrap.style.cssText='width:calc(100% - 32px);max-width:1160px;margin:24px auto 0;padding:26px 24px;border:1px solid var(--gold, #c9a24b);border-radius:4px;background:rgba(201,162,75,.05);';
+  const tag=document.createElement('div'); tag.className='lib-tag'; tag.textContent='LEDGER & CO.'; wrap.appendChild(tag);
+  const h=document.createElement('h4'); h.id='ledgerGreetingTitle'; h.style.cssText='margin:10px 0 8px;font-size:24px;'; wrap.appendChild(h);
+  const p=document.createElement('p'); p.id='ledgerGreetingBody'; p.style.cssText='margin:0 0 10px;font-size:14px;line-height:1.7;opacity:.9;'; wrap.appendChild(p);
+  const st=document.createElement('p'); st.id='ledgerGreetingStatus'; st.style.cssText='margin:0;font-size:13px;letter-spacing:.03em;'; wrap.appendChild(st);
+  const nav=document.querySelector('nav');
+  if(nav&&nav.parentNode){ nav.parentNode.insertBefore(wrap, nav.nextSibling); }
+  else if(document.body.firstChild){ document.body.insertBefore(wrap, document.body.firstChild); }
+  else { document.body.appendChild(wrap); }
+  updateGreeting();
+}
+function updateGreeting(){
+  const h=document.getElementById('ledgerGreetingTitle');
+  const p=document.getElementById('ledgerGreetingBody');
+  const st=document.getElementById('ledgerGreetingStatus');
+  if(!h||!p||!st) return;
+  st.innerHTML='';
+  if(currentUser){
+    h.textContent='Welcome back';
+    p.textContent='Your library is waiting: the member guides, every interactive tool, and \u2014 if you hold it \u2014 the Capital Systems Suite. Pick up where you left off.';
+    let planLabel='FREE PREVIEW';
+    if(currentSubscription&&currentSubscription.length){
+      planLabel=currentSubscription.map(function(r){ return (TIER_NAMES[r.tier]||('Tier '+r.tier)); }).join(' + ').toUpperCase();
+    }
+    st.innerHTML='<strong style="color:var(--gold, #c9a24b);">YOUR PLAN: '+planLabel+'</strong> \u2014 ';
+    const a=document.createElement('a'); a.href='#'; a.textContent='open your dashboard \u2192';
+    a.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
+    a.addEventListener('click',function(e){ e.preventDefault(); loadSubscriptionAndShowDashboard(); });
+    st.appendChild(a);
+  } else {
+    h.textContent='Welcome to Ledger & Co.';
+    p.textContent='Independent financial education, built on honest math: member guides, live interactive tools, and the Capital Systems Suite \u2014 designed to show you your real numbers, not the marketing\u2019s.';
+    st.innerHTML='<strong style="color:var(--gold, #c9a24b);">NEW HERE?</strong> ';
+    const a1=document.createElement('a'); a1.href='#guides'; a1.textContent='See the plans';
+    a1.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
+    st.appendChild(a1);
+    st.appendChild(document.createTextNode(' \u00b7 '));
+    const a2=document.createElement('a'); a2.href='#'; a2.textContent='Sign in';
+    a2.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
+    a2.addEventListener('click',function(e){ e.preventDefault(); openAuthModal('signin'); });
+    st.appendChild(a2);
+  }
+}
+
+// ============================================================
 // PAGE SETUP — everything below runs when the DOM is ready,
 // each piece isolated so one failure can't take down the rest.
 // ============================================================
@@ -1597,12 +1672,14 @@ async function restoreSession(){
       setUserEmailBridge(currentUser.email);
       await loadSubscriptionAndShowDashboard();
       checkStackQueue(currentUser.email);
+      try{ updateGreeting(); }catch(err){}
     }
   }catch(err){ console.error('Session restore failed:', err); }
 }
 
 function initPage(){
   safeRun('mobile nav', initMobileNav);
+  safeRun('home greeting', buildGreeting);
   safeRun('billing toggle', ()=>setBilling('monthly'));
   safeRun('reveal animations', initReveal);
   safeRun('global keys', initGlobalKeys);
