@@ -433,14 +433,20 @@ async function openCapViewer(idx){
   const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
   try{
     const sb=getSupabase(); if(!sb) throw new Error('no client');
-    const {data,error}=await sb.storage.from('capital-systems').list(cs.key,{limit:100,sortBy:{column:'name',order:'asc'}});
-    if(error) throw error;
-    const files=(data||[]).filter(f=>f&&f.name&&!f.name.startsWith('.'));
+    // Folder lookup tolerates either capitalization (e.g. foundation / Foundation)
+    const variants=[cs.key, cs.key.charAt(0).toUpperCase()+cs.key.slice(1)];
+    let files=[], folder=cs.key;
+    for(const v of variants){
+      const {data,error}=await sb.storage.from('capital-systems').list(v,{limit:100,sortBy:{column:'name',order:'asc'}});
+      if(error) continue;
+      const found=(data||[]).filter(f=>f&&f.name&&!f.name.startsWith('.'));
+      if(found.length){ files=found; folder=v; break; }
+    }
     if(!files.length){ box.textContent='Your files are being provisioned for this account \u2014 check back shortly, or email dee8shops@gmail.com and we\u2019ll send them directly.'; return; }
     box.innerHTML='';
     for(const f of files){
       const rowEl=document.createElement('div'); rowEl.style.cssText='margin:9px 0;';
-      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(cs.key+'/'+f.name,3600);
+      const {data:s,error:e2}=await sb.storage.from('capital-systems').createSignedUrl(folder+'/'+f.name,3600);
       if(e2||!s||!s.signedUrl){ rowEl.textContent=f.name+' \u2014 temporarily unavailable, email dee8shops@gmail.com'; }
       else{
         const a=document.createElement('a'); a.href=s.signedUrl; a.textContent='\u2b07 '+f.name;
