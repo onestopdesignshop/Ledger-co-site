@@ -20,6 +20,12 @@
 //     Safari's read-only preview — plus an "open it in Numbers /
 //     Excel / Google Sheets" tip above the file list, because the
 //     browser preview cannot run spreadsheet formulas.
+//  6. NEW: Capital Systems INTERACTIVE toolkits — full browser versions
+//     of the tier 5–7 workbooks (Capital Allocation, Ladder Builder +
+//     Rung Ledger, Income Operations, Position Sizing & Risk Register,
+//     Capital Operating System, Due-Diligence Scorecard). They run live
+//     in the dashboard and auto-save entries to the buyer's device.
+//     The Excel downloads remain available as the portable copies.
 // ============================================================
 
 // ============ SUPABASE CONFIG ============
@@ -477,6 +483,401 @@ async function openCapViewer(idx){
   }catch(err){ console.error('Cap Systems files error:',err); box.textContent='Could not load your files \u2014 refresh and try again, or email dee8shops@gmail.com.'; }
 }
 
+// ============ CAPITAL SYSTEMS — INTERACTIVE TOOLKITS (tiers 5-7) ============
+// Browser versions of the Capital Systems workbooks. Same math as the Excel
+// files, running live in the dashboard. Entries auto-save to this device,
+// keyed to the signed-in account (localStorage).
+function capKey(k){ return 'ledgerCap_'+((currentUser&&currentUser.email)||'anon')+'_'+k; }
+function capLoad(k,fb){ try{ const v=localStorage.getItem(capKey(k)); return v!==null?JSON.parse(v):fb; }catch(err){ return fb; } }
+function capSave(k,v){ try{ localStorage.setItem(capKey(k),JSON.stringify(v)); }catch(err){} }
+function capEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(ch){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[ch]; }); }
+function capHead(c,txt){ const h=document.createElement('h4'); h.textContent=txt; h.style.cssText='margin-top:22px;'; c.appendChild(h); return h; }
+function capSaveNote(c){ const p=document.createElement('p'); p.style.cssText='font-size:11px;opacity:.6;margin-top:6px;'; p.textContent='Auto-saves to this device for your account. The Excel version (in the tier card above) is the portable copy.'; c.appendChild(p); }
+
+// Editable, persistent row table (register / ledger pattern)
+function capRows(storeKey, columns, defaults, onchange){
+  let rows=capLoad(storeKey, defaults);
+  const wrap=document.createElement('div');
+  const list=document.createElement('div');
+  wrap.appendChild(list);
+  const add=document.createElement('button'); add.type='button'; add.textContent='+ ADD ROW';
+  add.style.cssText='margin:8px 0 4px;padding:8px 14px;background:none;border:1px solid var(--gold, #c9a24b);border-radius:4px;color:var(--gold, #c9a24b);font-size:12px;letter-spacing:.08em;cursor:pointer;';
+  add.addEventListener('click',function(){ const o={}; columns.forEach(function(cl){ o[cl.key]=cl.def!==undefined?cl.def:''; }); rows.push(o); persist(); render(); });
+  wrap.appendChild(add);
+  function persist(){ capSave(storeKey, rows); if(onchange) onchange(rows); }
+  function render(){
+    list.innerHTML='';
+    const hd=document.createElement('div'); hd.style.cssText='display:flex;gap:6px;margin:8px 0 2px;';
+    columns.forEach(function(cl){ const s=document.createElement('span'); s.textContent=cl.label; s.style.cssText='flex:'+(cl.flex||1)+';min-width:0;font-size:10px;letter-spacing:.06em;opacity:.7;'; hd.appendChild(s); });
+    const sp=document.createElement('span'); sp.style.cssText='width:26px;flex:none;'; hd.appendChild(sp);
+    list.appendChild(hd);
+    rows.forEach(function(row,ri){
+      const r=document.createElement('div'); r.style.cssText='display:flex;gap:6px;margin:4px 0;align-items:center;';
+      columns.forEach(function(cl){
+        let el;
+        if(cl.type==='select'){
+          el=document.createElement('select');
+          (cl.options||[]).forEach(function(o){ const op=document.createElement('option'); op.value=o; op.textContent=o; el.appendChild(op); });
+          el.value=row[cl.key]||cl.options[0];
+        } else {
+          el=document.createElement('input'); el.type='text'; if(cl.type==='num') el.inputMode='decimal';
+          el.value=row[cl.key]!==undefined?row[cl.key]:''; if(cl.ph) el.placeholder=cl.ph;
+        }
+        el.style.cssText='flex:'+(cl.flex||1)+';min-width:0;padding:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:inherit;font-size:13px;';
+        el.addEventListener(cl.type==='select'?'change':'input',function(){ row[cl.key]=el.value; persist(); });
+        r.appendChild(el);
+      });
+      const del=document.createElement('button'); del.type='button'; del.textContent='\u2715';
+      del.style.cssText='width:26px;flex:none;height:30px;background:none;border:none;color:inherit;opacity:.5;cursor:pointer;font-size:14px;';
+      del.addEventListener('click',function(){ rows.splice(ri,1); persist(); render(); });
+      r.appendChild(del);
+      list.appendChild(r);
+    });
+  }
+  render();
+  wrap.__getRows=function(){ return rows; };
+  return wrap;
+}
+
+// Persistent checklist (audit / disqualifier pattern). Returns wrap with __get().
+function capChecklist(storeKey, items, onchange){
+  let state=capLoad(storeKey, items.map(function(){ return false; }));
+  if(!Array.isArray(state)||state.length!==items.length) state=items.map(function(){ return false; });
+  const wrap=document.createElement('div');
+  items.forEach(function(txt,i){
+    const row=document.createElement('label'); row.style.cssText='display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:13px;line-height:1.5;cursor:pointer;';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!state[i]; cb.style.cssText='margin-top:2px;flex:none;';
+    cb.addEventListener('change',function(){ state[i]=cb.checked; capSave(storeKey,state); if(onchange) onchange(state); });
+    const sp=document.createElement('span'); sp.textContent=txt;
+    row.appendChild(cb); row.appendChild(sp); wrap.appendChild(row);
+  });
+  wrap.__get=function(){ return state; };
+  return wrap;
+}
+
+const CAP_TOOLS = [
+  { title:"Capital Allocation System \u2014 Interactive", minTier:5, tag:"FOUNDATION",
+    desc:"The Foundation workbook, live: your true monthly outflow, the Buffer / Reserve / Parked bucket plan, and the account comparison that computes effective annual dollars per account \u2014 with WINNER and LOSES MONEY verdicts.",
+    build:function(c){
+      const ns='cs_f1_';
+      function P(k,label,def){ const f=tField(label,String(capLoad(ns+k,def)),function(){ capSave(ns+k,f.__input.value); calc(); }); c.appendChild(f); return f; }
+      capHead(c,'1 \u00b7 Monthly outflow \u2014 three real months of statements');
+      const m1=P('m1','Month 1 total spending ($)','3400');
+      const m2=P('m2','Month 2 total spending ($)','3600');
+      const m3=P('m3','Month 3 total spending ($)','3500');
+      const out1=tResultBox(); c.appendChild(out1);
+      capHead(c,'2 \u00b7 Bucket plan');
+      const tc=P('total','Total cash across all accounts ($)','22000');
+      const bm=P('bm','Buffer size (months of outflow)','1');
+      const rm=P('rm','Reserve size (months of outflow, 3\u20136)','4');
+      const out2=tResultBox(); c.appendChild(out2);
+      capHead(c,'3 \u00b7 Account comparison \u2014 current account + challengers');
+      const cb=P('cmpbal','Balance to compare on ($)','14000');
+      const rowsEl=capRows(ns+'accts',[
+        {key:'name',label:'ACCOUNT',flex:1.5,ph:'Name'},
+        {key:'apy',label:'HEADLINE %',type:'num'},
+        {key:'cap',label:'CAP $ (0=NONE)',type:'num'},
+        {key:'base',label:'BASE %',type:'num'},
+        {key:'fee',label:'FEE $/MO',type:'num'},
+        {key:'miss',label:'MISS MO/YR',type:'num'}
+      ],[
+        {name:'Current account',apy:'0.5',cap:'0',base:'0.5',fee:'0',miss:'0'},
+        {name:'Challenger A',apy:'4.5',cap:'0',base:'0.25',fee:'0',miss:'0'}
+      ],calc);
+      c.appendChild(rowsEl);
+      const out3=tResultBox(); c.appendChild(out3);
+      capSaveNote(c); tNote(c);
+      function calc(){
+        const outflow=(tNum(m1.__input.value)+tNum(m2.__input.value)+tNum(m3.__input.value))/3;
+        out1.innerHTML='<strong>True monthly outflow: '+tMoney(outflow)+'</strong><br>Computed from real statements \u2014 people guessing land 20\u201330% low.';
+        const T=tNum(tc.__input.value), buf=outflow*tNum(bm.__input.value);
+        let res=outflow*tNum(rm.__input.value), parked=T-buf-res, warn='';
+        if(parked<0){ res=Math.max(0,T-buf); parked=0; warn='<br><strong>Total cash does not fully cover buffer + reserve</strong> \u2014 the reserve is only partially funded, and nothing is Parked yet.'; }
+        out2.innerHTML='<strong>Buffer (stays in checking): '+tMoney(buf)+'</strong><br><strong>Reserve (insured high-yield savings): '+tMoney(res)+'</strong><br><strong>Parked (CDs / T-bills, 12+ months): '+tMoney(parked)+'</strong>'+warn;
+        const B=tNum(cb.__input.value), rows=rowsEl.__getRows();
+        if(B<=0||!rows.length){ out3.textContent='Enter a balance and at least one account.'; return; }
+        let best=-Infinity, results=rows.map(function(r){
+          const r1=tNum(r.apy)/100, capIn=tNum(r.cap), r0=tNum(r.base)/100, F=tNum(r.fee);
+          let m=Math.min(12,Math.max(0,Math.round(tNum(r.miss))));
+          const cap=capIn>0?Math.min(capIn,B):B;
+          const good=(cap*r1+Math.max(0,B-cap)*r0)/12, missM=(B*r0)/12;
+          const annual=(12-m)*good+m*missM-12*F;
+          if(annual>best) best=annual;
+          return {name:r.name||'(unnamed)',annual:annual};
+        });
+        let html='';
+        results.forEach(function(x){
+          let tagTxt=''; if(x.annual<0) tagTxt=' \u2014 <strong>LOSES MONEY</strong>';
+          else if(x.annual===best&&results.length>1) tagTxt=' \u2014 <strong>WINNER</strong>';
+          html+=capEsc(x.name)+': <strong>'+tMoney(x.annual)+'</strong>/yr'+tagTxt+'<br>';
+        });
+        html+='<br>Effective annual dollars on YOUR balance \u2014 the only number that decides anything. Break ties on friction and access, never basis points.';
+        out3.innerHTML=html;
+      }
+      calc();
+    } },
+  { title:"Ladder Builder & Rung Ledger \u2014 Interactive", minTier:5, tag:"FOUNDATION",
+    desc:"Three inputs generate your rung schedule with real maturity dates \u2014 then the Rung Ledger tracks every live instrument: blended rate computed live, next maturity, and a flag on any rung with auto-renewal still ON.",
+    build:function(c){
+      const ns='cs_f2_';
+      function P(k,label,def){ const f=tField(label,String(capLoad(ns+k,def)),function(){ capSave(ns+k,f.__input.value); calc(); }); c.appendChild(f); return f; }
+      capHead(c,'1 \u00b7 Ladder schedule');
+      const fT=P('total','Total Parked capital to ladder ($)','24000');
+      const fN=P('rungs','Number of rungs (2\u201312)','4');
+      const fI=P('int','Interval between rungs (months)','3');
+      const out1=tResultBox(); c.appendChild(out1);
+      capHead(c,'2 \u00b7 Rung ledger \u2014 every live instrument, one page');
+      const rowsEl=capRows(ns+'ledger',[
+        {key:'inst',label:'INSTRUMENT',flex:1.5,ph:'e.g. 12-mo CD'},
+        {key:'amt',label:'AMOUNT $',type:'num'},
+        {key:'rate',label:'RATE %',type:'num'},
+        {key:'mat',label:'MATURES',ph:'MM/DD/YYYY'},
+        {key:'renew',label:'AUTO-RENEW',type:'select',options:['OFF','ON'],def:'OFF'}
+      ],[],calc);
+      c.appendChild(rowsEl);
+      const out2=tResultBox(); c.appendChild(out2);
+      capSaveNote(c); tNote(c);
+      function calc(){
+        const T=tNum(fT.__input.value); let N=Math.round(tNum(fN.__input.value)); let I=Math.round(tNum(fI.__input.value));
+        N=Math.min(12,Math.max(2,N||4)); I=Math.max(1,I||3);
+        if(T<=0){ out1.textContent='Enter an amount to build the schedule.'; }
+        else{
+          const per=T/N, today=new Date(); let rowsHtml='';
+          for(let k=1;k<=N;k++){ const d=new Date(today); d.setMonth(d.getMonth()+k*I);
+            rowsHtml+='<tr><td style="padding:4px 10px 4px 0;">Rung '+k+'</td><td style="padding:4px 10px 4px 0;">'+tMoney(per)+'</td><td style="padding:4px 0;">'+d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</td></tr>'; }
+          out1.innerHTML='<table style="border-collapse:collapse;font-size:13px;"><tr><td style="padding:4px 10px 4px 0;opacity:.7;">RUNG</td><td style="padding:4px 10px 4px 0;opacity:.7;">AMOUNT</td><td style="padding:4px 0;opacity:.7;">MATURES</td></tr>'+rowsHtml+'</table><br>Roll rule: at each maturity, roll into a new '+(N*I)+'-month instrument unless a planned expense falls inside the next '+I+' months. Turn auto-renewal OFF the day you open each one.';
+        }
+        const rows=rowsEl.__getRows();
+        if(!rows.length){ out2.textContent='Add each instrument as you open it \u2014 the ledger is the audit.'; return; }
+        let sum=0,wsum=0,renewOn=0,next=null;
+        rows.forEach(function(r){ const a=tNum(r.amt); sum+=a; wsum+=a*tNum(r.rate);
+          if((r.renew||'OFF')==='ON') renewOn++;
+          const d=new Date(r.mat); if(!isNaN(d)&&d>=new Date(new Date().toDateString())&&(next===null||d<next)) next=d; });
+        let html='<strong>Total on the ladder: '+tMoney(sum)+'</strong><br>Blended rate: <strong>'+(sum>0?tPct(wsum/sum):'\u2014')+'</strong>';
+        if(next) html+='<br>Next maturity: <strong>'+next.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</strong> \u2014 apply the roll rule that day.';
+        if(renewOn>0) html+='<br><strong>\u26a0 '+renewOn+' rung'+(renewOn>1?'s have':' has')+' auto-renewal ON \u2014 turn it off.</strong> Auto-renewal is the single most common leak.';
+        out2.innerHTML=html;
+      }
+      calc();
+    } },
+  { title:"Income Operations Dashboard \u2014 Interactive", minTier:6, tag:"OPERATOR",
+    desc:"Every income stream on one page \u2014 expected monthly income computed live from principal and rate, blended yield across everything you own, the expected-vs-arrived gap check, and your computed review dates.",
+    build:function(c){
+      const ns='cs_o1_';
+      function P(k,label,def){ const f=tField(label,String(capLoad(ns+k,def)),function(){ capSave(ns+k,f.__input.value); calc(); }); c.appendChild(f); return f; }
+      capHead(c,'1 \u00b7 Income sources \u2014 everything that pays');
+      const rowsEl=capRows(ns+'streams',[
+        {key:'name',label:'STREAM',flex:1.6,ph:'e.g. HYSA, Rung 1, dividends'},
+        {key:'prin',label:'PRINCIPAL $',type:'num'},
+        {key:'apy',label:'RATE %',type:'num'}
+      ],[],calc);
+      c.appendChild(rowsEl);
+      const out1=tResultBox(); c.appendChild(out1);
+      capHead(c,'2 \u00b7 Income log \u2014 expected vs. arrived');
+      const fArr=P('arrived','What actually arrived this month ($)','0');
+      const out2=tResultBox(); c.appendChild(out2);
+      capHead(c,'3 \u00b7 Review cadence \u2014 next due');
+      const out3=tResultBox(); c.appendChild(out3);
+      capSaveNote(c); tNote(c);
+      function calc(){
+        const rows=rowsEl.__getRows();
+        let prin=0,inc=0,html='';
+        rows.forEach(function(r){ const p=tNum(r.prin), m=p*tNum(r.apy)/100/12; prin+=p; inc+=m;
+          html+=capEsc(r.name||'(unnamed)')+': <strong>'+tMoney(m)+'</strong>/mo<br>'; });
+        if(!rows.length){ out1.textContent='List every stream \u2014 every account, every rung, everything that pays.'; }
+        else out1.innerHTML=html+'<br><strong>Total principal: '+tMoney(prin)+'</strong><br><strong>Expected monthly income: '+tMoney(inc)+'</strong><br>Blended yield: <strong>'+(prin>0?tPct(inc*12/prin*100):'\u2014')+'</strong>';
+        const arr=tNum(fArr.__input.value), gap=arr-inc;
+        if(arr<=0){ out2.textContent='Log the month\u2019s income once a month. Five minutes. Non-negotiable.'; }
+        else out2.innerHTML='Expected: '+tMoney(inc)+' \u00b7 Arrived: '+tMoney(arr)+'<br><strong>Gap: '+(gap>=0?'+':'')+tMoney(gap)+'</strong><br>'+(Math.abs(gap)>Math.max(5,inc*0.05)?'<strong>Investigate if this gap repeats two months running</strong> \u2014 a persistent gap is a rate that quietly changed, a condition you missed, or a stream that needs re-vetting.':'Within normal noise. Log it and move on.');
+        const now=new Date();
+        const nm=new Date(now.getFullYear(),now.getMonth()+1,1);
+        const nq=new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3+3,1);
+        const na=new Date(now.getFullYear()+1,0,1);
+        function fmt(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+        out3.innerHTML='Monthly income log (5 min): <strong>'+fmt(nm)+'</strong><br>Quarterly review (20 min): <strong>'+fmt(nq)+'</strong><br>Annual full re-run (one evening): <strong>'+fmt(na)+'</strong>';
+      }
+      calc();
+    } },
+  { title:"Position Sizing & Risk Register \u2014 Interactive", minTier:6, tag:"OPERATOR",
+    desc:"Your tier caps as hard dollar ceilings, the recovery curve beside them, a live position register with automatic OVER CAP flags, and the THEME CHECK that catches one bet wearing five names.",
+    build:function(c){
+      const ns='cs_o2_';
+      function P(k,label,def){ const f=tField(label,String(capLoad(ns+k,def)),function(){ capSave(ns+k,f.__input.value); calc(); }); c.appendChild(f); return f; }
+      capHead(c,'1 \u00b7 Tier caps');
+      const fV=P('base','Total investable assets ($)','50000');
+      const fCv=P('conv','Conviction cap per position (%)','5');
+      const fSp=P('spec','Speculative cap per position (%)','2');
+      const fSl=P('sleeve','Speculative sleeve cap \u2014 whole sleeve (%)','8');
+      const out1=tResultBox(); c.appendChild(out1);
+      capHead(c,'2 \u00b7 Position register \u2014 everything outside core');
+      const rowsEl=capRows(ns+'reg',[
+        {key:'name',label:'POSITION',flex:1.4,ph:'Name'},
+        {key:'tier',label:'TIER',type:'select',options:['Conviction','Speculative'],def:'Conviction'},
+        {key:'theme',label:'THEME',flex:1.2,ph:'What drives it'},
+        {key:'val',label:'VALUE $',type:'num'}
+      ],[],calc);
+      c.appendChild(rowsEl);
+      const out2=tResultBox(); c.appendChild(out2);
+      capSaveNote(c); tNote(c);
+      function calc(){
+        const V=tNum(fV.__input.value), cv=tNum(fCv.__input.value)/100, sp=tNum(fSp.__input.value)/100, sl=tNum(fSl.__input.value)/100;
+        const convCap=V*cv, specCap=V*sp, sleeveCap=V*sl;
+        out1.innerHTML='<strong>Conviction: max '+tMoney(convCap)+' per position</strong><br><strong>Speculative: max '+tMoney(specCap)+' per position \u00b7 '+tMoney(sleeveCap)+' whole sleeve</strong><br>Recovery curve: \u221210% needs +11% \u00b7 \u221220% needs +25% \u00b7 \u221250% needs +100% \u00b7 \u221280% needs +400%. Sizing keeps every loss on the flat part.';
+        const rows=rowsEl.__getRows();
+        if(!rows.length){ out2.textContent='Register every position outside your core holdings.'; return; }
+        let html='',specTotal=0,themes={};
+        rows.forEach(function(r){
+          const v=tNum(r.val), capD=(r.tier==='Speculative')?specCap:convCap;
+          if(r.tier==='Speculative') specTotal+=v;
+          const th=(r.theme||'').trim(); if(th){ themes[th]=(themes[th]||0)+v; }
+          html+=capEsc(r.name||'(unnamed)')+' ('+capEsc(r.tier||'Conviction')+'): '+tMoney(v)+(v>capD?' \u2014 <strong>OVER CAP \u2014 TRIM '+tMoney(v-capD)+'</strong>':' \u2014 within cap')+'<br>';
+        });
+        html+='<br>Speculative sleeve total: <strong>'+tMoney(specTotal)+'</strong>'+(specTotal>sleeveCap?' \u2014 <strong>OVER SLEEVE CAP by '+tMoney(specTotal-sleeveCap)+'</strong>':' (cap '+tMoney(sleeveCap)+')');
+        let themeHtml='';
+        Object.keys(themes).forEach(function(t){ if(themes[t]>convCap) themeHtml+='<br><strong>\u26a0 THEME "'+capEsc(t)+'" totals '+tMoney(themes[t])+'</strong> \u2014 over your per-position cap. One bet, many names: treat it as a single position and trim.'; });
+        if(themeHtml) html+='<br>'+themeHtml;
+        html+='<br><br>The trim is the rule working, not conviction failing. Clear every flag this week, while it\u2019s fresh.';
+        out2.innerHTML=html;
+      }
+      calc();
+    } },
+  { title:"Capital Operating System \u2014 Interactive", minTier:7, tag:"INSTITUTIONAL",
+    desc:"Your written allocation policy, live: targets and bands per asset class, drift computed from current values, REBALANCE flags with exact dollars to move \u2014 plus the eight-line quarterly audit.",
+    build:function(c){
+      const ns='cs_i1_';
+      capHead(c,'1 \u00b7 Allocation policy \u2014 targets, bands, current values');
+      const rowsEl=capRows(ns+'policy',[
+        {key:'cls',label:'ASSET CLASS',flex:1.4,ph:'e.g. Core equity'},
+        {key:'target',label:'TARGET %',type:'num'},
+        {key:'band',label:'BAND \u00b1%',type:'num'},
+        {key:'val',label:'CURRENT $',type:'num'}
+      ],[
+        {cls:'Cash & ladder',target:'20',band:'4',val:''},
+        {cls:'Core equity',target:'65',band:'6',val:''},
+        {cls:'Conviction',target:'10',band:'5',val:''},
+        {cls:'Speculative',target:'5',band:'2',val:''}
+      ],calc);
+      c.appendChild(rowsEl);
+      const out1=tResultBox(); c.appendChild(out1);
+      capHead(c,'2 \u00b7 Quarterly audit \u2014 the whole stack, one sitting');
+      const audit=capChecklist(ns+'audit',[
+        'Account map refreshed from live balances \u2014 every institution, account, and wallet',
+        'Policy drift checked; anything flagged REBALANCE executed all the way back to target',
+        'Ladder maturities handled per the roll rule; auto-renew confirmed OFF on every rung',
+        'Income gaps from the log investigated',
+        'Position register clear of OVER CAP flags; themes re-checked',
+        'Account conditions still being met (or account re-priced at base rate)',
+        'Stale token approvals revoked',
+        'One thing that surprised you \u2014 written down in one sentence'
+      ],calc);
+      c.appendChild(audit);
+      const fSurprise=tField('The one sentence that surprised you',String(capLoad(ns+'surprise','')),function(){ capSave(ns+'surprise',fSurprise.__input.value); });
+      c.appendChild(fSurprise);
+      const out2=tResultBox(); c.appendChild(out2);
+      capSaveNote(c); tNote(c);
+      function calc(){
+        const rows=rowsEl.__getRows();
+        let tSum=0,total=0;
+        rows.forEach(function(r){ tSum+=tNum(r.target); total+=tNum(r.val); });
+        let html='Targets sum to <strong>'+tPct(tSum)+'</strong>'+(Math.round(tSum)!==100?' \u2014 <strong>policy must sum to 100%</strong>':' \u2713')+'<br>Total portfolio: <strong>'+tMoney(total)+'</strong><br><br>';
+        if(total>0){
+          rows.forEach(function(r){
+            const v=tNum(r.val), tgt=tNum(r.target), band=tNum(r.band);
+            const cur=v/total*100, drift=cur-tgt, move=(tgt/100*total)-v;
+            html+=capEsc(r.cls||'(class)')+': '+tPct(cur)+' (target '+tPct(tgt)+', band \u00b1'+tPct(band)+') \u2014 ';
+            if(Math.abs(drift)>band) html+='<strong>REBALANCE: '+(move>0?'add ':'trim ')+tMoney(Math.abs(move))+'</strong> back to target<br>';
+            else html+='within band, do nothing<br>';
+          });
+          html+='<br>Between band breaches you do nothing \u2014 that is a feature. Breach = trim or top up all the way back to target: buying low and selling high with zero forecasting.';
+        } else html+='Enter current values to compute drift.';
+        out1.innerHTML=html;
+        const done=audit.__get().filter(Boolean).length;
+        out2.innerHTML='Audit progress: <strong>'+done+' / 8</strong>'+(done===8?' \u2014 <strong>audit complete.</strong> Date it, and reset the boxes at the start of next quarter.':' \u2014 eight lines, four times a year. An audit that is not scheduled is an audit that does not happen.');
+      }
+      calc();
+    } },
+  { title:"Due-Diligence Scorecard \u2014 Interactive", minTier:7, tag:"INSTITUTIONAL",
+    desc:"The repeatable machine for anything new that asks for your money: five automatic disqualifiers, six weighted categories scored 0\u20132, a computed verdict, and the mandatory sizing gate on any PROCEED.",
+    build:function(c){
+      const ns='cs_i2_';
+      const fName=tField('Opportunity being evaluated',String(capLoad(ns+'name','')),function(){ capSave(ns+'name',fName.__input.value); calc(); });
+      c.appendChild(fName);
+      capHead(c,'1 \u00b7 Disqualifiers \u2014 any one ends it');
+      const dq=capChecklist(ns+'dq',[
+        'Guaranteed or fixed returns promised',
+        'Anonymous team with no track record',
+        'Urgency pressure \u2014 "migrate now," countdown timers',
+        'Yield far beyond what its claimed source could generate',
+        'Referral rewards as the main growth engine'
+      ],calc);
+      c.appendChild(dq);
+      capHead(c,'2 \u00b7 The six categories \u2014 score 0 (fail) / 1 (partial) / 2 (pass)');
+      const CATS=[
+        {k:'custody',w:25,label:'Custody \u2014 would the money survive the operator vanishing tonight?'},
+        {k:'yield',w:20,label:'Yield source \u2014 a plain sentence names who pays and why'},
+        {k:'audit',w:15,label:'Audit \u2014 recent, reputable, on the live contract, criticals fixed'},
+        {k:'exit',w:15,label:'Exit \u2014 tested small round trip; stress behavior bounded'},
+        {k:'admin',w:15,label:'Admin key \u2014 no single anonymous key controls the code'},
+        {k:'team',w:10,label:'Team & treasury \u2014 identifiable team; treasury in hard assets'}
+      ];
+      let scores=capLoad(ns+'scores',{});
+      CATS.forEach(function(cat){
+        const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;align-items:center;margin:8px 0;';
+        const sel=document.createElement('select');
+        ['0','1','2'].forEach(function(o){ const op=document.createElement('option'); op.value=o; op.textContent=o; sel.appendChild(op); });
+        sel.value=scores[cat.k]!==undefined?String(scores[cat.k]):'0';
+        sel.style.cssText='flex:none;width:54px;padding:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:inherit;font-size:13px;';
+        sel.addEventListener('change',function(){ scores[cat.k]=parseInt(sel.value,10); capSave(ns+'scores',scores); calc(); });
+        const sp=document.createElement('span'); sp.textContent=cat.label+' (weight '+cat.w+')'; sp.style.cssText='font-size:13px;line-height:1.5;';
+        row.appendChild(sel); row.appendChild(sp); c.appendChild(row);
+      });
+      const out=tResultBox(); c.appendChild(out);
+      capSaveNote(c);
+      const arch=document.createElement('p'); arch.style.cssText='font-size:11px;opacity:.6;margin-top:6px;';
+      arch.textContent='One live evaluation at a time here. For the archive of past evaluations \u2014 your casebook \u2014 duplicate tabs in the Excel scorecard.';
+      c.appendChild(arch); tNote(c);
+      function calc(){
+        const anyDQ=dq.__get().some(Boolean);
+        let score=0; CATS.forEach(function(cat){ score+=((scores[cat.k]||0)/2)*cat.w; });
+        const nm=fName.__input.value?('<strong>'+capEsc(fName.__input.value)+'</strong><br>'):'';
+        if(anyDQ){ out.innerHTML=nm+'<strong>VERDICT: REJECT.</strong> A disqualifier is present \u2014 the pattern is the verdict, no matter how the rest scored.'; return; }
+        let verdict;
+        if(score>=70) verdict='<strong>VERDICT: PROCEED \u2014 with the mandatory sizing gate.</strong> PROCEED never means safe; it means understood. The position enters at your speculative per-position cap or below. Diligence lowers the odds of failure; sizing is the only thing that caps the cost of it.';
+        else if(score>=50) verdict='<strong>VERDICT: CAUTION.</strong> Too many partial scores. Resolve the weak categories to a clear pass or walk away \u2014 "probably fine" is not a category.';
+        else verdict='<strong>VERDICT: REJECT on score.</strong> The weak categories are exactly where the bodies are buried.';
+        out.innerHTML=nm+'Weighted score: <strong>'+Math.round(score)+' / 100</strong><br><br>'+verdict;
+      }
+      calc();
+    } },
+];
+
+function renderCapTools(eff, grid){
+  const head=document.createElement('div'); head.style.cssText='grid-column:1/-1;margin-top:30px;';
+  head.innerHTML='<div class="lib-tag">CAPITAL SYSTEMS \u2014 INTERACTIVE TOOLKITS</div>';
+  grid.appendChild(head);
+  CAP_TOOLS.forEach(function(t,idx){
+    const unlocked=eff>=t.minTier;
+    const card=document.createElement('div');
+    card.className='library-item'+(unlocked?'':' locked');
+    card.innerHTML='<div class="lib-tag">'+(unlocked?'INCLUDED IN YOUR PLAN':'REQUIRES '+(TIER_NAMES[t.minTier]||'').toUpperCase())+'</div><h4>'+t.title+'</h4><p>'+t.desc+'</p><div class="lib-action '+(unlocked?'':'locked-action')+'">'+(unlocked?'OPEN TOOL \u2192':'\ud83d\udd12 LOCKED \u2014 SOLD SEPARATELY')+'</div>';
+    if(unlocked){ card.querySelector('.lib-action').addEventListener('click',function(){ openCapTool(idx); }); }
+    grid.appendChild(card);
+  });
+}
+
+function openCapTool(idx){
+  const t=CAP_TOOLS[idx]; if(!t||!currentUser) return;
+  const vt=document.getElementById('viewerTitle'); if(vt) vt.textContent=t.title;
+  const vl=document.getElementById('viewerLicenseEmail'); if(vl) vl.textContent=currentUser.email;
+  const c=document.getElementById('viewerContent'); if(!c) return;
+  c.innerHTML='';
+  const box=document.createElement('div');
+  try{ t.build(box); }catch(err){ console.error('Cap tool error:',err); box.textContent='This tool hit an error \u2014 refresh and try again.'; }
+  c.appendChild(box);
+  c.appendChild(buildWatermark(currentUser.email));
+  const cv=document.getElementById('contentViewer'); if(cv) cv.classList.add('show'); document.body.style.overflow='hidden';
+}
+
 // ============ INTERACTIVE TOOLS (calculators, tier-gated) ============
 function tNum(v){ const n=parseFloat(String(v).replace(/[,$%\s]/g,'')); return isNaN(n)?0:n; }
 function tMoney(n){ const neg=n<0; const a=Math.abs(n); const s='$'+a.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:(a<100?2:0)}); return neg?'-'+s:s; }
@@ -830,6 +1231,7 @@ function showDashboard(){
     grid.appendChild(card);
   });
   renderCapSystems(eff, grid);
+  renderCapTools(eff, grid);
   renderTools(eff, grid);
   const d=document.getElementById('dashboard'); if(d) d.classList.add('show'); document.body.style.overflow='hidden';
 }
@@ -870,6 +1272,7 @@ function renderPreviewLibrary(){
     grid.appendChild(card);
   });
   renderCapSystems(0, grid);
+  renderCapTools(0, grid);
   renderTools(0, grid);
   const note=document.createElement('div'); note.className='preview-overlay-note'; note.style.gridColumn='1/-1';
   note.textContent="Titles are real. The full in-depth guides are only visible to members.";
