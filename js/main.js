@@ -1582,12 +1582,12 @@ async function handleResetRequest(e){
 // ============================================================
 function buildGreeting(){
   if(!document.getElementById('guides')) return;            // home page only
-  try{ if(sessionStorage.getItem('ledgerSplashSeen')) return; }catch(err){}
   if(document.getElementById('ledgerGreeting')) return;
   // ===== THE LEDGER & CO. BRAND-VALUES ENTRANCE SPLASH =====
+  // Shows on EVERY visit; the ENTER button is the only way through.
   // Restored from the original June design: engraved outlined words with
   // gold initials spelling L.E.D.G.E.R., diamond-bulleted meanings, and the
-  // gold ENTER button. Shows once per browser session, before the home page.
+  // gold ENTER button. Shows on every visit, before the home page.
   if(!document.getElementById('ledgerSplashCSS')){
     const css=document.createElement('style'); css.id='ledgerSplashCSS';
     css.textContent=[
@@ -1635,12 +1635,10 @@ function buildGreeting(){
     +'<div class="ls-rows">'+rows+'</div>'
     +'<p class="ls-tagline">\u201cLeadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and Creating Opportunity for every investor.\u201d</p>'
     +'<button type="button" class="ls-enter" id="ledgerSplashEnter">ENTER LEDGER \u0026 CO. \u2192</button>'
-    +'<button type="button" class="ls-skip" id="ledgerSplashSkip">Skip intro</button>'
     +'</div>';
   document.body.appendChild(overlay);
   document.body.style.overflow='hidden';
   function dismissSplash(){
-    try{ sessionStorage.setItem('ledgerSplashSeen','1'); }catch(err){}
     overlay.style.opacity='0';
     setTimeout(function(){
       if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -1652,7 +1650,6 @@ function buildGreeting(){
   }
   window.__ledgerDismissSplash=dismissSplash;
   const eb=document.getElementById('ledgerSplashEnter'); if(eb) eb.addEventListener('click',dismissSplash);
-  const skb=document.getElementById('ledgerSplashSkip'); if(skb) skb.addEventListener('click',dismissSplash);
 }
 function updateGreeting(){
   const h=document.getElementById('ledgerGreetingTitle');
