@@ -1746,3 +1746,30 @@ function initPage(){
 
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initPage); }
 else{ initPage(); }
+
+// ============================================================
+// BILLING TOGGLE — FIXED VERSION (overrides the one above)
+// The original only swapped the displayed price text; the buy
+// buttons stayed pointed at ".monthly", so Paddle charged the
+// monthly price no matter what the customer selected. This
+// version also rewrites every membership button's data-price-id
+// to the selected period, so checkout charges exactly what the
+// page displays. Capital Systems buttons are untouched.
+// ============================================================
+function setBilling(period){
+  document.querySelectorAll('.billing-seg').forEach(b=>{ b.classList.toggle('active',b.dataset.billing===period); });
+  ['monthly','quarterly','annual','lifetime'].forEach(p=>{
+    document.querySelectorAll('.price-'+p).forEach(el=> el.style.display=(p===period)?'inline':'none');
+    document.querySelectorAll('.price-period-'+p).forEach(el=> el.style.display=(p===period)?'inline':'none');
+  });
+  document.querySelectorAll('.annual-note').forEach(el=> el.style.display=(period==='annual')?'block':'none');
+  document.querySelectorAll('.quarterly-note').forEach(el=> el.style.display=(period==='quarterly')?'block':'none');
+  document.querySelectorAll('.lifetime-note').forEach(el=> el.style.display=(period==='lifetime')?'block':'none');
+  const sb=document.getElementById('signupBillingInterval'); if(sb) sb.value=period;
+  const FAMILIES=['yieldMap','fullLedger','annotatedPortfolio','allAccess'];
+  document.querySelectorAll('[data-price-id]').forEach(function(btn){
+    const fam=String(btn.getAttribute('data-price-id')||'').split('.')[0];
+    if(FAMILIES.indexOf(fam)!==-1){ btn.setAttribute('data-price-id', fam+'.'+period); }
+  });
+}
+
