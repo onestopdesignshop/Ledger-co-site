@@ -1582,51 +1582,77 @@ async function handleResetRequest(e){
 // ============================================================
 function buildGreeting(){
   if(!document.getElementById('guides')) return;            // home page only
-  if(document.getElementById('ledgerGreeting')) { updateGreeting(); return; }
-  const wrap=document.createElement('div'); wrap.id='ledgerGreeting';
-  wrap.style.cssText='width:calc(100% - 32px);max-width:1160px;margin:24px auto 0;padding:26px 24px;border:1px solid var(--gold, #c9a24b);border-radius:4px;background:rgba(201,162,75,.05);';
-  const tag=document.createElement('div'); tag.className='lib-tag'; tag.textContent='LEDGER & CO.'; wrap.appendChild(tag);
-  const h=document.createElement('h4'); h.id='ledgerGreetingTitle'; h.style.cssText='margin:10px 0 8px;font-size:24px;'; wrap.appendChild(h);
-  const p=document.createElement('p'); p.id='ledgerGreetingBody'; p.style.cssText='margin:0 0 10px;font-size:14px;line-height:1.7;opacity:.9;'; wrap.appendChild(p);
-  // ---- The L.E.D.G.E.R. & C.O. brand acronym — the name, spelled out ----
-  const acr=document.createElement('div');
-  acr.style.cssText='margin:14px 0 12px;padding-top:14px;border-top:1px solid rgba(201,162,75,.35);';
-  const LETTERS=[
-    ['L','Leadership','Guiding investors with integrity.'],
-    ['E','Education','Empowering members through knowledge.'],
-    ['D','Discipline','Encouraging consistent, thoughtful investing.'],
-    ['G','Growth','Focusing on long-term financial progress.'],
-    ['E','Excellence','Maintaining high standards in research and content.'],
-    ['R','Research','Providing thorough, evidence-based analysis.'],
-    ['\u0026','\u0026 Co.',''],
-    ['C','Confidence','Helping members invest with greater understanding.'],
-    ['O','Opportunity','Equipping members to recognize potential opportunities responsibly.']
+  try{ if(sessionStorage.getItem('ledgerSplashSeen')) return; }catch(err){}
+  if(document.getElementById('ledgerGreeting')) return;
+  // ===== THE LEDGER & CO. BRAND-VALUES ENTRANCE SPLASH =====
+  // Restored from the original June design: engraved outlined words with
+  // gold initials spelling L.E.D.G.E.R., diamond-bulleted meanings, and the
+  // gold ENTER button. Shows once per browser session, before the home page.
+  if(!document.getElementById('ledgerSplashCSS')){
+    const css=document.createElement('style'); css.id='ledgerSplashCSS';
+    css.textContent=[
+      '.ledger-splash{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#05070f,#0b1120);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:56px 24px;text-align:center;opacity:1;transition:opacity .5s ease;}',
+      '.ledger-splash .ls-inner{max-width:840px;margin:0 auto;}',
+      '.ledger-splash .ls-tag{letter-spacing:.3em;font-size:11px;color:var(--gold,#c9a24b);text-transform:uppercase;}',
+      '.ledger-splash .ls-title{font-family:Georgia,\'Times New Roman\',serif;font-size:clamp(28px,5vw,46px);font-weight:400;margin:16px 0 10px;color:#e9e4d8;}',
+      '.ledger-splash .ls-title em{color:#e6c465;font-style:italic;}',
+      '.ledger-splash .ls-intro{color:#9aa5b8;font-size:15px;margin:0 0 34px;}',
+      '.ledger-splash .ls-rows{display:grid;grid-template-columns:1fr 1fr;gap:22px 34px;text-align:left;margin:0 0 26px;}',
+      '.ledger-splash .ls-w{font-family:Georgia,\'Times New Roman\',serif;font-size:clamp(24px,3.5vw,34px);line-height:1.1;color:#0b0f1a;-webkit-text-stroke:1px rgba(255,255,255,.9);paint-order:stroke fill;text-shadow:0 1px 2px rgba(0,0,0,.4);}',
+      '.ledger-splash .ls-w .ls-ini{color:var(--gold,#c9a24b);font-size:1.3em;-webkit-text-stroke:1.4px rgba(255,255,255,.5);paint-order:stroke fill;}',
+      '.ledger-splash .ls-d{font-size:11px;color:#9aa5b8;margin-top:3px;display:flex;gap:7px;}',
+      '.ledger-splash .ls-d::before{content:"\\25C6";color:var(--gold,#c9a24b);font-size:7px;line-height:1.8;flex-shrink:0;}',
+      '.ledger-splash .ls-andco{grid-column:1/-1;letter-spacing:.3em;font-size:11px;color:var(--gold,#c9a24b);text-transform:uppercase;margin-top:2px;}',
+      '.ledger-splash .ls-tagline{font-style:italic;color:#9aa5b8;font-size:13px;max-width:640px;margin:0 auto 30px;line-height:1.7;}',
+      '.ledger-splash .ls-enter{text-transform:uppercase;letter-spacing:.14em;font-size:13px;background:var(--gold,#c9a24b);color:#05070f;border:none;padding:15px 38px;border-radius:6px;cursor:pointer;font-weight:700;transition:transform .15s;}',
+      '.ledger-splash .ls-enter:hover{transform:translateY(-2px);}',
+      '.ledger-splash .ls-skip{display:block;margin:18px auto 0;font-size:12px;color:#9aa5b8;background:none;border:none;cursor:pointer;text-decoration:underline;letter-spacing:.06em;}',
+      '@media(max-width:640px){.ledger-splash .ls-rows{grid-template-columns:1fr;text-align:center;}.ledger-splash .ls-d{justify-content:center;}}'
+    ].join('\n');
+    document.head?document.head.appendChild(css):document.body.appendChild(css);
+  }
+  const overlay=document.createElement('div'); overlay.id='ledgerGreeting'; overlay.className='ledger-splash';
+  const WORDS=[
+    ['L','eadership','Integrity \u0026 long-term perspective.'],
+    ['E','ducation','Practical financial education.'],
+    ['D','iscipline','Evidence over speculation.'],
+    ['G','rowth','Sustainable, sound strategy.'],
+    ['E','xcellence','Highest standard of quality.'],
+    ['R','esearch','Facts-first analysis.'],
+    ['\u0026','CO.',''],
+    ['C','onfidence','Invest with understanding.'],
+    ['O','pportunity','Recognized responsibly.']
   ];
-  LETTERS.forEach(function(row){
-    if(row[0]==='\u0026'){
-      const dv=document.createElement('div'); dv.textContent='\u0026 CO.';
-      dv.style.cssText='margin:10px 0 4px;font-size:12px;letter-spacing:.14em;color:var(--gold, #c9a24b);';
-      acr.appendChild(dv); return;
-    }
-    const r=document.createElement('div'); r.style.cssText='display:flex;gap:12px;align-items:baseline;margin:6px 0;';
-    const l=document.createElement('span'); l.textContent=row[0];
-    l.style.cssText='flex:none;width:20px;font-size:18px;font-weight:700;color:var(--gold, #c9a24b);';
-    const t=document.createElement('span');
-    t.innerHTML='<strong>'+row[1]+'</strong> \u2014 '+row[2];
-    t.style.cssText='font-size:13px;line-height:1.6;opacity:.88;';
-    r.appendChild(l); r.appendChild(t); acr.appendChild(r);
+  let rows='';
+  WORDS.forEach(function(w){
+    if(w[0]==='\u0026'){ rows+='<div class="ls-andco">\u0026 CO.</div>'; return; }
+    rows+='<div class="ls-wr"><div class="ls-w"><span class="ls-ini">'+w[0]+'</span>'+w[1]+'</div><div class="ls-d">'+w[2]+'</div></div>';
   });
-  const tagline=document.createElement('p');
-  tagline.textContent='\u201cLeadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and Creating Opportunity for every investor.\u201d';
-  tagline.style.cssText='margin:12px 0 0;font-size:13px;font-style:italic;opacity:.8;border-left:2px solid var(--gold, #c9a24b);padding-left:12px;line-height:1.7;';
-  acr.appendChild(tagline);
-  wrap.appendChild(acr);
-  const st=document.createElement('p'); st.id='ledgerGreetingStatus'; st.style.cssText='margin:0;font-size:13px;letter-spacing:.03em;'; wrap.appendChild(st);
-  const nav=document.querySelector('nav');
-  if(nav&&nav.parentNode){ nav.parentNode.insertBefore(wrap, nav.nextSibling); }
-  else if(document.body.firstChild){ document.body.insertBefore(wrap, document.body.firstChild); }
-  else { document.body.appendChild(wrap); }
-  updateGreeting();
+  overlay.innerHTML='<div class="ls-inner">'
+    +'<div class="ls-tag">Our Foundation</div>'
+    +'<div class="ls-title">The meaning behind <em>Ledger \u0026 Co.</em></div>'
+    +'<p class="ls-intro">Eight principles that turn hard financial lessons into lasting confidence and wealth.</p>'
+    +'<div class="ls-rows">'+rows+'</div>'
+    +'<p class="ls-tagline">\u201cLeadership. Education. Discipline. Growth. Excellence. Research. Building Confidence and Creating Opportunity for every investor.\u201d</p>'
+    +'<button type="button" class="ls-enter" id="ledgerSplashEnter">ENTER LEDGER \u0026 CO. \u2192</button>'
+    +'<button type="button" class="ls-skip" id="ledgerSplashSkip">Skip intro</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  document.body.style.overflow='hidden';
+  function dismissSplash(){
+    try{ sessionStorage.setItem('ledgerSplashSeen','1'); }catch(err){}
+    overlay.style.opacity='0';
+    setTimeout(function(){
+      if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      const dash=document.getElementById('dashboard');
+      const cv=document.getElementById('contentViewer');
+      const keepLocked=(dash&&dash.classList&&dash.classList.contains('show'))||(cv&&cv.classList&&cv.classList.contains('show'));
+      document.body.style.overflow=keepLocked?'hidden':'';
+    },520);
+  }
+  window.__ledgerDismissSplash=dismissSplash;
+  const eb=document.getElementById('ledgerSplashEnter'); if(eb) eb.addEventListener('click',dismissSplash);
+  const skb=document.getElementById('ledgerSplashSkip'); if(skb) skb.addEventListener('click',dismissSplash);
 }
 function updateGreeting(){
   const h=document.getElementById('ledgerGreetingTitle');
@@ -1644,7 +1670,7 @@ function updateGreeting(){
     st.innerHTML='<strong style="color:var(--gold, #c9a24b);">YOUR PLAN: '+planLabel+'</strong> \u2014 ';
     const a=document.createElement('a'); a.href='#'; a.textContent='open your dashboard \u2192';
     a.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
-    a.addEventListener('click',function(e){ e.preventDefault(); loadSubscriptionAndShowDashboard(); });
+    a.addEventListener('click',function(e){ e.preventDefault(); if(window.__ledgerDismissSplash) window.__ledgerDismissSplash(); loadSubscriptionAndShowDashboard(); });
     st.appendChild(a);
   } else {
     h.textContent='Welcome to Ledger & Co.';
@@ -1652,11 +1678,12 @@ function updateGreeting(){
     st.innerHTML='<strong style="color:var(--gold, #c9a24b);">NEW HERE?</strong> ';
     const a1=document.createElement('a'); a1.href='#guides'; a1.textContent='See the plans';
     a1.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
+    a1.addEventListener('click',function(){ if(window.__ledgerDismissSplash) window.__ledgerDismissSplash(); });
     st.appendChild(a1);
     st.appendChild(document.createTextNode(' \u00b7 '));
     const a2=document.createElement('a'); a2.href='#'; a2.textContent='Sign in';
     a2.style.cssText='color:var(--gold, #c9a24b);text-decoration:underline;';
-    a2.addEventListener('click',function(e){ e.preventDefault(); openAuthModal('signin'); });
+    a2.addEventListener('click',function(e){ e.preventDefault(); if(window.__ledgerDismissSplash) window.__ledgerDismissSplash(); openAuthModal('signin'); });
     st.appendChild(a2);
   }
 }
