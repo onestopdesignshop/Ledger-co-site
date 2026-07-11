@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Red Flag Scorecard — Ledger &amp; Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2E1F;          /* ledger ink */
+    --paper:#F4F3EC;        /* stock */
+    --bar:#E3EDE4;          /* green-bar stripe */
+    --rule:#CBD6CC;
+    --flag:#B23A2E;         /* red flag */
+    --caution:#B07D18;
+    --clear:#1B7A3D;
+    --muted:#6B7A70;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    padding-bottom:120px;
+  }
+  .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- Masthead ---------- */
+  header{background:var(--ink);color:#fff;padding:34px 20px 30px}
+  .wrap{max-width:1080px;margin:0 auto}
+  .brand{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:#9DBFAB;margin-bottom:18px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(34px,7vw,58px);line-height:1.02;letter-spacing:-.02em;
+  }
+  .thesis{
+    margin-top:14px;max-width:620px;color:#C3D6C9;font-size:16px;
+  }
+  .howto{
+    margin-top:22px;padding-top:18px;border-top:1px solid #2A4A38;
+    font-size:13px;color:#8FAE9C;max-width:620px;
+  }
+
+  /* ---------- Layout ---------- */
+  .grid{
+    max-width:1080px;margin:0 auto;padding:0 20px;
+    display:grid;grid-template-columns:1fr 268px;gap:40px;align-items:start;
+  }
+
+  /* ---------- Questions ---------- */
+  .sheet{margin-top:34px;border-top:2px solid var(--ink)}
+  .q{
+    display:grid;grid-template-columns:34px 1fr;gap:12px;
+    padding:20px 14px;border-bottom:1px solid var(--rule);
+    position:relative;transition:background .18s;
+  }
+  .q:nth-child(odd){background:var(--bar)}
+  .q.answered{background:transparent}
+  .q.answered:nth-child(odd){background:rgba(227,237,228,.45)}
+  /* margin mark — the auditor's flag */
+  .q::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;
+    transition:background .2s;
+  }
+  .q[data-state="2"]::before{background:var(--flag)}
+  .q[data-state="1"]::before{background:var(--caution)}
+  .q[data-state="0"]::before{background:var(--clear)}
+
+  .qn{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+    padding-top:3px;font-variant-numeric:tabular-nums;
+  }
+  .qt{font-size:16px;font-weight:500;line-height:1.45}
+
+  .opts{grid-column:2;display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .opt{
+    flex:1 1 0;min-width:96px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:11px 13px;border:1.5px solid var(--rule);border-radius:8px;
+    background:#fff;color:var(--ink);cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+    transition:all .15s;
+  }
+  .opt:hover{border-color:var(--ink)}
+  .opt:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  .pts{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+    color:var(--muted);font-variant-numeric:tabular-nums;
+  }
+  /* selected states — the fill */
+  .opt[aria-pressed="true"]{color:#fff;border-color:transparent}
+  .opt[aria-pressed="true"] .pts{color:rgba(255,255,255,.75)}
+  .opt.yes[aria-pressed="true"]{background:var(--flag)}
+  .opt.unsure[aria-pressed="true"]{background:var(--caution)}
+  .opt.no[aria-pressed="true"]{background:var(--clear)}
+
+  /* ---------- Tally rail (signature) ---------- */
+  .rail{position:sticky;top:26px;margin-top:34px}
+  .rail-inner{border:2px solid var(--ink);background:#fff;padding:20px}
+  .rail-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px;
+  }
+  .score{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;
+    font-size:56px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+  }
+  .score span{font-size:20px;color:var(--muted)}
+  .meter{
+    height:10px;background:var(--bar);border:1px solid var(--rule);margin:16px 0 6px;
+    position:relative;overflow:hidden;
+  }
+  .fill{height:100%;width:0;background:var(--clear);transition:width .35s cubic-bezier(.4,0,.2,1),background .35s}
+  .meter-legend{
+    display:flex;justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);
+  }
+  .band{
+    margin-top:18px;padding:12px;border:1px solid var(--rule);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;font-weight:600;text-align:center;color:var(--muted);
+  }
+  .band.f2{background:var(--flag);color:#fff;border-color:var(--flag)}
+  .band.f1{background:var(--caution);color:#fff;border-color:var(--caution)}
+  .band.f0{background:var(--clear);color:#fff;border-color:var(--clear)}
+  .verdict{margin-top:12px;font-size:13px;line-height:1.5;color:var(--ink)}
+  .progress{
+    margin-top:16px;padding-top:12px;border-top:1px solid var(--rule);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);
+    display:flex;justify-content:space-between;
+  }
+  .reset{
+    margin-top:14px;width:100%;padding:10px;background:none;
+    border:1px solid var(--rule);border-radius:6px;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--muted);
+  }
+  .reset:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ---------- Completion panel ---------- */
+  .done{
+    margin-top:28px;border:2px solid var(--ink);background:#fff;padding:28px 24px;
+  }
+  .done-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .done-score{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:64px;line-height:1;
+    letter-spacing:-.03em;margin-top:6px;
+  }
+  .done-score span:last-child{font-size:22px;color:var(--muted)}
+  .done-band{
+    display:inline-block;margin-top:14px;padding:7px 14px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;font-weight:600;color:#fff;background:var(--muted);
+  }
+  .done-band.f2{background:var(--flag)}
+  .done-band.f1{background:var(--caution)}
+  .done-band.f0{background:var(--clear)}
+  .done-verdict{margin-top:16px;font-size:15px;line-height:1.55;max-width:520px}
+  .done-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .btn{
+    padding:13px 20px;border-radius:8px;cursor:pointer;text-decoration:none;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+    border:1.5px solid var(--ink);transition:opacity .15s;
+  }
+  .btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{opacity:.88}
+  .btn.ghost{background:none;color:var(--ink)}
+  .btn.ghost:hover{background:var(--bar)}
+  .done-note{margin-top:18px;font-size:12px;color:var(--muted);max-width:480px}
+
+  /* ---------- Patterns + footer ---------- */
+  .patterns{max-width:1080px;margin:56px auto 0;padding:0 20px}
+  .patterns h2{
+    font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin-bottom:6px;
+  }
+  .patterns p.sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .p{background:var(--paper);padding:20px}
+  .p .k{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--flag);
+    letter-spacing:.1em;margin-bottom:8px;
+  }
+  .p h3{font-size:15px;font-weight:600;margin-bottom:6px}
+  .p p{font-size:13px;color:var(--muted);line-height:1.5}
+
+  footer{
+    max-width:1080px;margin:48px auto 0;padding:24px 20px 40px;
+    border-top:1px solid var(--rule);
+    font-size:11px;color:var(--muted);line-height:1.6;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media(max-width:860px){
+    .grid{grid-template-columns:1fr;gap:0}
+    .rail{
+      position:fixed;bottom:0;left:0;right:0;margin:0;z-index:20;
+    }
+    .rail-inner{
+      border:none;border-top:2px solid var(--ink);padding:12px 16px;
+      display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
+      box-shadow:0 -6px 22px rgba(11,46,31,.13);
+    }
+    .rail-label,.verdict,.meter-legend,.reset{display:none}
+    .score{font-size:34px}
+    .meter{margin:8px 0 0}
+    .band{margin-top:0;padding:8px;font-size:10px}
+    .progress{margin:6px 0 0;padding:0;border:none}
+    body{padding-bottom:110px}
+    .opt{min-width:0;padding:11px 10px;font-size:13px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Ledger &amp; Co.</div>
+    <h1>The Red Flag<br>Scorecard</h1>
+    <p class="thesis">Twelve questions that surface the warning signs behind most bad investments — before your money is committed and hard to get back.</p>
+    <p class="howto">Tap an answer for each question. Your risk score updates as you go. Nothing is saved or sent anywhere.</p>
+  </div>
+</header>
+
+<div class="grid">
+  <main>
+    <div class="sheet" id="sheet"></div>
+
+    <div class="done" id="done" hidden>
+      <div class="done-label">Your result</div>
+      <div class="done-score num"><span id="doneScore">0</span><span>/100</span></div>
+      <div class="done-band" id="doneBand">—</div>
+      <p class="done-verdict" id="doneVerdict"></p>
+      <div class="done-actions">
+        <button class="btn primary" id="copyBtn">Copy my result</button>
+        <a class="btn ghost" href="https://onestopdesignshop.github.io/Ledger-co-site/">Explore Ledger &amp; Co.</a>
+      </div>
+      <p class="done-note">Free to use, free to share. If it was useful, say what you scored — that is the whole point of putting it out there.</p>
+    </div>
+  </main>
+
+  <aside class="rail">
+    <div class="rail-inner">
+      <div>
+        <div class="rail-label">Risk score</div>
+        <div class="score num"><span id="scoreVal">—</span><span>/100</span></div>
+      </div>
+      <div>
+        <div class="meter"><div class="fill" id="fill"></div></div>
+        <div class="meter-legend"><span>0</span><span>50</span><span>100</span></div>
+        <div class="band" id="band">Awaiting answers</div>
+        <p class="verdict" id="verdict">Answer all twelve to see your verdict.</p>
+        <div class="progress">
+          <span id="prog">0 of 12 answered</span>
+          <span id="flags">0 flags</span>
+        </div>
+        <button class="reset" id="reset">Start over</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<section class="patterns">
+  <h2>The four patterns behind most bad deals</h2>
+  <p class="sub">Every question above traces back to one of these.</p>
+  <div class="pgrid">
+    <div class="p"><div class="k">01</div><h3>Return claims</h3><p>“Guaranteed,” “risk-free,” or unusually high and steady returns. Real markets do not behave that way.</p></div>
+    <div class="p"><div class="k">02</div><h3>Transparency</h3><p>You cannot get straight, written answers about how it makes money, who runs it, or where your funds go.</p></div>
+    <div class="p"><div class="k">03</div><h3>Exit &amp; liquidity</h3><p>Getting your money back out is slow, penalised, or blocked. Trouble exiting is the classic late warning.</p></div>
+    <div class="p"><div class="k">04</div><h3>Source credibility</h3><p>Unregistered sellers, unsolicited outreach, urgency, secrecy, or structures that ask you to recruit others.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Educational tool — not financial, investment, or legal advice.</strong> This scorecard is not a guarantee or prediction of any outcome and cannot tell you whether a specific investment is safe or fraudulent. It helps you think through common warning signs. Always do your own research and consider consulting a licensed professional.</p>
+  <p style="margin-top:10px">© Ledger &amp; Co. · Leadership · Education · Discipline · Growth · Excellence · Research</p>
+</footer>
+
+<script>
+const QUESTIONS = [
+  "Are you promised — or do you expect — high returns with little or no risk?",
+  "Is there pressure to act fast, or a deadline that discourages thinking it over?",
+  "Is it hard to get clear, written answers about how the investment actually makes money?",
+  "Would it be difficult, slow, or costly to get your money back out if you needed it?",
+  "Is the person or company unregistered, unlicensed, or impossible to verify with a regulator?",
+  "Did this arrive through an unsolicited message, DM, or a contact you cannot fully verify?",
+  "Are the fees, terms, or ownership structure confusing or deliberately vague?",
+  "Does the pitch lean on hype, status, or fear of missing out more than on numbers and documents?",
+  "Are returns described as unusually smooth or consistent, whatever the market does?",
+  "Are you encouraged to recruit others, or to bring in friends and family?",
+  "Have you been discouraged from involving an outside advisor, lawyer, or your own research?",
+  "Does any part of it require secrecy, or feel like something you would hesitate to explain out loud?"
+];
+
+const OPTS = [
+  {key:"yes",    label:"Yes",      pts:2},
+  {key:"unsure", label:"Not sure", pts:1},
+  {key:"no",     label:"No",       pts:0}
+];
+
+const answers = new Array(QUESTIONS.length).fill(null);
+const sheet = document.getElementById("sheet");
+
+QUESTIONS.forEach((text, i) => {
+  const row = document.createElement("div");
+  row.className = "q";
+  row.id = "q" + i;
+
+  const n = document.createElement("div");
+  n.className = "qn";
+  n.textContent = String(i + 1).padStart(2, "0");
+
+  const t = document.createElement("div");
+  t.className = "qt";
+  t.textContent = text;
+
+  const opts = document.createElement("div");
+  opts.className = "opts";
+  opts.setAttribute("role", "group");
+  opts.setAttribute("aria-label", "Question " + (i + 1));
+
+  OPTS.forEach(o => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt " + o.key;
+    b.setAttribute("aria-pressed", "false");
+    b.dataset.pts = o.pts;
+
+    const lab = document.createElement("span");
+    lab.textContent = o.label;
+    const pts = document.createElement("span");
+    pts.className = "pts";
+    pts.textContent = o.pts === 0 ? "0" : "+" + o.pts;
+
+    b.append(lab, pts);
+    b.addEventListener("click", () => select(i, o.pts, b, opts, row));
+    opts.appendChild(b);
+  });
+
+  row.append(n, t, opts);
+  sheet.appendChild(row);
+});
+
+function select(i, pts, btn, group, row){
+  group.querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", "false"));
+  btn.setAttribute("aria-pressed", "true");
+  answers[i] = pts;
+  row.classList.add("answered");
+  row.dataset.state = pts;
+  update();
+}
+
+function update(){
+  const done = answers.filter(a => a !== null).length;
+  const points = answers.reduce((s, a) => s + (a || 0), 0);
+  const max = QUESTIONS.length * 2;
+  const score = Math.round(points / max * 100);
+  const flags = answers.filter(a => a === 2).length;
+
+  document.getElementById("prog").textContent = done + " of " + QUESTIONS.length + " answered";
+  document.getElementById("flags").textContent = flags + (flags === 1 ? " flag" : " flags");
+
+  const fill = document.getElementById("fill");
+  fill.style.width = score + "%";
+
+  const scoreVal = document.getElementById("scoreVal");
+  const band = document.getElementById("band");
+  const verdict = document.getElementById("verdict");
+
+  // Live score always visible; verdict withheld until complete.
+  scoreVal.textContent = done ? score : "—";
+
+  let color = "var(--clear)", cls = "f0";
+  if (score >= 50)      { color = "var(--flag)";    cls = "f2"; }
+  else if (score >= 25) { color = "var(--caution)"; cls = "f1"; }
+  fill.style.background = color;
+
+  const panel = document.getElementById("done");
+
+  band.className = "band";
+  if (done < QUESTIONS.length){
+    band.textContent = (QUESTIONS.length - done) + " left to answer";
+    verdict.textContent = "Answer all twelve to see your verdict.";
+    panel.hidden = true;
+    return;
+  }
+
+  const COPY = {
+    2: ["High risk", "This pattern matches how most investment losses and frauds actually look. Strong reasons to stop and investigate — or walk away — before any money moves."],
+    1: ["Caution", "Real warning signs are present. Get every claim in writing and verify the seller independently before you proceed."],
+    0: ["Lower risk", "Few flags raised. No investment is risk-free — keep verifying the source, the fees, and how you would exit."]
+  };
+  const level = score >= 50 ? 2 : score >= 25 ? 1 : 0;
+  const [title, text] = COPY[level];
+
+  band.classList.add(cls);
+  band.textContent = title;
+  verdict.textContent = text;
+
+  // Completion panel
+  panel.hidden = false;
+  document.getElementById("doneScore").textContent = score;
+  const dband = document.getElementById("doneBand");
+  dband.className = "done-band " + cls;
+  dband.textContent = title;
+  document.getElementById("doneVerdict").textContent = text;
+
+  panel.dataset.share =
+    "I scored " + score + "/100 on the Red Flag Scorecard — " + title.toUpperCase() +
+    " (" + flags + " red " + (flags === 1 ? "flag" : "flags") + " out of 12).\n\n" +
+    "It is a free 12-question check for warning signs before you put money into anything: " +
+    "onestopdesignshop.github.io/Ledger-co-site/red-flag-scorecard.html";
+}
+
+document.getElementById("copyBtn").addEventListener("click", async (e) => {
+  const share = document.getElementById("done").dataset.share || "";
+  const btn = e.currentTarget;
+  try {
+    await navigator.clipboard.writeText(share);
+    btn.textContent = "Copied";
+  } catch {
+    // Clipboard blocked (older browsers / insecure context) — select-to-copy fallback
+    const ta = document.createElement("textarea");
+    ta.value = share;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); btn.textContent = "Copied"; }
+    catch { btn.textContent = "Press and hold to copy"; }
+    document.body.removeChild(ta);
+  }
+  setTimeout(() => { btn.textContent = "Copy my result"; }, 2200);
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  answers.fill(null);
+  document.querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", "false"));
+  document.querySelectorAll(".q").forEach(q => { q.classList.remove("answered"); delete q.dataset.state; });
+  update();
+  window.scrollTo({top: 0, behavior: "smooth"});
+});
+
+update();
+</script>
+</body>
+</html>
