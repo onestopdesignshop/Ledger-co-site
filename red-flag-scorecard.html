@@ -88,6 +88,14 @@
   .rep-tally .l{font-size:11px;color:var(--muted);margin-top:5px}
   .rep-tally .t2 .n{color:var(--flag)} .rep-tally .t1 .n{color:var(--caution)} .rep-tally .t0 .n{color:var(--clear)}
 
+  /* Track toggle inside the report */
+  .track{display:flex;gap:8px;margin-top:22px}
+  .tbtn{flex:1;padding:12px;border:1.5px solid var(--rule);border-radius:8px;background:#fff;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--muted);text-align:center;transition:all .15s}
+  .tbtn small{display:block;font-weight:400;font-size:11px;margin-top:2px;opacity:.8}
+  .tbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tbtn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
   .rep-sec{margin-top:34px}
   .rep-sec h2{font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin-bottom:4px}
   .rep-sec .sub{color:var(--muted);font-size:14px;margin-bottom:20px}
@@ -219,6 +227,9 @@ const Q = [
 {
  t:"Are you promised — or do you expect — high returns with little or no risk?",
  c:"Return claims",
+ bm:"Someone is telling you that you can earn a lot without much chance of losing.",
+ bw:"This is the single most common feature of investment fraud. If a genuinely safe way to earn 20% existed, institutions with billions would pour in until the return collapsed. It doesn't sit around waiting to be offered to you in a DM.",
+ ba:"Compare it to the boring baseline. Look up the yield on a 3-month US Treasury bill — that's about as close to risk-free as money gets. Any promise of far more than that <em>with no risk</em> is where the lie lives.",
  why:"Return above the risk-free rate is compensation for taking risk. It isn't a reward for being clever or early. If a genuinely safe way to earn 20% existed, institutions with billions would pour in until the return collapsed — it would not be sitting around waiting to be offered to you.",
  good:"\"Expected return is X. Here is the range of outcomes. Here is our worst year and what caused it.\"",
  bad:"\"Guaranteed.\" \"Risk-free.\" \"We've never had a down month.\" \"Fixed 2% monthly.\"",
@@ -228,6 +239,9 @@ const Q = [
 {
  t:"Is there pressure to act fast, or a deadline that discourages thinking it over?",
  c:"Source credibility",
+ bm:"There's a deadline, a closing window, or a sense that hesitating will cost you.",
+ bw:"Urgency is a sales tactic, not a feature of good investments. It exists to stop you thinking, comparing, and asking someone else.",
+ ba:"Say: <em>\"I need a week.\"</em> Then watch. A legitimate seller says fine. A fraudster escalates, guilt-trips, or suddenly finds a reason it must be tonight.",
  why:"Urgency exists to stop you thinking, comparing, and asking someone else. Fraud depends entirely on you not doing those three things. It also serves the seller structurally — money must arrive before you research.",
  good:"\"The round closes on the 30th, here's the term sheet. Take your time — if you miss this one there will be others.\"",
  bad:"\"Spots are filling up.\" \"The price goes up at midnight.\" \"I can only hold this for you today.\"",
@@ -237,6 +251,9 @@ const Q = [
 {
  t:"Is it hard to get clear, written answers about how the investment actually makes money?",
  c:"Transparency",
+ bm:"When you ask where the returns come from, you get a vague, impressive-sounding non-answer.",
+ bw:"Every legitimate investment has an engine. A company sells things. A bond pays interest. A property collects rent. If nobody will name the engine, you have to consider that there may not be one.",
+ ba:"Ask: <em>\"Where does the money actually come from?\"</em> Then ask again about whatever part you didn't follow. Keep going until you understand it or run out of patience. Running out of patience is an answer.",
  why:"Every legitimate investment has an engine — a company sells things, a bond pays interest, a property collects rent. A Ponzi scheme has no engine at all, which is precisely why its strategy can never survive a follow-up question. The absence of an explanation is not a communication problem. It is the structure.",
  good:"A specific, documented strategy, audited statements, an independent custodian, and an administrator you can call.",
  bad:"\"Proprietary algorithm.\" \"Secret arbitrage.\" \"You wouldn't understand the strategy.\"",
@@ -246,6 +263,9 @@ const Q = [
 {
  t:"Would it be difficult, slow, or costly to get your money back out if you needed it?",
  c:"Exit &amp; liquidity",
+ bm:"It's unclear, slow, expensive, or awkward to withdraw your money.",
+ bw:"You can be completely right about an investment and still be wiped out by not reaching your money when you need it. A blocked exit is often the first visible sign something has already gone wrong.",
+ ba:"Before you put a dollar in, ask exactly how you take it out: what steps, how many days, what it costs. Get the answer in writing.",
  why:"You can be completely right about an investment and still be wiped out by not reaching your money when you need it. And a blocked exit is very often the first visible sign that something has already gone wrong inside.",
  good:"Written redemption terms, a lock-up you agreed to in advance, and a clear fee schedule.",
  bad:"Withdrawals \"processing\" indefinitely. Access \"temporarily paused.\" A fee required <em>before</em> your funds can be released.",
@@ -255,6 +275,9 @@ const Q = [
 {
  t:"Is the person or company unregistered, unlicensed, or impossible to verify with a regulator?",
  c:"Source credibility",
+ bm:"You can't confirm that this person or firm is who and what they claim to be.",
+ bw:"Registration is no guarantee of honesty — but its absence is an enormous signal, and checking is free. Most people never do it, which is exactly what the pitch is counting on.",
+ ba:"Two minutes: search the person and the firm at <strong>brokercheck.finra.org</strong> and <strong>adviserinfo.sec.gov</strong>. Both are also searchable from <strong>investor.gov</strong>.",
  why:"Registration creates a public record — disciplinary history, complaints, regulatory actions. It's no guarantee of honesty, but its absence is an enormous signal, and checking is free. Almost nobody checks, which is exactly what the pitch counts on.",
  good:"A clean, findable record for both the individual and the firm, matching the details you were given.",
  bad:"No record. Undisclosed disciplinary history. A firm name that's <em>almost</em> a famous one.",
@@ -264,6 +287,9 @@ const Q = [
 {
  t:"Did this arrive through an unsolicited message, DM, or a contact you cannot fully verify?",
  c:"Source credibility",
+ bm:"A stranger contacted you — a DM, a text to the wrong number, a dating app, a social post.",
+ bw:"Legitimate investments do not need to cold-message strangers. If they found you, ask why you.",
+ ba:"Never move money onto a platform someone introduced you to. Never install an investment app from a link rather than the official app store.",
  why:"This is the shape of relationship investment fraud: contact via a wrong-number text or dating app, weeks of genuine-feeling rapport, the investment mentioned almost reluctantly, a slick platform showing real-looking gains, then the exit closes. The most dangerous version never feels like a scam — because by the time money comes up, the relationship feels real.",
  good:"You found them. You initiated. They're verifiable independently.",
  bad:"They found you. The platform came from them. Nobody you know has heard of it.",
@@ -273,6 +299,9 @@ const Q = [
 {
  t:"Are the fees, terms, or ownership structure confusing or deliberately vague?",
  c:"Transparency",
+ bm:"You can't say, as a single number, what this actually costs you per year.",
+ bw:"Fees come out whether you win or lose, every year, forever. Complexity is very often where cost hides.",
+ ba:"Ask one question: <em>\"What is my total annual cost, as one percentage, including everything?\"</em> If they can't or won't produce a single number, you have your answer.",
  why:"Fees come out whether you win or lose, every year, forever. And they compound against you. $100,000 over 30 years at 7%: with a 0.1% fee you end with about $740,000. With a 2% fee, about $432,000. That 2% didn't cost you 2% — it cost roughly 40% of your outcome, quietly, in years where nothing appeared to go wrong.",
  good:"A single all-in number, in writing, that matches the documents.",
  bad:"\"It depends.\" \"Our fees are competitive.\" Fees that only surface in a document you're asked to sign quickly.",
@@ -282,6 +311,9 @@ const Q = [
 {
  t:"Does the pitch lean on hype, status, or fear of missing out more than on numbers and documents?",
  c:"Source credibility",
+ bm:"The pitch is a feeling — excitement, belonging, the fear of being left behind — rather than a document.",
+ bw:"Excitement is not evidence. Neither is the fact that people you like are already in. Emotion is what gets used <em>instead</em> of proof when proof isn't available.",
+ ba:"Ask for the paperwork. Note carefully whether what comes back is a document — or another story.",
  why:"This is the engine of affinity fraud — schemes that spread through a church, a profession, a community, an online tribe. Trust in the group substitutes for verification of the investment. Early participants are genuinely enthusiastic because they haven't lost anything <em>yet</em>, which makes the social proof completely sincere. That's exactly what makes it work.",
  good:"An offering document, audited numbers, and a seller comfortable with you taking your time.",
  bad:"Screenshots of gains. Lifestyle photos. \"Do you trust me?\" A room full of people who all found it through each other.",
@@ -291,6 +323,9 @@ const Q = [
 {
  t:"Are returns described as unusually smooth or consistent, whatever the market does?",
  c:"Return claims",
+ bm:"The chart goes up in a suspiciously straight line. Few losses, no bad months.",
+ bw:"Real investments move around — that's what taking risk looks like from the inside. A line that never dips isn't a sign of skill. It's a sign something isn't being reported honestly.",
+ ba:"Ask for month-by-month results, including the worst ones. Every genuine strategy has bad months. A manager who can't produce any is telling you something.",
  why:"Implausible smoothness has three usual explanations and none is good. The numbers are fabricated. Or the assets are illiquid and marked at cost, so losses haven't been recognised. Or the strategy is quietly selling tail risk — small steady premiums, rare catastrophic downside. That third one looks like genius for years and then removes the principal in a week.",
  good:"Volatility that fits the asset class, disclosed drawdowns, independent pricing and audit.",
  bad:"A near-straight line. \"We've never had a down quarter.\" Returns steady <em>regardless</em> of what markets did.",
@@ -300,6 +335,9 @@ const Q = [
 {
  t:"Are you encouraged to recruit others, or to bring in friends and family?",
  c:"Exit &amp; liquidity",
+ bm:"You earn more — or earn at all — by bringing in other people.",
+ bw:"If your return depends on recruitment, it isn't an investment. It's a pyramid, and pyramids are guaranteed to collapse. Not likely to. Guaranteed.",
+ ba:"Ask one question: <em>\"Do I earn anything from recruiting people?\"</em> If the answer is yes, you're done here.",
  why:"Recruitment-driven structures collapse for arithmetic reasons, not bad luck. If each person recruits six, six levels down needs 46,656 people. Ten levels needs over 60 million. The maths runs out of human beings long before it runs out of enthusiasm — which means most participants must lose money by design, not by mismanagement.",
  good:"Revenue comes from real customers who are not participants.",
  bad:"Your income depends on downline. You must buy inventory. \"It's not a pyramid, it's a network.\"",
@@ -309,6 +347,9 @@ const Q = [
 {
  t:"Have you been discouraged from involving an outside advisor, lawyer, or your own research?",
  c:"Source credibility",
+ bm:"Involving your accountant, your lawyer, or a sceptical friend is treated as an obstacle.",
+ bw:"Anyone who doesn't want you to check with someone else has just told you something important about what checking would reveal.",
+ ba:"Say: <em>\"I'm running this past my accountant first.\"</em> The reaction to that sentence is worth more than anything else they've told you.",
  why:"Isolation is a deliberate control tactic, and it's usually the last one deployed before money moves. Anyone who doesn't want you to check with someone else has just told you something important about what checking would reveal.",
  good:"\"Of course — send it to your advisor. Here's everything they'll need.\"",
  bad:"\"Advisors don't get this.\" \"They'll just be jealous.\" \"Keep it between us.\"",
@@ -318,6 +359,9 @@ const Q = [
 {
  t:"Does any part of it require secrecy, or feel like something you would hesitate to explain out loud?",
  c:"Transparency",
+ bm:"You're asked to keep it quiet — or you notice you'd rather not explain it out loud.",
+ bw:"That hesitation is your own risk assessment leaking out before your conscious mind has caught up. It is worth listening to.",
+ ba:"Explain the whole thing, out loud, to one person whose judgement you trust. Notice which parts you find yourself softening.",
  why:"Secrecy serves the seller and nobody else. It prevents verification, prevents comparison, and delays detection — buying the scheme time it couldn't otherwise buy. And that hesitation you feel is your own risk assessment leaking out before your conscious mind has caught up.",
  good:"You can describe the entire thing, plainly, to anyone, and it holds up.",
  bad:"\"Don't tell anyone.\" \"This is only for a few people.\" \"Don't mention it to your wife until it's done.\"",
@@ -445,23 +489,33 @@ function update(){
   report.hidden = false;
 }
 
+let track = "b"; // "b" = start here (beginner), "a" = go deeper
+
 function item(i, lvl){
   const q = Q[i];
   const n = String(i+1).padStart(2,"0");
   const tag = lvl === 2 ? "Flag raised" : "Unresolved";
   let s = '<div class="item f' + lvl + '">' +
     '<div class="item-h"><span class="item-n num">' + n + '</span><h3>' + q.t + '</h3></div>' +
-    '<span class="tag f' + lvl + '">' + tag + ' · ' + q.c + '</span>' +
-    '<div class="blk"><h4>Why this matters</h4><p>' + q.why + '</p></div>';
+    '<span class="tag f' + lvl + '">' + tag + ' · ' + q.c + '</span>';
 
-  if (lvl === 2){
-    s += '<div class="gb">' +
-      '<div class="g"><span class="lbl">Good answer sounds like</span>' + q.good + '</div>' +
-      '<div class="b"><span class="lbl">Bad answer sounds like</span>' + q.bad + '</div>' +
-      '</div>' +
-      '<div class="doit"><strong>Do this</strong>' + q.act + '</div>';
+  if (track === "b"){
+    // Beginner: plain language, one thing to do.
+    s += '<div class="blk"><h4>What it means</h4><p>' + q.bm + '</p></div>' +
+         '<div class="blk"><h4>Why it matters</h4><p>' + q.bw + '</p></div>' +
+         '<div class="doit"><strong>Do this</strong>' + q.ba + '</div>';
   } else {
-    s += '<div class="doit"><strong>How to find out</strong>' + q.unsure + '</div>';
+    // Go deeper: the mechanism, good vs bad answers, and the specific action.
+    s += '<div class="blk"><h4>Why this matters</h4><p>' + q.why + '</p></div>';
+    if (lvl === 2){
+      s += '<div class="gb">' +
+        '<div class="g"><span class="lbl">Good answer sounds like</span>' + q.good + '</div>' +
+        '<div class="b"><span class="lbl">Bad answer sounds like</span>' + q.bad + '</div>' +
+        '</div>' +
+        '<div class="doit"><strong>Do this</strong>' + q.act + '</div>';
+    } else {
+      s += '<div class="doit"><strong>How to find out</strong>' + q.unsure + '</div>';
+    }
   }
   return s + '</div>';
 }
@@ -478,6 +532,10 @@ function buildReport(score, level, title, text, flags, unsure, clear){
       '<div class="t2"><div class="n num">' + flags + '</div><div class="l">flags raised</div></div>' +
       '<div class="t1"><div class="n num">' + unsure + '</div><div class="l">unresolved</div></div>' +
       '<div class="t0"><div class="n num">' + clear + '</div><div class="l">clear</div></div>' +
+    '</div>' +
+    '<div class="track">' +
+      '<button class="tbtn" id="tb" type="button" aria-pressed="' + (track === "b") + '">Start here<small>Plain English</small></button>' +
+      '<button class="tbtn" id="ta" type="button" aria-pressed="' + (track === "a") + '">Go deeper<small>Mechanics &amp; verification</small></button>' +
     '</div></div>';
 
   html += '<div class="next f' + level + '"><div class="next-h">Do this next</div><div class="next-b"><ul>' +
@@ -525,6 +583,17 @@ function buildReport(score, level, title, text, flags, unsure, clear){
     "onestopdesignshop.github.io/Ledger-co-site/red-flag-scorecard.html";
 
   document.getElementById("copyBtn").addEventListener("click", copyResult);
+
+  document.getElementById("tb").addEventListener("click", function(){ setTrack("b"); });
+  document.getElementById("ta").addEventListener("click", function(){ setTrack("a"); });
+}
+
+function setTrack(t){
+  if (track === t) return;
+  track = t;
+  const y = window.scrollY;   // hold the reader's place instead of jumping to the top
+  update();
+  window.scrollTo({ top: y });
 }
 
 async function copyResult(e){
