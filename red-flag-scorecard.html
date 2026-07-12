@@ -14,6 +14,7 @@
     --flag:#B23A2E; --caution:#B07D18; --clear:#1B7A3D; --muted:#6B7A70;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
   html{-webkit-text-size-adjust:100%}
   body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.5;padding-bottom:120px}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
@@ -95,6 +96,39 @@
   .tbtn small{display:block;font-weight:400;font-size:11px;margin-top:2px;opacity:.8}
   .tbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .tbtn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+  /* ===== Top view switch ===== */
+  .viewswitch{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--rule);padding:12px 20px}
+  .vs-inner{max-width:1080px;margin:0 auto;display:flex;gap:8px}
+  .vbtn{flex:1;padding:12px;border:1.5px solid var(--rule);border-radius:8px;background:#fff;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--muted);text-align:center;transition:all .15s}
+  .vbtn small{display:block;font-weight:400;font-size:11px;margin-top:2px;opacity:.8}
+  .vbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .vbtn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+  /* ===== Learn ===== */
+  .lwrap{max-width:820px;margin:0 auto;padding:0 20px}
+  .learnwrap section{padding:40px 0}
+  .learnwrap h2{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:6px;letter-spacing:-.01em}
+  .learnwrap .lede{color:var(--muted);font-size:15px;margin-bottom:22px}
+  .primer{background:var(--bar);border-left:3px solid var(--clear);padding:24px}
+  .primer h3{font-size:16px;font-weight:600;margin:18px 0 6px}
+  .primer h3:first-child{margin-top:0}
+  .primer p{font-size:15px;color:#33443B;line-height:1.6}
+  .lsign{border-top:1px solid var(--rule);padding:24px 0}
+  .lsign-h{display:flex;gap:13px;align-items:baseline}
+  .lsign-n{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--flag)}
+  .lsign h3{font-family:'Fraunces',serif;font-size:20px;font-weight:600;line-height:1.28;letter-spacing:-.01em}
+  .lcat{display:inline-block;margin:8px 0 0 25px;padding:3px 8px;border:1px solid var(--rule);
+    font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .lblk{margin-top:15px;padding-left:25px}
+  .lblk h4{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--clear);margin-bottom:4px}
+  .lblk h4.w{color:var(--flag)}
+  .lblk p{font-size:15px;color:#2A3B33;line-height:1.6}
+  .learn-cta{background:var(--ink);color:#fff;margin:24px 0 48px;padding:34px 26px}
+  .learn-cta h2{color:#fff;margin-bottom:8px}
+  .learn-cta p{color:#C3D6C9;font-size:15px;max-width:520px;margin-bottom:20px}
+  .learn-cta .btn{background:#fff;color:var(--ink);border-color:#fff}
 
   .rep-sec{margin-top:34px}
   .rep-sec h2{font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin-bottom:4px}
@@ -179,7 +213,49 @@
   </div>
 </header>
 
-<div class="grid">
+<div class="viewswitch">
+  <div class="vs-inner">
+    <button class="vbtn" id="vLearn" type="button" aria-pressed="true">Start here<small>Learn the twelve signs</small></button>
+    <button class="vbtn" id="vTest" type="button" aria-pressed="false">Take the test<small>Score your situation</small></button>
+  </div>
+</div>
+
+<!-- ============ LEARN ============ -->
+<div class="learnwrap" id="learn">
+  <div class="lwrap">
+    <section>
+      <h2>Five things to know first</h2>
+      <p class="lede">If you read nothing else, read this. Everything below rests on it.</p>
+      <div class="primer">
+        <h3>1. Risk and return are joined at the hip.</h3>
+        <p>Higher potential return always means a higher chance of loss. Always. Anyone offering high returns with low or no risk is either lying to you or doesn't understand their own product. There is no third option.</p>
+        <h3>2. Fees are quiet and enormous.</h3>
+        <p>A fee sounds small as a percentage and lands hard over time. It comes out whether you gain or lose, every single year, and it compounds against you.</p>
+        <h3>3. Being able to get your money out is part of the investment.</h3>
+        <p>You can be completely right about something and still be ruined by not being able to access your money when you need it. Check the exit before you check the upside.</p>
+        <h3>4. You can verify almost anyone for free, in two minutes.</h3>
+        <p>In the US, brokers are searchable at <strong>brokercheck.finra.org</strong>, investment advisers at <strong>adviserinfo.sec.gov</strong>, and both at <strong>investor.gov</strong>. Almost nobody checks. Checking puts you ahead of almost everybody.</p>
+        <h3>5. "I don't understand it" is a complete reason to say no.</h3>
+        <p>You are never obligated to invest in something you can't explain. Confusion is not a personal failing to push through — very often it is the product working as designed.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>The twelve warning signs</h2>
+      <p class="lede">What each one means, why it matters, and the one thing to actually do.</p>
+      <div id="learnList"></div>
+    </section>
+
+    <div class="learn-cta">
+      <h2>Now score your situation</h2>
+      <p>Twelve questions, about a minute. You'll get a breakdown of every flag you raise. Free — no email, no signup, nothing saved.</p>
+      <button class="btn primary" id="goTest" type="button">Take the test →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TEST ============ -->
+<div class="grid" id="test" hidden>
   <main>
     <div class="sheet" id="sheet"></div>
     <div class="report" id="report" hidden></div>
@@ -489,7 +565,7 @@ function update(){
   report.hidden = false;
 }
 
-let track = "b"; // "b" = start here (beginner), "a" = go deeper
+let track = "a"; // report always shows full depth — the beginner version lives in the Learn view
 
 function item(i, lvl){
   const q = Q[i];
@@ -497,28 +573,51 @@ function item(i, lvl){
   const tag = lvl === 2 ? "Flag raised" : "Unresolved";
   let s = '<div class="item f' + lvl + '">' +
     '<div class="item-h"><span class="item-n num">' + n + '</span><h3>' + q.t + '</h3></div>' +
-    '<span class="tag f' + lvl + '">' + tag + ' · ' + q.c + '</span>';
+    '<span class="tag f' + lvl + '">' + tag + ' · ' + q.c + '</span>' +
+    '<div class="blk"><h4>Why this matters</h4><p>' + q.why + '</p></div>';
 
-  if (track === "b"){
-    // Beginner: plain language, one thing to do.
-    s += '<div class="blk"><h4>What it means</h4><p>' + q.bm + '</p></div>' +
-         '<div class="blk"><h4>Why it matters</h4><p>' + q.bw + '</p></div>' +
-         '<div class="doit"><strong>Do this</strong>' + q.ba + '</div>';
+  if (lvl === 2){
+    s += '<div class="gb">' +
+      '<div class="g"><span class="lbl">Good answer sounds like</span>' + q.good + '</div>' +
+      '<div class="b"><span class="lbl">Bad answer sounds like</span>' + q.bad + '</div>' +
+      '</div>' +
+      '<div class="doit"><strong>Do this</strong>' + q.act + '</div>';
   } else {
-    // Go deeper: the mechanism, good vs bad answers, and the specific action.
-    s += '<div class="blk"><h4>Why this matters</h4><p>' + q.why + '</p></div>';
-    if (lvl === 2){
-      s += '<div class="gb">' +
-        '<div class="g"><span class="lbl">Good answer sounds like</span>' + q.good + '</div>' +
-        '<div class="b"><span class="lbl">Bad answer sounds like</span>' + q.bad + '</div>' +
-        '</div>' +
-        '<div class="doit"><strong>Do this</strong>' + q.act + '</div>';
-    } else {
-      s += '<div class="doit"><strong>How to find out</strong>' + q.unsure + '</div>';
-    }
+    s += '<div class="doit"><strong>How to find out</strong>' + q.unsure + '</div>';
   }
   return s + '</div>';
 }
+
+/* ---------- Learn view ---------- */
+document.getElementById("learnList").innerHTML = Q.map(function(q, i){
+  return '<div class="lsign">' +
+    '<div class="lsign-h"><span class="lsign-n num">' + String(i+1).padStart(2,"0") + '</span>' +
+    '<h3>' + q.t + '</h3></div>' +
+    '<span class="lcat">' + q.c + '</span>' +
+    '<div class="lblk"><h4>What it means</h4><p>' + q.bm + '</p></div>' +
+    '<div class="lblk"><h4 class="w">Why it matters</h4><p>' + q.bw + '</p></div>' +
+    '<div class="lblk"><h4>Do this</h4><p>' + q.ba + '</p></div>' +
+    '</div>';
+}).join('');
+
+/* ---------- View switching ---------- */
+const learnEl = document.getElementById("learn");
+const testEl  = document.getElementById("test");
+const vLearn  = document.getElementById("vLearn");
+const vTest   = document.getElementById("vTest");
+
+function setView(v){
+  const learning = (v === "learn");
+  learnEl.hidden = !learning;
+  testEl.hidden  = learning;
+  vLearn.setAttribute("aria-pressed", learning);
+  vTest.setAttribute("aria-pressed", !learning);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+vLearn.addEventListener("click", function(){ setView("learn"); });
+vTest.addEventListener("click", function(){ setView("test"); });
+document.getElementById("goTest").addEventListener("click", function(){ setView("test"); });
 
 function buildReport(score, level, title, text, flags, unsure, clear){
   const r = document.getElementById("report");
@@ -532,10 +631,6 @@ function buildReport(score, level, title, text, flags, unsure, clear){
       '<div class="t2"><div class="n num">' + flags + '</div><div class="l">flags raised</div></div>' +
       '<div class="t1"><div class="n num">' + unsure + '</div><div class="l">unresolved</div></div>' +
       '<div class="t0"><div class="n num">' + clear + '</div><div class="l">clear</div></div>' +
-    '</div>' +
-    '<div class="track">' +
-      '<button class="tbtn" id="tb" type="button" aria-pressed="' + (track === "b") + '">Start here<small>Plain English</small></button>' +
-      '<button class="tbtn" id="ta" type="button" aria-pressed="' + (track === "a") + '">Go deeper<small>Mechanics &amp; verification</small></button>' +
     '</div></div>';
 
   html += '<div class="next f' + level + '"><div class="next-h">Do this next</div><div class="next-b"><ul>' +
@@ -583,17 +678,6 @@ function buildReport(score, level, title, text, flags, unsure, clear){
     "onestopdesignshop.github.io/Ledger-co-site/red-flag-scorecard.html";
 
   document.getElementById("copyBtn").addEventListener("click", copyResult);
-
-  document.getElementById("tb").addEventListener("click", function(){ setTrack("b"); });
-  document.getElementById("ta").addEventListener("click", function(){ setTrack("a"); });
-}
-
-function setTrack(t){
-  if (track === t) return;
-  track = t;
-  const y = window.scrollY;   // hold the reader's place instead of jumping to the top
-  update();
-  window.scrollTo({ top: y });
 }
 
 async function copyResult(e){
