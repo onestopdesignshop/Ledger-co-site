@@ -183,6 +183,12 @@
   .p h3{font-size:15px;font-weight:600;margin-bottom:6px}
   .p p{font-size:13px;color:var(--muted);line-height:1.5}
 
+  .sitecta{background:var(--ink);color:#fff;margin-top:56px;padding:36px 20px}
+  .sitecta .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .sitecta h2{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:#fff;margin-bottom:6px}
+  .sitecta p{color:#C3D6C9;font-size:15px;max-width:480px}
+  .sitecta .btn{background:#fff;color:var(--ink);border-color:#fff;white-space:nowrap}
+
   footer{max-width:1080px;margin:48px auto 0;padding:24px 20px 40px;border-top:1px solid var(--rule);
     font-size:11px;color:var(--muted);line-height:1.6}
 
@@ -292,6 +298,16 @@
     <div class="p"><div class="k">04</div><h3>Source credibility</h3><p>Unregistered sellers, unsolicited outreach, urgency, secrecy, or structures that ask you to recruit others.</p></div>
   </div>
 </section>
+
+<div class="sitecta">
+  <div class="wrap">
+    <div>
+      <h2>Built by Ledger &amp; Co.</h2>
+      <p>Financial education for people who'd rather run a process than a guess. Guides, calculators, and systems for every level.</p>
+    </div>
+    <a class="btn primary" href="https://onestopdesignshop.github.io/Ledger-co-site/">Explore Ledger &amp; Co. →</a>
+  </div>
+</div>
 
 <footer>
   <p><strong>Educational tool — not financial, investment, or legal advice.</strong> This scorecard is not a guarantee or prediction of any outcome and cannot tell you whether a specific investment is safe or fraudulent. It helps you think through common warning signs. Regulatory resources named are US-based; other countries have equivalents. Always do your own research and consider consulting a licensed professional.</p>
@@ -666,6 +682,7 @@ function buildReport(score, level, title, text, flags, unsure, clear){
   html += '<div class="actions">' +
     '<button class="btn primary" id="copyBtn" type="button">Copy my result</button>' +
     '<a class="btn ghost" href="https://onestopdesignshop.github.io/Ledger-co-site/red-flag-guide.html">Read the full Field Guide</a>' +
+    '<a class="btn ghost" href="https://onestopdesignshop.github.io/Ledger-co-site/">Explore Ledger &amp; Co.</a>' +
     '</div>' +
     '<p class="note">Free to use, free to share. Nothing you entered was saved or sent anywhere.</p>';
 
