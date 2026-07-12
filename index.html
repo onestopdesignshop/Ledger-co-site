@@ -1127,3 +1127,101 @@
 
 </body>
 </html>
+<!-- ============ RED FLAG SCORECARD (free tool — self-injecting) ============ -->
+<script>
+(function(){
+  var URL_SCORECARD = 'red-flag-scorecard.html';
+  var URL_GUIDE     = 'red-flag-guide.html';
+
+  /* 1. Nav link — placed first, so the free thing leads. */
+  function injectNav(){
+    var navLinks = document.getElementById('navLinks');
+    if(!navLinks || document.getElementById('redflagNavLink')) return;
+    var a = document.createElement('a');
+    a.id = 'redflagNavLink';
+    a.href = '#redflag';
+    a.textContent = 'Free Tool';
+    navLinks.insertBefore(a, navLinks.firstChild);
+  }
+
+  /* 2. Homepage section — injected above pricing, so a cold visitor is
+        given something before they're asked for $19.99. */
+  function injectSection(){
+    var guides = document.getElementById('guides');
+    if(!guides || document.getElementById('redflag')) return;
+
+    var s = document.createElement('section');
+    s.id = 'redflag';
+    s.className = 'border-top';
+    s.innerHTML = ''
+      + '<div class="wrap">'
+      +   '<div class="section-head reveal">'
+      +     '<div class="eyebrow"><span class="tick"></span>FREE — NO SIGNUP, NO EMAIL</div>'
+      +     '<h2>The Red Flag Scorecard.</h2>'
+      +     '<p>Twelve questions that surface the warning signs behind most bad investments — before your money is committed and hard to get back. Learn the twelve signs in plain English, then score your own situation and get a breakdown of every flag you raise.</p>'
+      +     '<p style="margin-top:14px; font-size:13.5px; color:var(--slate);">Built the same way as everything else here: sourced, honest about risk, and it tells you what to actually <em style="color:var(--parchment); font-style:normal;">do</em> — not just what to worry about.</p>'
+      +   '</div>'
+      +   '<div class="web3-grid reveal">'
+      +     '<div class="web3-card">'
+      +       '<div class="flag">Learn first</div>'
+      +       '<h4>The twelve warning signs</h4>'
+      +       '<p>Each one explained plainly: what it means, why it matters, and the single thing to do about it. No jargon, nothing assumed.</p>'
+      +     '</div>'
+      +     '<div class="web3-card">'
+      +       '<div class="flag">Then score it</div>'
+      +       '<h4>Your situation, 0–100</h4>'
+      +       '<p>Tap through twelve questions. The risk score updates as you go, with a plain-language verdict at the end.</p>'
+      +     '</div>'
+      +     '<div class="web3-card">'
+      +       '<div class="flag">Then act</div>'
+      +       '<h4>A personalised breakdown</h4>'
+      +       '<p>Every flag you raised, expanded — the mechanism behind it, what a good and a bad answer sound like, and the exact next step.</p>'
+      +     '</div>'
+      +     '<div class="web3-card">'
+      +       '<div class="flag">Nothing kept</div>'
+      +       '<h4>Genuinely free</h4>'
+      +       '<p>No account, no email, nothing saved or sent anywhere. Use it, share it, ignore us entirely if you want.</p>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="upgrade-nudge reveal">'
+      +     '<p><strong>Start here if you\'re new.</strong> It costs nothing and takes about a minute. If it\'s useful, the paid guides go considerably deeper — but this stands on its own.</p>'
+      +     '<a href="' + URL_SCORECARD + '" class="btn-primary">OPEN THE SCORECARD →</a>'
+      +   '</div>'
+      + '</div>';
+
+    guides.parentNode.insertBefore(s, guides);
+  }
+
+  /* 3. Footer links — under Resources, so it's reachable from any page depth. */
+  function injectFooter(){
+    var cols = document.querySelectorAll('footer .footer-col');
+    for(var i = 0; i < cols.length; i++){
+      var h = cols[i].querySelector('h5');
+      if(h && h.textContent.trim() === 'Resources'){
+        if(cols[i].querySelector('a[href="' + URL_SCORECARD + '"]')) return;
+        var a1 = document.createElement('a');
+        a1.href = URL_SCORECARD;
+        a1.textContent = 'Red Flag Scorecard — free';
+        var a2 = document.createElement('a');
+        a2.href = URL_GUIDE;
+        a2.textContent = 'The Red Flag Field Guide';
+        cols[i].insertBefore(a2, cols[i].children[1] || null);
+        cols[i].insertBefore(a1, cols[i].children[1] || null);
+        return;
+      }
+    }
+  }
+
+  function init(){
+    injectNav();
+    injectSection();
+    injectFooter();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
