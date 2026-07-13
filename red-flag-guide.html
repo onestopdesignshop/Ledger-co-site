@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Red Flag Field Guide — Ledger &amp; Co.</title>
+<meta name="description" content="A plain-English guide to the twelve warning signs behind most bad investments. Beginner and advanced tracks. Free.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2E1F; --paper:#F4F3EC; --bar:#E3EDE4; --rule:#CBD6CC;
+    --flag:#B23A2E; --caution:#B07D18; --clear:#1B7A3D; --muted:#6B7A70;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.6}
+  .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px}
+
+  header{background:var(--ink);color:#fff;padding:38px 0 32px}
+  .brand{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#9DBFAB;margin-bottom:16px}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(32px,6.5vw,52px);line-height:1.03;letter-spacing:-.02em}
+  .thesis{margin-top:14px;color:#C3D6C9;font-size:16px;max-width:600px}
+
+  /* Track switch */
+  .track{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--rule);padding:12px 0}
+  .switch{display:flex;gap:8px;max-width:820px;margin:0 auto;padding:0 20px}
+  .tbtn{
+    flex:1;padding:12px;border:1.5px solid var(--rule);border-radius:8px;background:#fff;
+    cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--muted);
+    transition:all .15s;text-align:center;
+  }
+  .tbtn small{display:block;font-weight:400;font-size:11px;margin-top:2px;opacity:.8}
+  .tbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tbtn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+  section{padding:44px 0}
+  h2{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:8px;letter-spacing:-.01em}
+  .lede{color:var(--muted);font-size:15px;margin-bottom:24px}
+
+  /* Primer */
+  .primer{background:var(--bar);border-left:3px solid var(--clear);padding:24px;margin-bottom:8px}
+  .primer h3{font-size:16px;margin:18px 0 6px}
+  .primer h3:first-of-type{margin-top:12px}
+  .primer p{font-size:15px;color:#33443B}
+
+  /* Signs */
+  .sign{border-top:1px solid var(--rule);padding:26px 0}
+  .sign-head{display:flex;gap:14px;align-items:baseline}
+  .sign-n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--flag);font-weight:600}
+  .sign h3{font-family:'Fraunces',serif;font-size:21px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+  .cat{
+    display:inline-block;margin-top:8px;margin-left:26px;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);border:1px solid var(--rule);padding:3px 8px;
+  }
+  .blk{margin-top:16px;padding-left:26px}
+  .blk h4{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--clear);margin-bottom:5px;
+  }
+  .blk h4.warn{color:var(--flag)}
+  .blk p{font-size:15px;color:#2A3B33}
+  .blk ul{margin:6px 0 0 18px;font-size:15px;color:#2A3B33}
+  .blk li{margin-bottom:5px}
+  .eg{
+    margin-top:14px;margin-left:26px;padding:14px 16px;background:#fff;border:1px solid var(--rule);
+    font-size:14px;color:#33443B;
+  }
+  .eg strong{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+  .gb{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:14px;margin-left:26px}
+  .gb div{background:#fff;padding:13px 15px;font-size:14px}
+  .gb .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:5px}
+  .gb .g .lbl{color:var(--clear)} .gb .b .lbl{color:var(--flag)}
+  @media(max-width:640px){.gb{grid-template-columns:1fr}}
+
+  /* Score actions */
+  .act{border:1px solid var(--rule);background:#fff;margin-bottom:12px}
+  .act-h{padding:12px 18px;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+  .act.lo .act-h{background:var(--clear)}
+  .act.md .act-h{background:var(--caution)}
+  .act.hi .act-h{background:var(--flag)}
+  .act-b{padding:16px 18px;font-size:15px}
+  .act-b ul{margin:8px 0 0 18px}
+  .act-b li{margin-bottom:6px}
+
+  .cta{background:var(--ink);color:#fff;padding:34px 0;margin-top:40px}
+  .cta h2{color:#fff;margin-bottom:8px}
+  .cta p{color:#C3D6C9;font-size:15px;max-width:540px}
+  .btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .btn{padding:13px 20px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;display:inline-block}
+  .btn.p{background:#fff;color:var(--ink)}
+  .btn.s{border:1.5px solid #4A6B58;color:#fff}
+
+  footer{padding:26px 0 44px;font-size:11px;color:var(--muted);line-height:1.6}
+  a{color:var(--clear)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Ledger &amp; Co. · Field Guide</div>
+    <h1>The Twelve<br>Red Flags</h1>
+    <p class="thesis">Most bad investments announce themselves before they go wrong. This is what they say, why it matters, and exactly how to check — free, and in plain English.</p>
+  </div>
+</header>
+
+<div class="track">
+  <div class="switch">
+    <button class="tbtn" id="tb" aria-pressed="true">Start here<small>New to this</small></button>
+    <button class="tbtn" id="ta" aria-pressed="false">Go deeper<small>Mechanics &amp; verification</small></button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- BEGINNER PRIMER -->
+  <section id="primer">
+    <h2>Five things to know first</h2>
+    <p class="lede">If you read nothing else, read this. Everything below rests on it.</p>
+    <div class="primer">
+      <h3>1. Risk and return are joined at the hip.</h3>
+      <p>Higher potential return always means a higher chance of loss. Always. Anyone offering high returns with low or no risk is either lying to you or doesn't understand their own product. There is no third option.</p>
+
+      <h3>2. Fees are quiet and enormous.</h3>
+      <p>A fee sounds small as a percentage and lands hard over time. It comes out whether you gain or lose, every single year, and it compounds against you.</p>
+
+      <h3>3. Being able to get your money out is part of the investment.</h3>
+      <p>You can be completely right about something and still be ruined by not being able to access your money when you need it. Check the exit before you check the upside.</p>
+
+      <h3>4. You can verify almost anyone for free, in two minutes.</h3>
+      <p>In the US, brokers are searchable at <strong>brokercheck.finra.org</strong>, investment advisers at <strong>adviserinfo.sec.gov</strong>, and both at <strong>investor.gov</strong>. Company filings are public at <strong>sec.gov/edgar</strong>. Almost nobody checks. Checking puts you ahead of almost everybody.</p>
+
+      <h3>5. "I don't understand it" is a complete reason to say no.</h3>
+      <p>You are never obligated to invest in something you can't explain. Confusion is not a personal failing to push through — very often it is the product working as designed.</p>
+    </div>
+  </section>
+
+  <!-- THE TWELVE -->
+  <section>
+    <h2>The twelve warning signs</h2>
+    <p class="lede" id="lede">Plain English. What it means, why it matters, and the one thing to actually do.</p>
+    <div id="signs"></div>
+  </section>
+
+  <!-- WHAT TO DO -->
+  <section>
+    <h2>What to do with your result</h2>
+    <p class="lede">A score is only useful if it changes what you do next.</p>
+
+    <div class="act lo">
+      <div class="act-h">0–24 · Lower risk</div>
+      <div class="act-b">
+        Few flags. That is not the same as "safe" — it means nothing obvious is wrong.
+        <ul>
+          <li>Still verify the seller at investor.gov before money moves.</li>
+          <li>Get the total annual cost, as one number, in writing.</li>
+          <li>Write down, in one sentence, how this makes money. If you can't, stop.</li>
+          <li>Decide in advance what would make you exit — and how you'd do it.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="act md">
+      <div class="act-h">25–49 · Caution</div>
+      <div class="act-b">
+        Real warning signs are present. This is the point where most people talk themselves into it anyway.
+        <ul>
+          <li>Do not send money while you are still unsure. There is no deadline worth this.</li>
+          <li>Put every claim they made in an email and ask them to confirm it in writing. Watch what happens.</li>
+          <li>Take it to one independent person who is not paid by the seller.</li>
+          <li>Identify which specific flags fired and get each one answered — not explained away.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="act hi">
+      <div class="act-h">50–100 · High risk</div>
+      <div class="act-b">
+        This pattern matches how most investment fraud and blowups actually look from the inside.
+        <ul>
+          <li>Stop sending money. Immediately, and including any fee "required to release" funds — that request is itself near-conclusive.</li>
+          <li>Do not tell the seller you are investigating. Fraudsters accelerate when discovered.</li>
+          <li>Save everything: messages, screenshots, names, wallet addresses, bank details.</li>
+          <li>Report it. In the US: <strong>sec.gov/tcr</strong>, <strong>reportfraud.ftc.gov</strong>, and <strong>ic3.gov</strong> for anything online. Your state securities regulator too.</li>
+          <li>If you have already sent money, contact your bank now. Speed matters enormously.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="cta">
+  <div class="wrap">
+    <h2>Score your situation</h2>
+    <p>Twelve questions, about a minute, free. No email, no signup, nothing saved.</p>
+    <div class="btns">
+      <a class="btn p" href="https://onestopdesignshop.github.io/Ledger-co-site/red-flag-scorecard.html">Open the Scorecard</a>
+      <a class="btn s" href="https://onestopdesignshop.github.io/Ledger-co-site/">Ledger &amp; Co.</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <p><strong>Educational only — not financial, investment, or legal advice.</strong> Nothing here is a recommendation, a guarantee, or a prediction, and no tool can tell you whether a specific investment is safe or fraudulent. Examples describe publicly reported cases for illustration. Regulatory resources named are US-based; other countries have equivalents. Always do your own research and consider a licensed professional.</p>
+    <p style="margin-top:10px">© Ledger &amp; Co. · Leadership · Education · Discipline · Growth · Excellence · Research</p>
+  </footer>
+</div>
+
+<script>
+const SIGNS = [
+{
+  t:"High returns with little or no risk",
+  c:"Return claims",
+  b:{
+    m:"Someone is telling you that you can earn a lot without much chance of losing.",
+    w:"This is the single most common feature of investment fraud. If a genuinely safe way to earn 20% existed, institutions with billions would pour in until the return collapsed. It doesn't sit around waiting for you to be offered it in a DM.",
+    d:"Compare it to the boring baseline. Look up the current yield on a 3-month US Treasury bill — that's about as close to risk-free as money gets. Any promise of far more than that <em>with no risk</em> is where the lie lives."
+  },
+  a:{
+    m:"Return above the risk-free rate is compensation for bearing risk — a risk premium. It is not a reward for cleverness, access, or being early. US stocks have returned roughly 10% a year on average over the long run, and have also fallen by half more than once. A product claiming steady 2% monthly (about 27% a year) with no down periods isn't an unusually good investment. It's a claim that markets don't price risk, which is another way of saying it isn't real.",
+    v:["Ask: <em>what specific risk am I being paid to take?</em> If nobody can name it, there is no strategy.","Ask for the worst month, the worst year, and the maximum drawdown. Every real strategy has them.","Ask what happens in a market crash. A real manager has a rehearsed, specific answer."],
+    g:"Expected return is X. Here is the range of outcomes. Here is our worst historical year and what caused it.",
+    bd:"\"Guaranteed.\" \"Risk-free.\" \"We've never had a down month.\" \"Fixed 2% monthly.\"",
+    e:"Bernie Madoff reported steady gains with almost no losing months for years. That impossible smoothness — not any single bad trade — was what analyst Harry Markopolos flagged to the SEC years before the fund collapsed."
+  }
+},
+{
+  t:"Pressure to act fast",
+  c:"Source credibility",
+  b:{
+    m:"There's a deadline, a closing window, or a sense that hesitating will cost you.",
+    w:"Urgency is a sales tactic, not a feature of good investments. It exists to stop you thinking, comparing, and asking someone else. Fraud depends entirely on you not doing those three things.",
+    d:"Say: <em>\"I need a week.\"</em> Then watch. A legitimate seller says fine. A fraudster escalates, guilt-trips, or suddenly finds a reason it must be tonight."
+  },
+  a:{
+    m:"Time pressure exploits loss aversion — the fear of missing out reliably overrides careful evaluation. It also serves the fraudster structurally: money must arrive before you research, and often before the scheme's existing obligations come due.",
+    v:["Ask for the deadline in writing, with the reason for it.","Legitimate closes do exist — a funding round really does close. But they are documented, and the seller is genuinely fine if you pass.","Test it. Passing on a real opportunity costs you one opportunity. Rushing into a fraud costs you the principal."],
+    g:"\"The round closes on the 30th, here's the term sheet. Take your time — if you miss this one there will be others.\"",
+    bd:"\"Spots are filling up.\" \"The price goes up at midnight.\" \"I can only hold this for you today.\"",
+    e:"Urgency plus secrecy is a particularly dangerous pair. If you are being rushed <em>and</em> asked not to discuss it, treat that as a single, very loud flag."
+  }
+},
+{
+  t:"No clear answer on how it actually makes money",
+  c:"Transparency",
+  b:{
+    m:"When you ask where the returns come from, you get a vague, impressive-sounding non-answer.",
+    w:"Every legitimate investment has an engine. A company sells things. A bond pays interest. A property collects rent. If nobody will name the engine, you have to consider that there may not be one.",
+    d:"Ask: <em>\"Where does the money actually come from?\"</em> Then ask again about whatever part you didn't follow. Keep going until you either understand it or run out of patience. Running out of patience is an answer."
+  },
+  a:{
+    m:"A Ponzi scheme pays existing investors with new investors' money. There is no return engine at all — which is precisely why the strategy can never be explained in a way that survives a follow-up question. The absence of an explainable mechanism is not a communication problem. It is the defining structural feature.",
+    v:["Ask for the strategy in writing.","Ask for audited financial statements — then verify the auditor exists, is real, and is independent. A giant fund with a tiny unknown auditor is a serious structural warning.","Ask who holds the assets. An independent custodian and third-party administrator make outright fabrication much harder.","Ask who prices the assets. If the manager marks their own book, the returns are an opinion."],
+    g:"A specific, documented strategy, audited statements, an independent custodian, and a named administrator you can call.",
+    bd:"\"Proprietary algorithm.\" \"Secret arbitrage.\" \"You wouldn't understand the strategy.\" \"We can't disclose that.\"",
+    e:"Many collapsed crypto \"yield\" programs promised fixed high APY and never disclosed the source of it. The mechanism turned out to be new deposits. When redemptions spiked, withdrawals froze — in that order, every time."
+  }
+},
+{
+  t:"Getting your money back out is hard",
+  c:"Exit & liquidity",
+  b:{
+    m:"It's unclear, slow, expensive, or awkward to withdraw your money.",
+    w:"You can be completely right about an investment and still be wiped out by not reaching your money when you need it. And a blocked exit is very often the first visible sign that something has already gone wrong inside.",
+    d:"Before you put a dollar in, ask exactly how you take it out: what steps, how many days, what it costs. Get the answer in writing."
+  },
+  a:{
+    m:"This is liquidity risk. Lock-ups, gates, redemption windows, and surrender charges all restrict exit. Some are entirely legitimate and clearly disclosed — private equity and real estate are illiquid by nature. What is never legitimate is a restriction that is informal, undisclosed, or that appears only once you try to leave.",
+    v:["Read the redemption terms in the offering documents — not the pitch deck.","Ask what happens if many investors redeem at once. A real fund has a documented answer.","Watch for restrictions that appear <em>after</em> you request a withdrawal. That sequence is the tell."],
+    g:"Written redemption terms, a disclosed lock-up you agreed to in advance, and a clear fee schedule.",
+    bd:"Withdrawals \"processing\" indefinitely. Access \"temporarily paused.\" A fee, tax, or deposit required <em>before</em> your funds can be released.",
+    e:"Being asked to pay money in order to receive your own money is close to conclusive evidence of fraud. No legitimate institution requires you to send funds to withdraw funds. If you're at this stage, stop — that request is the scheme, not a hurdle before the payout."
+  }
+},
+{
+  t:"The seller is unregistered or can't be verified",
+  c:"Source credibility",
+  b:{
+    m:"You can't confirm that this person or firm is who and what they claim to be.",
+    w:"Registration is no guarantee of honesty — but its absence is an enormous signal, and checking is free. Most people never do it, which is exactly what the pitch is counting on.",
+    d:"Two minutes: search the person and the firm at <strong>brokercheck.finra.org</strong> and <strong>adviserinfo.sec.gov</strong>. Both are also searchable from <strong>investor.gov</strong>."
+  },
+  a:{
+    m:"Registration creates a public record: disciplinary history, employment history, customer complaints, regulatory actions. Fraudsters either avoid the system entirely, or impersonate a real registered firm — which is why verifying the <em>name</em> is not enough.",
+    v:["Look up the individual <strong>and</strong> the firm. Both.","Find the firm's phone and address independently and call that number — never the contact details they gave you.","Check for lookalike names and near-miss domains. Impersonating a legitimate firm is one of the most common tactics there is.","For any company claiming to be SEC-reporting, check <strong>sec.gov/edgar</strong>. No filings is decisive.","If they claim an exemption from registration, ask which one, in writing, and verify it. Some exemptions are real (private offerings). Vagueness is not."],
+    g:"A clean, findable record for both individual and firm, matching the details you were given.",
+    bd:"No record. A record with disciplinary history they didn't mention. A firm name that's <em>almost</em> a famous one.",
+    e:"Prior disciplinary history is one of the most useful predictors available to you, and it is sitting there, free, in a public database that takes two minutes to search."
+  }
+},
+{
+  t:"It arrived unsolicited",
+  c:"Source credibility",
+  b:{
+    m:"A stranger contacted you — a DM, a text to the wrong number, a dating app, a social post.",
+    w:"Legitimate investments do not need to cold-message strangers. If they found you, ask why you.",
+    d:"Never move money onto a platform that someone introduced you to. Never install an investment app from a link rather than the official app store."
+  },
+  a:{
+    m:"This is the shape of relationship investment fraud (often called \"pig butchering\"): initial contact via a wrong-number text, dating app, or social media; weeks or months of genuine-feeling rapport; the investment introduced casually, almost reluctantly; a slick platform showing real-looking gains; encouragement to deposit more; small early withdrawals honoured to build trust — and then the exit closes.",
+    v:["Reverse-image-search their photos.","Insist on a live, unscripted video call. Evasion is diagnostic.","Check whether the platform exists anywhere outside the link they sent you.","Treat an app installed outside the official App Store or Play Store as disqualifying.","A small successful early withdrawal is a <em>tactic</em>, not evidence. It is designed to make you deposit more."],
+    g:"You found them. You initiated. They're verifiable independently.",
+    bd:"They found you. The platform came from them. Nobody you know has heard of it.",
+    e:"The most dangerous version does not feel like a scam at all — because by the time money is mentioned, the relationship feels real. The relationship is the product."
+  }
+},
+{
+  t:"Fees, terms, or ownership are confusing",
+  c:"Transparency",
+  b:{
+    m:"You can't say, as a single number, what this actually costs you per year.",
+    w:"Fees come out whether you win or lose, every year, forever. Complexity is very often where cost hides.",
+    d:"Ask one question: <em>\"What is my total annual cost, as one percentage, including everything?\"</em> If they can't or won't produce a single number, you have your answer."
+  },
+  a:{
+    m:"Costs stack: expense ratios, load fees, platform fees, performance fees, spreads, surrender charges. Each sounds trivial. Together they compound against you for the entire life of the investment.",
+    v:["The maths, plainly: $100,000 invested for 30 years at 7% before fees.","At a 0.1% annual fee, you end with roughly <strong>$740,000</strong>.","At a 2% annual fee, you end with roughly <strong>$432,000</strong>.","The 2% fee did not cost you 2%. It cost you about <strong>40% of your final outcome</strong> — over $300,000 — and it did that quietly, in the background, in a year where nothing seemed to go wrong.","For any fund, the total expense ratio is stated in the prospectus. Read it. If no prospectus exists, ask why not."],
+    g:"A single all-in number, in writing, that matches the documents.",
+    bd:"\"It depends.\" \"Our fees are competitive.\" Fees that only appear in a document you're asked to sign quickly.",
+    e:"Fees are the one variable here you can control with certainty. You cannot control returns. You can absolutely control what you pay to chase them."
+  }
+},
+{
+  t:"Hype, status, or FOMO instead of documents",
+  c:"Source credibility",
+  b:{
+    m:"The pitch is a feeling — excitement, belonging, the fear of being left behind — rather than a document.",
+    w:"Excitement is not evidence. Neither is the fact that people you like are already in. Emotion is what gets used <em>instead</em> of proof when proof isn't available.",
+    d:"Ask for the paperwork. Note carefully whether what comes back is a document — or another story."
+  },
+  a:{
+    m:"This is the engine of affinity fraud: schemes that spread through an existing community — a church, a profession, an ethnic group, a military unit, an online tribe. Trust in the group substitutes for verification of the investment. And because early participants are genuinely enthusiastic (they haven't lost anything <em>yet</em>), the social proof is completely sincere. That is exactly what makes it so effective.",
+    v:["Separate the pitch from the paper. Insist on reading the actual offering document.","\"Everyone in my group is in\" is not diligence. It usually means nobody in the group did any.","A testimonial tells you about someone's experience so far. It tells you nothing about the mechanism, and a Ponzi scheme produces glowing testimonials right up until the day it doesn't."],
+    g:"An offering document, audited numbers, and a seller who is comfortable with you taking your time.",
+    bd:"Screenshots of gains. Lifestyle photos. \"Do you trust me?\" A room full of people who all found it through each other.",
+    e:"The people recruiting you into affinity fraud are usually victims themselves. Their sincerity is real. It is also worthless as evidence."
+  }
+},
+{
+  t:"Returns are unusually smooth",
+  c:"Return claims",
+  b:{
+    m:"The chart goes up in a suspiciously straight line. Few losses, no bad months.",
+    w:"Real investments move around — that's what taking risk looks like from the inside. A line that never dips isn't a sign of skill. It's a sign that something isn't being reported honestly.",
+    d:"Ask for month-by-month results, including the worst ones. Every genuine strategy has bad months. A manager who can't produce any is telling you something."
+  },
+  a:{
+    m:"Implausible smoothness has three usual explanations, and none is good. One: the numbers are fabricated. Two: the assets are illiquid and marked at cost rather than market, so losses simply haven't been recognised yet. Three: the strategy is quietly selling tail risk — collecting small, steady premiums while carrying a rare, catastrophic downside. That third one looks like genius for years and then removes the principal in a week.",
+    v:["Ask for maximum drawdown, worst month, and standard deviation. Vagueness here is disqualifying.","Ask who independently prices the assets. If the manager marks their own positions, the smoothness is an opinion, not a result.","Ask whether there is an independent auditor and a third-party administrator. Then verify both actually exist.","Ask what would have to happen for this strategy to lose 30%. A real manager answers immediately, because they think about it constantly."],
+    g:"Volatility that makes sense for the asset class, disclosed drawdowns, independent pricing and audit.",
+    bd:"A near-straight line. \"We've never had a down quarter.\" Returns that are steady <em>regardless</em> of what markets did.",
+    e:"Madoff's returns were remarkable not because they were high, but because they were <em>smooth</em>. The fund also self-cleared its own trades and used a tiny, obscure auditor. Each structural fact was visible from the outside, years in advance."
+  }
+},
+{
+  t:"You're encouraged to recruit others",
+  c:"Exit & liquidity",
+  b:{
+    m:"You earn more — or earn at all — by bringing in other people.",
+    w:"If your return depends on recruitment, it isn't an investment. It's a pyramid, and pyramids are guaranteed to collapse. Not likely to. Guaranteed.",
+    d:"Ask one question: <em>\"Do I earn anything from recruiting people?\"</em> If the answer is yes, you're done here."
+  },
+  a:{
+    m:"Recruitment-driven structures collapse for arithmetic reasons, not bad luck. If each person must recruit six others, then six levels down requires 46,656 participants. Ten levels requires over 60 million. The maths runs out of human beings long before it runs out of enthusiasm — which means the overwhelming majority of participants must lose money, structurally, by design. Not through mismanagement. Because the shape of the thing requires it.",
+    v:["Ask what percentage of revenue comes from sales to people <em>outside</em> the scheme versus from recruitment and participant purchases.","Ask to see that broken out in writing. The reluctance is the answer.","Note that regulators have acted repeatedly against these structures, and study after study finds most participants lose money."],
+    g:"Revenue comes from real customers who are not participants.",
+    bd:"Your income depends on downline. You must buy inventory. \"It's not a pyramid, it's a network.\"",
+    e:"The people above you in the structure are not lying to you. They genuinely believe it, because they are still in the phase where it works — the phase that is paid for by people like you."
+  }
+},
+{
+  t:"You're discouraged from getting outside advice",
+  c:"Source credibility",
+  b:{
+    m:"Involving your accountant, your lawyer, or a sceptical friend is treated as an obstacle.",
+    w:"Anyone who doesn't want you to check with someone else has just told you something important about what checking would reveal.",
+    d:"Say: <em>\"I'm running this past my accountant first.\"</em> The reaction to that sentence is worth more than anything else they've told you."
+  },
+  a:{
+    m:"Isolation is a deliberate control tactic, and it is often the last one deployed before the money moves. Watch for outside professionals being dismissed as \"not understanding this space,\" for in-group framing (\"they'll just talk you out of it\"), and for the framing that your scepticism is disloyalty rather than diligence.",
+    v:["Bring in a professional who is not paid by, and has no relationship with, the seller.","The seller's <em>reaction</em> to that step is itself high-quality information — arguably better than anything in the pitch deck.","Any request that you not tell your spouse, your accountant, or your lawyer is disqualifying. There is no legitimate version of that request."],
+    g:"\"Of course — send it to your advisor. Here's everything they'll need.\"",
+    bd:"\"Advisors don't get this.\" \"They'll just be jealous.\" \"Keep it between us.\"",
+    e:"Legitimate businesses survive scrutiny. That is essentially the whole difference."
+  }
+},
+{
+  t:"It requires secrecy",
+  c:"Transparency",
+  b:{
+    m:"You're asked to keep it quiet — or you notice you'd rather not explain it out loud.",
+    w:"That hesitation is your own risk assessment leaking out before your conscious mind has caught up. It is worth listening to.",
+    d:"Explain the whole thing, out loud, to one person whose judgement you trust. Notice which parts you find yourself softening."
+  },
+  a:{
+    m:"Secrecy serves the fraudster and nobody else. It prevents verification, it prevents comparison, and it delays detection — which buys the scheme time it could not otherwise buy. Ordinary business confidentiality is a real thing, but it has limits: an NDA can restrict what you republish. It never restricts you from consulting your own lawyer or accountant.",
+    v:["Try to explain it, fully, to a sceptical person. Watch for what you instinctively soften, skip, or reframe. That is the part you already don't believe.","Any secrecy request that extends to your spouse or your own professional advisors is disqualifying. Not a yellow flag. Disqualifying.","Ask directly: <em>why</em> does this need to be secret? Sit with the answer."],
+    g:"You can describe the entire thing, plainly, to anyone, and it holds up.",
+    bd:"\"Don't tell anyone.\" \"This is only for a few people.\" \"Don't mention it to your wife until it's done.\"",
+    e:"If you would be embarrassed to explain it to someone who respects you, you have already completed your own risk assessment. The score is just confirming it."
+  }
+}
+];
+
+const wrapEl = document.getElementById("signs");
+const primer = document.getElementById("primer");
+const lede = document.getElementById("lede");
+const tb = document.getElementById("tb");
+const ta = document.getElementById("ta");
+let mode = "b";
+
+function esc(s){ return s; } // content is authored, not user input
+
+function render(){
+  wrapEl.innerHTML = "";
+  SIGNS.forEach((s, i) => {
+    const d = document.createElement("div");
+    d.className = "sign";
+    const n = String(i + 1).padStart(2, "0");
+
+    let inner =
+      '<div class="sign-head"><span class="sign-n num">' + n + '</span>' +
+      '<h3>' + s.t + '</h3></div>' +
+      '<span class="cat">' + s.c + '</span>';
+
+    if (mode === "b"){
+      inner +=
+        '<div class="blk"><h4>What it means</h4><p>' + s.b.m + '</p></div>' +
+        '<div class="blk"><h4 class="warn">Why it matters</h4><p>' + s.b.w + '</p></div>' +
+        '<div class="blk"><h4>Do this</h4><p>' + s.b.d + '</p></div>';
+    } else {
+      inner +=
+        '<div class="blk"><h4>The mechanism</h4><p>' + s.a.m + '</p></div>' +
+        '<div class="blk"><h4>How to verify</h4><ul>' +
+          s.a.v.map(x => '<li>' + x + '</li>').join('') +
+        '</ul></div>' +
+        '<div class="gb">' +
+          '<div class="g"><span class="lbl">Good answer</span>' + s.a.g + '</div>' +
+          '<div class="b"><span class="lbl">Bad answer</span>' + s.a.bd + '</div>' +
+        '</div>' +
+        '<div class="eg"><strong>Worth knowing</strong>' + s.a.e + '</div>';
+    }
+
+    d.innerHTML = inner;
+    wrapEl.appendChild(d);
+  });
+
+  const beginner = mode === "b";
+  primer.classList.toggle("hidden", !beginner);
+  tb.setAttribute("aria-pressed", beginner);
+  ta.setAttribute("aria-pressed", !beginner);
+  lede.textContent = beginner
+    ? "Plain English. What it means, why it matters, and the one thing to actually do."
+    : "The mechanism behind each sign, exactly how to verify it, and what good and bad answers sound like.";
+}
+
+tb.addEventListener("click", () => { mode = "b"; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+ta.addEventListener("click", () => { mode = "a"; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+
+render();
+</script>
+</body>
+</html>
