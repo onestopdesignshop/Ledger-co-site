@@ -1297,3 +1297,61 @@
   }
 })();
 </script>
+<!-- ============ MAKE WEBHOOK BRIDGE (signup machine — self-injecting) ============ -->
+<script>
+(function(){
+  var HOOK = 'https://hook.us2.make.com/eya146u6t5dfrkypwgs2kfhreg8urp3a';
+
+  function nameFromEmail(email){
+    var local = String(email).split('@')[0] || '';
+    local = local.replace(/[._\-+0-9]+/g, ' ').trim();
+    return local ? local.charAt(0).toUpperCase() + local.slice(1) : 'there';
+  }
+
+  function ping(email, source){
+    if(!email) return;
+    try{
+      var key = 'ledgerHookSent:' + email.toLowerCase();
+      if(localStorage.getItem(key)) return;           // no duplicate sends per browser
+      localStorage.setItem(key, '1');
+    }catch(_){}
+    var qs = '?email=' + encodeURIComponent(email)
+           + '&name=' + encodeURIComponent(nameFromEmail(email))
+           + '&source=' + encodeURIComponent(source);
+    try{
+      fetch(HOOK + qs, { method:'GET', mode:'no-cors', keepalive:true });
+    }catch(_){}
+  }
+
+  function wrap(){
+    if(typeof window.handleEmailCapture === 'function' && !window.__hookWrapCapture){
+      var origCap = window.handleEmailCapture;
+      window.handleEmailCapture = function(e){
+        try{
+          var el = document.getElementById('popupEmail');
+          if(el && el.value) ping(el.value.trim(), 'popup');
+        }catch(_){}
+        return origCap.apply(this, arguments);
+      };
+      window.__hookWrapCapture = true;
+    }
+    if(typeof window.handleSignUp === 'function' && !window.__hookWrapSignup){
+      var origSign = window.handleSignUp;
+      window.handleSignUp = function(e){
+        try{
+          var el = document.getElementById('signupEmail');
+          if(el && el.value) ping(el.value.trim(), 'signup');
+        }catch(_){}
+        return origSign.apply(this, arguments);
+      };
+      window.__hookWrapSignup = true;
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', wrap);
+  } else {
+    wrap();
+  }
+})();
+</script>
