@@ -1765,3 +1765,37 @@
   document.addEventListener("click", function () { setTimeout(scan, 300); });
 })();
 </script>
+<!-- ===== IN-APP MODE: hide all purchasing when loaded inside the iOS app (Guideline 3.1.1) ===== -->
+<style>
+  html.lc-in-app #guides,
+  html.lc-in-app [data-price-id],
+  html.lc-in-app .billing-toggle,
+  html.lc-in-app a[href="#guides"],
+  html.lc-in-app .annual-note,
+  html.lc-in-app .quarterly-note,
+  html.lc-in-app .lifetime-note { display: none !important; }
+</style>
+<script>
+(function () {
+  var ua = navigator.userAgent || "";
+  var isIOSWebView = /iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua);
+  if (!isIOSWebView) return;
+  document.documentElement.classList.add("lc-in-app");
+
+  // Also hide the "want a plan?" step in sign-up and any late-rendered
+  // plan links (splash "See the plans", dashboard upsell notes).
+  function scrub() {
+    document.querySelectorAll('input[name="wantsPlan"]').forEach(function (r) {
+      if (r.value === "no") r.checked = true;
+      var box = r.closest("fieldset") || r.closest(".form-group") || r.parentElement;
+      if (box) box.style.display = "none";
+    });
+    document.querySelectorAll('a[href="#guides"], [data-price-id]').forEach(function (el) {
+      el.style.display = "none";
+    });
+  }
+  scrub();
+  var n = 0;
+  var iv = setInterval(function () { scrub(); if (++n > 40) clearInterval(iv); }, 500);
+})();
+</script>
