@@ -1543,8 +1543,7 @@
   else { inject(); }
 })();
 </script>
-
-<!-- ===== ACCOUNT DELETION (Apple 5.1.1v) — injects into the dashboard overlay ===== -->
+<!-- ===== ACCOUNT DELETION (Apple 5.1.1v) — two-step: type DELETE, then password re-verify ===== -->
 <style>
   .lc-danger-zone{margin:48px 0 24px;padding:24px 28px;border:1px solid rgba(196,30,58,.45);border-radius:10px;background:rgba(196,30,58,.06)}
   .lc-danger-zone h3{margin:0 0 6px;font-size:1.05rem;letter-spacing:.04em;color:#e05a6f}
@@ -1556,7 +1555,10 @@
   .lc-del-modal{width:100%;max-width:420px;background:#101828;border:1px solid rgba(201,162,75,.3);border-radius:12px;padding:28px 26px;color:#fff}
   .lc-del-modal h4{margin:0 0 10px;font-size:1.1rem;color:#e05a6f}
   .lc-del-modal p{margin:0 0 16px;font-size:.88rem;line-height:1.55;color:rgba(255,255,255,.75)}
-  .lc-del-modal input{width:100%;box-sizing:border-box;padding:10px 12px;margin-bottom:16px;font-size:1rem;letter-spacing:.08em;color:#fff;background:#0a101d;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+  .lc-del-modal input{width:100%;box-sizing:border-box;padding:10px 12px;margin-bottom:16px;font-size:1rem;color:#fff;background:#0a101d;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+  .lc-del-step{display:none}
+  .lc-del-step.active{display:block}
+  .lc-del-stepnum{font-size:.7rem;letter-spacing:.14em;color:#c9a24b;margin-bottom:6px}
   .lc-del-actions{display:flex;gap:10px;justify-content:flex-end}
   .lc-del-cancel{padding:10px 18px;font-size:.9rem;color:rgba(255,255,255,.85);background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:6px;cursor:pointer}
   .lc-del-confirm{padding:10px 18px;font-size:.9rem;font-weight:600;color:#fff;background:#a8233a;border:none;border-radius:6px;cursor:pointer}
@@ -1566,14 +1568,30 @@
 
 <div class="lc-del-overlay" id="lcDelOverlay" role="dialog" aria-modal="true">
   <div class="lc-del-modal">
-    <h4>This can't be undone</h4>
-    <p>Your account and membership access records will be permanently deleted. Type <strong>DELETE</strong> below to confirm.</p>
-    <input type="text" id="lcDelConfirmInput" autocomplete="off" autocapitalize="characters" placeholder="Type DELETE" />
-    <div class="lc-del-actions">
-      <button type="button" class="lc-del-cancel" id="lcDelCancelBtn">Cancel</button>
-      <button type="button" class="lc-del-confirm" id="lcDelConfirmBtn" disabled>Delete account</button>
+
+    <div class="lc-del-step active" id="lcDelStep1">
+      <div class="lc-del-stepnum">STEP 1 OF 2</div>
+      <h4>This can't be undone</h4>
+      <p>Your account and membership access records will be permanently deleted. Type <strong>DELETE</strong> below to continue.</p>
+      <input type="text" id="lcDelConfirmInput" autocomplete="off" autocapitalize="characters" placeholder="Type DELETE" style="letter-spacing:.08em" />
+      <div class="lc-del-actions">
+        <button type="button" class="lc-del-cancel" id="lcDelCancelBtn1">Cancel</button>
+        <button type="button" class="lc-del-confirm" id="lcDelNextBtn" disabled>Continue</button>
+      </div>
     </div>
-    <div class="lc-del-status" id="lcDelStatus"></div>
+
+    <div class="lc-del-step" id="lcDelStep2">
+      <div class="lc-del-stepnum">STEP 2 OF 2 — VERIFY IT'S YOU</div>
+      <h4>Confirm with your password</h4>
+      <p>For your security, enter your account password to permanently delete <strong id="lcDelEmailShow"></strong>.</p>
+      <input type="password" id="lcDelPassword" autocomplete="current-password" placeholder="Account password" />
+      <div class="lc-del-actions">
+        <button type="button" class="lc-del-cancel" id="lcDelCancelBtn2">Cancel</button>
+        <button type="button" class="lc-del-confirm" id="lcDelFinalBtn" disabled>Verify &amp; delete forever</button>
+      </div>
+      <div class="lc-del-status" id="lcDelStatus"></div>
+    </div>
+
   </div>
 </div>
 
@@ -1586,7 +1604,6 @@
     return window.__ledgerSupabaseClient || null;
   }
 
-  // Inject the Danger Zone into the dashboard overlay (below the library grid)
   function injectDangerZone() {
     if (document.getElementById("lcDangerZone")) return;
     var grid = document.getElementById("libraryGrid");
@@ -1601,7 +1618,6 @@
     grid.insertAdjacentElement("afterend", sec);
     document.getElementById("lcDeleteAccountBtn").addEventListener("click", openModal);
   }
-  // Try now and keep retrying briefly (dashboard renders after session restore)
   var tries = 0;
   var iv = setInterval(function () {
     injectDangerZone();
@@ -1609,63 +1625,102 @@
   }, 500);
 
   var overlay = document.getElementById("lcDelOverlay");
+  var step1 = document.getElementById("lcDelStep1");
+  var step2 = document.getElementById("lcDelStep2");
   var input = document.getElementById("lcDelConfirmInput");
-  var cancelBtn = document.getElementById("lcDelCancelBtn");
-  var confirmBtn = document.getElementById("lcDelConfirmBtn");
+  var nextBtn = document.getElementById("lcDelNextBtn");
+  var pwInput = document.getElementById("lcDelPassword");
+  var finalBtn = document.getElementById("lcDelFinalBtn");
   var statusEl = document.getElementById("lcDelStatus");
+  var emailShow = document.getElementById("lcDelEmailShow");
 
   function openModal() {
     input.value = "";
-    confirmBtn.disabled = true;
+    pwInput.value = "";
+    nextBtn.disabled = true;
+    finalBtn.disabled = true;
     statusEl.textContent = "";
+    step1.classList.add("active");
+    step2.classList.remove("active");
     overlay.classList.add("open");
     input.focus();
   }
 
-  cancelBtn.addEventListener("click", function () {
-    overlay.classList.remove("open");
-  });
+  function closeModal() { overlay.classList.remove("open"); }
+  document.getElementById("lcDelCancelBtn1").addEventListener("click", closeModal);
+  document.getElementById("lcDelCancelBtn2").addEventListener("click", closeModal);
 
   input.addEventListener("input", function () {
-    confirmBtn.disabled = input.value.trim().toUpperCase() !== "DELETE";
+    nextBtn.disabled = input.value.trim().toUpperCase() !== "DELETE";
   });
 
-  confirmBtn.addEventListener("click", async function () {
-    confirmBtn.disabled = true;
-    cancelBtn.disabled = true;
-    statusEl.textContent = "Deleting your account…";
+  nextBtn.addEventListener("click", async function () {
+    var sb = client();
+    var email = "";
+    try {
+      var sr = await sb.auth.getSession();
+      email = sr.data && sr.data.session ? sr.data.session.user.email : "";
+    } catch (e) {}
+    emailShow.textContent = email || "your account";
+    step1.classList.remove("active");
+    step2.classList.add("active");
+    pwInput.focus();
+  });
+
+  pwInput.addEventListener("input", function () {
+    finalBtn.disabled = pwInput.value.length < 6;
+  });
+
+  finalBtn.addEventListener("click", async function () {
+    finalBtn.disabled = true;
+    statusEl.textContent = "Verifying…";
     try {
       var sb = client();
-      if (!sb) { statusEl.textContent = "Connection error — refresh and try again."; cancelBtn.disabled = false; return; }
-      var sessionResult = await sb.auth.getSession();
-      var session = sessionResult.data ? sessionResult.data.session : null;
+      if (!sb) { statusEl.textContent = "Connection error — refresh and try again."; return; }
+
+      var sr = await sb.auth.getSession();
+      var session = sr.data ? sr.data.session : null;
       if (!session || !session.access_token) {
         statusEl.textContent = "You're not signed in. Please sign in again.";
-        cancelBtn.disabled = false;
         return;
       }
+
+      // STEP 2 SECURITY GATE: re-verify the password against Supabase auth
+      var check = await sb.auth.signInWithPassword({
+        email: session.user.email,
+        password: pwInput.value
+      });
+      if (check.error) {
+        statusEl.textContent = "Incorrect password. Account NOT deleted.";
+        finalBtn.disabled = false;
+        return;
+      }
+
+      statusEl.textContent = "Verified. Deleting your account…";
+      var fresh = await sb.auth.getSession();
+      var token = fresh.data && fresh.data.session ? fresh.data.session.access_token : session.access_token;
+
       var res = await fetch(FUNCTION_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + session.access_token
+          Authorization: "Bearer " + token
         }
       });
       var body = await res.json().catch(function () { return {}; });
       if (!res.ok || !body.success) {
         statusEl.textContent = body.error || "Deletion failed. Please try again.";
-        cancelBtn.disabled = false;
-        confirmBtn.disabled = false;
+        finalBtn.disabled = false;
         return;
       }
+
       statusEl.textContent = "Account deleted. Signing you out…";
       try { localStorage.clear(); } catch (e) {}
       try { await sb.auth.signOut(); } catch (e) {}
       window.location.href = "index.html";
     } catch (err) {
       statusEl.textContent = "Network error. Please try again.";
-      cancelBtn.disabled = false;
-      confirmBtn.disabled = false;
+      finalBtn.disabled = false;
     }
   });
 })();
