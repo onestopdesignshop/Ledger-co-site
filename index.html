@@ -1725,3 +1725,43 @@
   });
 })();
 </script>
+<!-- ===== SHOW/HIDE PASSWORD TOGGLES (auto-attaches to all password fields) ===== -->
+<style>
+  .lc-pw-wrap{position:relative;display:block}
+  .lc-pw-wrap input{padding-right:64px !important;width:100%;box-sizing:border-box}
+  .lc-pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:11px;letter-spacing:.08em;color:#c9a24b;padding:6px 4px;text-transform:uppercase}
+</style>
+<script>
+(function () {
+  function attachToggle(inp) {
+    if (!inp || inp.__lcPwDone) return;
+    inp.__lcPwDone = true;
+    var wrap = document.createElement("span");
+    wrap.className = "lc-pw-wrap";
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "lc-pw-eye";
+    btn.textContent = "SHOW";
+    btn.setAttribute("aria-label", "Show password");
+    btn.addEventListener("click", function () {
+      var showing = inp.type === "text";
+      inp.type = showing ? "password" : "text";
+      btn.textContent = showing ? "SHOW" : "HIDE";
+      btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+      inp.focus();
+    });
+    wrap.appendChild(btn);
+  }
+  function scan() {
+    document.querySelectorAll('input[type="password"]').forEach(attachToggle);
+  }
+  // Initial pass + re-scan periodically so late-rendered fields
+  // (delete-account Step 2, auth modal views) get the toggle too.
+  scan();
+  var n = 0;
+  var iv = setInterval(function () { scan(); if (++n > 30) clearInterval(iv); }, 1000);
+  document.addEventListener("click", function () { setTimeout(scan, 300); });
+})();
+</script>
