@@ -1544,3 +1544,129 @@
 })();
 </script>
 
+<!-- ===== ACCOUNT DELETION (Apple 5.1.1v) — injects into the dashboard overlay ===== -->
+<style>
+  .lc-danger-zone{margin:48px 0 24px;padding:24px 28px;border:1px solid rgba(196,30,58,.45);border-radius:10px;background:rgba(196,30,58,.06)}
+  .lc-danger-zone h3{margin:0 0 6px;font-size:1.05rem;letter-spacing:.04em;color:#e05a6f}
+  .lc-danger-zone p{margin:0 0 16px;font-size:.9rem;line-height:1.55;opacity:.75}
+  .lc-danger-btn{display:inline-block;padding:10px 20px;font-size:.9rem;font-weight:600;color:#fff;background:#a8233a;border:none;border-radius:6px;cursor:pointer}
+  .lc-danger-btn:hover{background:#c22b45}
+  .lc-del-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,12,22,.85);z-index:100000;padding:20px}
+  .lc-del-overlay.open{display:flex}
+  .lc-del-modal{width:100%;max-width:420px;background:#101828;border:1px solid rgba(201,162,75,.3);border-radius:12px;padding:28px 26px;color:#fff}
+  .lc-del-modal h4{margin:0 0 10px;font-size:1.1rem;color:#e05a6f}
+  .lc-del-modal p{margin:0 0 16px;font-size:.88rem;line-height:1.55;color:rgba(255,255,255,.75)}
+  .lc-del-modal input{width:100%;box-sizing:border-box;padding:10px 12px;margin-bottom:16px;font-size:1rem;letter-spacing:.08em;color:#fff;background:#0a101d;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+  .lc-del-actions{display:flex;gap:10px;justify-content:flex-end}
+  .lc-del-cancel{padding:10px 18px;font-size:.9rem;color:rgba(255,255,255,.85);background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:6px;cursor:pointer}
+  .lc-del-confirm{padding:10px 18px;font-size:.9rem;font-weight:600;color:#fff;background:#a8233a;border:none;border-radius:6px;cursor:pointer}
+  .lc-del-confirm:disabled{opacity:.4;cursor:not-allowed}
+  .lc-del-status{margin-top:12px;font-size:.85rem;color:#e0b64a;min-height:1.2em}
+</style>
+
+<div class="lc-del-overlay" id="lcDelOverlay" role="dialog" aria-modal="true">
+  <div class="lc-del-modal">
+    <h4>This can't be undone</h4>
+    <p>Your account and membership access records will be permanently deleted. Type <strong>DELETE</strong> below to confirm.</p>
+    <input type="text" id="lcDelConfirmInput" autocomplete="off" autocapitalize="characters" placeholder="Type DELETE" />
+    <div class="lc-del-actions">
+      <button type="button" class="lc-del-cancel" id="lcDelCancelBtn">Cancel</button>
+      <button type="button" class="lc-del-confirm" id="lcDelConfirmBtn" disabled>Delete account</button>
+    </div>
+    <div class="lc-del-status" id="lcDelStatus"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var FUNCTION_URL = "https://wtlftsaigiehropidurn.supabase.co/functions/v1/delete-account";
+
+  function client() {
+    if (typeof getSupabase === "function") return getSupabase();
+    return window.__ledgerSupabaseClient || null;
+  }
+
+  // Inject the Danger Zone into the dashboard overlay (below the library grid)
+  function injectDangerZone() {
+    if (document.getElementById("lcDangerZone")) return;
+    var grid = document.getElementById("libraryGrid");
+    if (!grid || !grid.parentNode) return;
+    var sec = document.createElement("section");
+    sec.className = "lc-danger-zone";
+    sec.id = "lcDangerZone";
+    sec.innerHTML =
+      '<h3>Delete account</h3>' +
+      '<p>Permanently delete your Ledger &amp; Co. account. This removes your sign-in and membership access records and cannot be undone. Saved tool data on this device will also be cleared.</p>' +
+      '<button type="button" class="lc-danger-btn" id="lcDeleteAccountBtn">Delete my account</button>';
+    grid.insertAdjacentElement("afterend", sec);
+    document.getElementById("lcDeleteAccountBtn").addEventListener("click", openModal);
+  }
+  // Try now and keep retrying briefly (dashboard renders after session restore)
+  var tries = 0;
+  var iv = setInterval(function () {
+    injectDangerZone();
+    if (document.getElementById("lcDangerZone") || ++tries > 40) clearInterval(iv);
+  }, 500);
+
+  var overlay = document.getElementById("lcDelOverlay");
+  var input = document.getElementById("lcDelConfirmInput");
+  var cancelBtn = document.getElementById("lcDelCancelBtn");
+  var confirmBtn = document.getElementById("lcDelConfirmBtn");
+  var statusEl = document.getElementById("lcDelStatus");
+
+  function openModal() {
+    input.value = "";
+    confirmBtn.disabled = true;
+    statusEl.textContent = "";
+    overlay.classList.add("open");
+    input.focus();
+  }
+
+  cancelBtn.addEventListener("click", function () {
+    overlay.classList.remove("open");
+  });
+
+  input.addEventListener("input", function () {
+    confirmBtn.disabled = input.value.trim().toUpperCase() !== "DELETE";
+  });
+
+  confirmBtn.addEventListener("click", async function () {
+    confirmBtn.disabled = true;
+    cancelBtn.disabled = true;
+    statusEl.textContent = "Deleting your account…";
+    try {
+      var sb = client();
+      if (!sb) { statusEl.textContent = "Connection error — refresh and try again."; cancelBtn.disabled = false; return; }
+      var sessionResult = await sb.auth.getSession();
+      var session = sessionResult.data ? sessionResult.data.session : null;
+      if (!session || !session.access_token) {
+        statusEl.textContent = "You're not signed in. Please sign in again.";
+        cancelBtn.disabled = false;
+        return;
+      }
+      var res = await fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + session.access_token
+        }
+      });
+      var body = await res.json().catch(function () { return {}; });
+      if (!res.ok || !body.success) {
+        statusEl.textContent = body.error || "Deletion failed. Please try again.";
+        cancelBtn.disabled = false;
+        confirmBtn.disabled = false;
+        return;
+      }
+      statusEl.textContent = "Account deleted. Signing you out…";
+      try { localStorage.clear(); } catch (e) {}
+      try { await sb.auth.signOut(); } catch (e) {}
+      window.location.href = "index.html";
+    } catch (err) {
+      statusEl.textContent = "Network error. Please try again.";
+      cancelBtn.disabled = false;
+      confirmBtn.disabled = false;
+    }
+  });
+})();
+</script>
