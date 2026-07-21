@@ -1799,3 +1799,70 @@
   var iv = setInterval(function () { scrub(); if (++n > 40) clearInterval(iv); }, 500);
 })();
 </script>
+<script>
+(function () {
+  var appleWired = false;
+
+  function findGoogleButtons() {
+    var els = document.querySelectorAll('button, a');
+    var out = [];
+    for (var i = 0; i < els.length; i++) {
+      var t = (els[i].textContent || '').trim().toLowerCase();
+      if (t.indexOf('google') !== -1 && t.indexOf('sign') !== -1) out.push(els[i]);
+    }
+    return out;
+  }
+
+  function signInWithApple() {
+    try {
+      var sb = getSupabase();
+      sb.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname
+        }
+      });
+    } catch (e) {
+      console.error('Apple sign-in error:', e);
+    }
+  }
+
+  function wire() {
+    var googles = findGoogleButtons();
+    if (!googles.length) return;
+
+    for (var i = 0; i < googles.length; i++) {
+      var g = googles[i];
+
+      // 1) Un-hide Google in app mode (beats any .lc-in-app CSS rule)
+      g.style.setProperty('display', 'flex', 'important');
+      g.style.setProperty('visibility', 'visible', 'important');
+
+      // 2) Add Apple button once, right after Google, same styling
+      if (!g.parentNode.querySelector('[data-lc-apple]')) {
+        var a = g.cloneNode(false);
+        a.setAttribute('data-lc-apple', '1');
+        a.removeAttribute('id');
+        a.textContent = ' Sign in with Apple';
+        a.style.setProperty('display', 'flex', 'important');
+        a.style.setProperty('visibility', 'visible', 'important');
+        a.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          signInWithApple();
+        });
+        g.parentNode.insertBefore(a, g.nextSibling);
+      }
+    }
+    appleWired = true;
+  }
+
+  // Auth UI can render late — poll like the password toggles do
+  var tries = 0;
+  var iv = setInterval(function () {
+    wire();
+    if (appleWired || ++tries > 40) clearInterval(iv);
+  }, 500);
+  document.addEventListener('click', function () { setTimeout(wire, 300); });
+})();
+</script>
+
